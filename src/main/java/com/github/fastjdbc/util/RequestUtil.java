@@ -29,16 +29,19 @@ import java.util.List;
  * <p>String, Integer, Long, BigDecimal, Boolean, Timestamp, String[], List&lt;Integer&gt; are supported.</p>
  * <p>Double and Float can replace by BigDecimal, Date and Time can replace by Timestamp.</p>
  * <p>Every method can set default value except {@link #getStringValues(String, HttpServletRequest)}
- * and {@link #getIntegerValues(String, HttpServletRequest)}, if the parameter is null or empty,
+ * and {@link #getIntegerValues(String, HttpServletRequest)}, if the parameter is {@code null} or empty,
  * the default value will be return.</p>
+ *
+ * @since 1.0
  */
 public class RequestUtil {
 
     /**
-     * Check string is null or empty.
+     * Check string is {@code null} or empty.
      *
      * @param value the value to checked
-     * @return {@code true} if the given string is null or empty, {@code false} otherwise
+     * @return {@code true} if the given string is {@code null} or empty, {@code false} otherwise
+     * @since 1.0
      */
     private static boolean isEmptyString(String value) {
         return value == null || value.isEmpty();
@@ -49,6 +52,7 @@ public class RequestUtil {
      *
      * @param value the value to be tested
      * @return {@code true} if the value is numeric, {@code false} otherwise
+     * @since 1.0
      */
     private static boolean isNumericString(String value) {
         if (isEmptyString(value)) {
@@ -67,7 +71,9 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty, otherwise return the value
+     * @return {@code null} if the value is empty, otherwise return the value
+     * @see #getString(String, HttpServletRequest, String)
+     * @since 1.0
      */
     public static String getString(String key, HttpServletRequest request) {
         return getString(key, request, null);
@@ -80,6 +86,7 @@ public class RequestUtil {
      * @param request      the request object
      * @param defaultValue the default to return if the value is empty
      * @return default value if the value is empty, otherwise return the value
+     * @since 1.0
      */
     public static String getString(String key, HttpServletRequest request, String defaultValue) {
         String value = request.getParameter(key);
@@ -88,25 +95,32 @@ public class RequestUtil {
     }
 
     /**
-     * Get Integer from request object.
+     * <p>Get Integer from request object.</p>
+     * <p>Note: the method name is <tt>getInt</tt> instead of <tt>getInteger</tt>
+     * is just keep the same method name with {@link java.sql.ResultSet#getInt(String)}</p>
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty or format exception occurred, otherwise return the value
+     * @return {@code null} if the value is empty or format exception occurred, otherwise return the value
+     * @see #getInt(String, HttpServletRequest, Integer)
+     * @since 1.0
      */
-    public static Integer getInteger(String key, HttpServletRequest request) {
-        return getInteger(key, request, null);
+    public static Integer getInt(String key, HttpServletRequest request) {
+        return getInt(key, request, null);
     }
 
     /**
-     * Get Integer from request object.
+     * <p>Get Integer from request object.</p>
+     * <p>Note: the method name is <tt>getInt</tt> instead of <tt>getInteger</tt>
+     * is just keep the same method name with {@link java.sql.ResultSet#getInt(String)}</p>
      *
      * @param key          the key of the value
      * @param request      the request object
      * @param defaultValue the default to return if the value is empty or format exception occurred
      * @return default value if the value is empty or format exception occurred, otherwise return the value
+     * @since 1.0
      */
-    public static Integer getInteger(String key, HttpServletRequest request, Integer defaultValue) {
+    public static Integer getInt(String key, HttpServletRequest request, Integer defaultValue) {
         String value = getString(key, request);
         if (isEmptyString(value)) {
             return defaultValue;
@@ -123,7 +137,9 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty or format exception occurred, otherwise return the value
+     * @return {@code null} if the value is empty or format exception occurred, otherwise return the value
+     * @see #getLong(String, HttpServletRequest, Long)
+     * @since 1.0
      */
     public static Long getLong(String key, HttpServletRequest request) {
         return getLong(key, request, null);
@@ -136,6 +152,7 @@ public class RequestUtil {
      * @param request      the request object
      * @param defaultValue the default to return if the value is empty or format exception occurred
      * @return default value if the value is empty or format exception occurred, otherwise return the value
+     * @since 1.0
      */
     public static Long getLong(String key, HttpServletRequest request, Long defaultValue) {
         String value = getString(key, request);
@@ -154,7 +171,9 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty or format exception occurred, otherwise return the value
+     * @return {@code null} if the value is empty or format exception occurred, otherwise return the value
+     * @see #getBigDecimal(String, HttpServletRequest, BigDecimal)
+     * @since 1.0
      */
     public static BigDecimal getBigDecimal(String key, HttpServletRequest request) {
         return getBigDecimal(key, request, null);
@@ -167,6 +186,7 @@ public class RequestUtil {
      * @param request      the request object
      * @param defaultValue the default to return if the value is empty or format exception occurred
      * @return default value if the value is empty or format exception occurred, otherwise return the value
+     * @since 1.0
      */
     public static BigDecimal getBigDecimal(String key, HttpServletRequest request, BigDecimal defaultValue) {
         String value = getString(key, request);
@@ -186,6 +206,8 @@ public class RequestUtil {
      * @param key     the key of the value
      * @param request the request object
      * @return {@code false} if the value is empty, otherwise return the value
+     * @see #getBoolean(String, HttpServletRequest, Boolean)
+     * @since 1.0
      */
     public static Boolean getBoolean(String key, HttpServletRequest request) {
         return getBoolean(key, request, Boolean.FALSE);
@@ -198,6 +220,7 @@ public class RequestUtil {
      * @param request      the request object
      * @param defaultValue the default to return if the value is empty
      * @return default value if the value is empty, otherwise return the value
+     * @since 1.0
      */
     public static Boolean getBoolean(String key, HttpServletRequest request, Boolean defaultValue) {
         String value = getString(key, request);
@@ -212,7 +235,9 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty or parse exception occurred, otherwise return the value
+     * @return {@code null} if the value is empty or parse exception occurred, otherwise return the value
+     * @see #getTimestamp(String, HttpServletRequest, String, Timestamp)
+     * @since 1.0
      */
     public static Timestamp getTimestamp(String key, HttpServletRequest request) {
         return getTimestamp(key, request, "yyyy-MM-dd HH:mm:ss");
@@ -224,7 +249,9 @@ public class RequestUtil {
      * @param key     the key of the value
      * @param request the request object
      * @param pattern the time format pattern
-     * @return null if the value is empty or parse exception occurred, otherwise return the value
+     * @return {@code null} if the value is empty or parse exception occurred, otherwise return the value
+     * @see #getTimestamp(String, HttpServletRequest, String, Timestamp)
+     * @since 1.0
      */
     public static Timestamp getTimestamp(String key, HttpServletRequest request, String pattern) {
         return getTimestamp(key, request, pattern, null);
@@ -238,6 +265,7 @@ public class RequestUtil {
      * @param pattern      the time format pattern
      * @param defaultValue the default to return if the value is empty or parse exception occurred
      * @return default value if the value is empty or parse exception occurred, otherwise return the value
+     * @since 1.0
      */
     public static Timestamp getTimestamp(String key, HttpServletRequest request, String pattern, Timestamp defaultValue) {
         String value = getString(key, request);
@@ -256,7 +284,8 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty, otherwise return an array of String
+     * @return {@code null} if the value is empty, otherwise return an array of String
+     * @since 1.0
      */
     public static String[] getStringValues(String key, HttpServletRequest request) {
         return request.getParameterValues(key);
@@ -267,7 +296,8 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return null if the value is empty, otherwise return the a List of Integer
+     * @return {@code null} if the value is empty, otherwise return the a List of Integer
+     * @since 1.0
      */
     public static List<Integer> getIntegerValues(String key, HttpServletRequest request) {
         String[] values = getStringValues(key, request);
