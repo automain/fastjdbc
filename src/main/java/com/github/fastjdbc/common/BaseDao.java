@@ -16,5 +16,5 @@
 
 package com.github.fastjdbc.common;
 
-public interface BaseDao {
+public class BaseDao {
 }

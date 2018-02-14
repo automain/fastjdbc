@@ -65,7 +65,7 @@ public interface BaseBean<T extends BaseBean> {
      * and an other column name <tt>test_name</tt>
      * the child method should like this:
      * <pre> {@code
-     * Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+     * Map<String, Object> map = new HashMap<String, Object>();
      * if (this.getTestName() != null) {
      *      map.put("test_name", this.getTestName());
      * }
@@ -110,7 +110,6 @@ public interface BaseBean<T extends BaseBean> {
      *  bean.setTestName(getString("testName", request));
      *  return bean;
      * }</pre>
-     * <p>
      * <p>Note: the mothod <tt>getInt</tt> and <tt>getString</tt> are from {@link com.github.fastjdbc.util.RequestUtil}</p>
      *
      * @param request the request object
