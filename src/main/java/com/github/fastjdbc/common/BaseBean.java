@@ -26,16 +26,16 @@ import java.util.Map;
  * <p>This is one of the basic compositions of fastjdbc, all transmission operations will be around this.</p>
  * <p>You can write a code generator to generate the implement classes,
  * and then if database changed, you only need to maintain the implement class with less changed.</p>
+ * <p>Note: the implement classes of {@link BaseBean} should extends {@link com.github.fastjdbc.util.RequestUtil}</p>
  *
  * @param <T> an object which implement this
- * @apiNote the child of this should extends {@link com.github.fastjdbc.util.RequestUtil}
- * for override {@link #pickBeanFromRequest(HttpServletRequest)}
+ *            for override {@link #pickBeanFromRequest(HttpServletRequest)}
  * @since 1.0
  */
 public interface BaseBean<T extends BaseBean> {
 
     /**
-     * Return the table name of the clild bean in the database.
+     * Return the table name of the child bean in the database.
      *
      * @return the table name of the child bean in the database
      * @since 1.0
@@ -71,9 +71,9 @@ public interface BaseBean<T extends BaseBean> {
      * }
      * return map;
      * }</pre>
+     * <p>Note: the primary key value pair should not in this map!</p>
      *
      * @return the notNullColumnMap of the child object
-     * @apiNote the primary key value pair should not in this map!
      * @since 1.0
      */
     Map<String, Object> notNullColumnMap();
@@ -110,10 +110,11 @@ public interface BaseBean<T extends BaseBean> {
      *  bean.setTestName(getString("testName", request));
      *  return bean;
      * }</pre>
+     * <p>
+     * <p>Note: the mothod <tt>getInt</tt> and <tt>getString</tt> are from {@link com.github.fastjdbc.util.RequestUtil}</p>
      *
      * @param request the request object
      * @return the object of child
-     * @apiNote the mothod <tt>getInt</tt> and <tt>getString</tt> are from {@link com.github.fastjdbc.util.RequestUtil}
      * @since 1.0
      */
     T pickBeanFromRequest(HttpServletRequest request);
