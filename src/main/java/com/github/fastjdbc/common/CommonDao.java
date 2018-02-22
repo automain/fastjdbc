@@ -23,12 +23,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * A common template of DAO layer, all the classes of DAO layer should extends {@link BaseDao}
- * and override the abstract methods. Considering performance and large amount of data support,
- * the primary key of table should be long type(bigint in mysql) and auto increment.
- * Data permissions should be considered when design the table in database.
- * In business,we usually need to customize the query conditions and return the {@link PageBean} object,
- * a new method is needed to be added to the DAO class in this condition.
+ * <p>A common template of DAO layer, all the classes of DAO layer should extends {@link BaseDao}</p>
+ * <p>Considering performance and large amount of data support,
+ * the primary key of table should be long type(bigint in mysql) and auto increment.</p>
+ * <p>Data permissions should be considered when design the table in database.</p>
+ * <p>In business,we usually need to customize the query conditions and return the {@link PageBean} object,
+ * a new method is needed to be added to the DAO class in this condition.</p>
  *
  * @param <T> an object which extends {@link BaseBean}
  * @see BaseDao
@@ -117,7 +117,7 @@ public interface CommonDao<T extends BaseBean> {
 
     /**
      * Soft delete a bean by the given id list.
-     * * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
+     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
      * {@code 1} represent the row is deleted,
      * {@code 0} represent the row is effective.
      *
