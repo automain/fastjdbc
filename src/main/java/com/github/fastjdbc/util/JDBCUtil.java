@@ -30,19 +30,15 @@ import java.util.List;
 
 public class JDBCUtil {
 
-
-    protected static <T> int executeUpdate(ConnectionBean conn, String sql, List<T> parameters) throws SQLException {
+    protected static <T> int executeUpdate(ConnectionBean connection, String sql, List<T> parameters) throws SQLException {
         PreparedStatement stmt = null;
-        if (conn != null) {
-            Connection writeConnection = conn.getWriteConnection();
+        if (connection != null) {
+            Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
                 try {
-//                    if (OPEN_UPDATE_SQL_LOG) {
-//                        UPDATE_LOGGER.info(makeLogSql(sql, parameters));
-//                    }
-//                    if (OPEN_DEBUG_SQL) {
-//                        System.out.println(makeLogSql(sql, parameters));
-//                    }
+                    if (connection.isPrintSql()) {
+                        System.out.println(makeLogSql(sql, parameters));
+                    }
                     stmt = writeConnection.prepareStatement(sql);
                     setParameters(stmt, parameters);
                     return stmt.executeUpdate();
@@ -57,28 +53,21 @@ public class JDBCUtil {
         return 0;
     }
 
-    private static int executeUpdateReturnId(ConnectionBean conn, String sql, List<Object> parameters) throws SQLException {
+    private static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        if (conn != null) {
-            Connection writeConnection = conn.getWriteConnection();
+        if (connection != null) {
+            Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
                 try {
-//                    if (OPEN_UPDATE_SQL_LOG) {
-//                        UPDATE_LOGGER.info(makeLogSql(sql, parameters));
-//                    }
-//                    if (OPEN_DEBUG_SQL) {
-//                        System.out.println(makeLogSql(sql, parameters));
-//                    }
+                    if (connection.isPrintSql()) {
+                        System.out.println(makeLogSql(sql, parameters));
+                    }
                     stmt = writeConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     setParameters(stmt, parameters);
                     stmt.executeUpdate();
                     rs = stmt.getGeneratedKeys();
-                    if (rs.next()) {
-                        return rs.getInt(1);
-                    } else {
-                        return 0;
-                    }
+                    return rs.next() ? rs.getLong(1) : 0L;
                 } catch (SQLException e) {
                     printError(sql, parameters);
                     throw e;
@@ -88,60 +77,52 @@ public class JDBCUtil {
                 }
             }
         }
-        return 0;
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseBean> T executeQueryReturnBean(ConnectionBean conn, String sql, List<Object> parameters, T bean) throws SQLException {
+    protected static <T extends BaseBean> T executeSelectReturnBean(ConnectionBean connection, String sql, List<Object> parameters, T bean) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeQueryReturnResultSet(conn, sql, parameters);
-            if (rs.next()) {
-                return (T) bean.pickBeanFromResultSet(rs);
-            }
+            rs = executeSelectReturnResultSet(connection, sql, parameters);
+            return rs.next() ? (T) bean.pickBeanFromResultSet(rs) : null;
         } finally {
             ConnectionPool.close(rs);
         }
-        return null;
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseBean> List<T> executeQueryReturnList(ConnectionBean conn, String sql, List<Object> parameters, T bean) throws SQLException {
+    protected static <T extends BaseBean> List<T> executeSelectReturnList(ConnectionBean connection, String sql, List<Object> parameters, T bean) throws SQLException {
         ResultSet rs = null;
-        List<T> resultList = new ArrayList<T>();
         try {
-            rs = executeQueryReturnResultSet(conn, sql, parameters);
+            List<T> resultList = new ArrayList<T>();
+            rs = executeSelectReturnResultSet(connection, sql, parameters);
             while (rs.next()) {
                 resultList.add((T) bean.pickBeanFromResultSet(rs));
             }
+            return resultList;
         } finally {
             ConnectionPool.close(rs);
         }
-        return resultList;
     }
 
-    public static ResultSet executeQueryReturnResultSet(ConnectionBean conn, String sql, List<Object> parameters) throws SQLException {
-        if (conn != null) {
-            Connection queryConnection = conn.getReadConnection();
+    public static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
+        if (connection != null) {
+            Connection queryConnection = connection.getReadConnection();
             if (queryConnection != null && !queryConnection.isClosed()) {
                 try {
                     PreparedStatement stmt = queryConnection.prepareStatement(sql);
                     setParameters(stmt, parameters);
-                    long start = System.nanoTime();
                     ResultSet rs = stmt.executeQuery();
-//                    if (OPEN_SLOW_SQL_LOG && (System.nanoTime() - start > SLOW_SQL_STANDARD)) {
-//                        SLOW_LOGGER.info(makeLogSql(sql, parameters));
-//                    }
-//                    if (OPEN_DEBUG_SQL) {
-//                        System.out.println(makeLogSql(sql, parameters));
-//                    }
+                    if (connection.isPrintSql()) {
+                        System.out.println(makeLogSql(sql, parameters));
+                    }
                     return rs;
                 } catch (SQLException e) {
                     printError(sql, parameters);
                     throw e;
                 }
             }
-
         }
         return null;
     }
@@ -172,18 +153,18 @@ public class JDBCUtil {
     }
 
     private static <T> void printError(String sql, List<T> parameters) {
-        System.err.println("===============================JDBC Error Begin==============================");
+        System.err.println("===============================JDBC Error Start==============================");
         System.err.println(makeLogSql(sql, parameters));
         System.err.println("===============================JDBC Error End================================");
     }
 
     private static <T> String makeLogSql(String sql, List<T> parameters) {
-        String logSql = sql;
         if (parameters != null) {
             for (Object o : parameters) {
-                logSql = logSql.replaceFirst("\\?", "'" + o.toString() + "'");
+                sql = sql.replaceFirst("\\?", "'" + o.toString() + "'");
             }
         }
-        return logSql;
+        return sql;
     }
+
 }

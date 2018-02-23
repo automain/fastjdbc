@@ -45,12 +45,27 @@ public class ConnectionBean {
      */
     private Connection readConnection;
 
+    /**
+     * Whether or not print sql in this transaction.
+     *
+     * @since 1.0
+     */
+    private boolean printSql;
+
     public Connection getWriteConnection() {
         return writeConnection;
     }
 
     public Connection getReadConnection() {
         return readConnection;
+    }
+
+    public boolean isPrintSql() {
+        return printSql;
+    }
+
+    public void setPrintSql(boolean printSql) {
+        this.printSql = printSql;
     }
 
     /**
