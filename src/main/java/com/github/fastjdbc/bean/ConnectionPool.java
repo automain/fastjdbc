@@ -72,26 +72,26 @@ public class ConnectionPool {
         return POOL_MAP.getOrDefault(poolName, DEFAULT_SLAVE_POOL);
     }
 
-    private static void closeConnectionBeanWithOutCommit(ConnectionBean conn) throws SQLException {
-        if (conn != null) {
-            close(conn.getWriteConnection());
-            close(conn.getReadConnection());
+    private static void closeConnectionBeanWithOutCommit(ConnectionBean connection) throws SQLException {
+        if (connection != null) {
+            close(connection.getWriteConnection());
+            close(connection.getReadConnection());
         }
     }
 
-    private static void close(Connection conn) throws SQLException {
-        if (conn != null) {
-            conn.close();
-            conn = null;
+    private static void close(Connection connection) throws SQLException {
+        if (connection != null) {
+            connection.close();
+            connection = null;
         }
     }
 
-    private static void commitAndClose(Connection conn) throws SQLException {
-        if (conn != null) {
+    private static void commitAndClose(Connection connection) throws SQLException {
+        if (connection != null) {
             try {
-                conn.commit();
+                connection.commit();
             } finally {
-                close(conn);
+                close(connection);
             }
         }
     }
@@ -106,19 +106,19 @@ public class ConnectionPool {
         return new ConnectionBean(writeConnection, getSlaveDataSource(slavePoolName).getConnection());
     }
 
-    public static void closeConnectionBean(ConnectionBean conn) throws SQLException {
-        if (conn != null) {
-            commitAndClose(conn.getWriteConnection());
-            close(conn.getReadConnection());
+    public static void closeConnectionBean(ConnectionBean connection) throws SQLException {
+        if (connection != null) {
+            commitAndClose(connection.getWriteConnection());
+            close(connection.getReadConnection());
         }
     }
 
-    public static void rollbackConnectionBean(ConnectionBean conn) throws SQLException {
-        if (conn != null && conn.getWriteConnection() != null) {
+    public static void rollbackConnectionBean(ConnectionBean connection) throws SQLException {
+        if (connection != null && connection.getWriteConnection() != null) {
             try {
-                conn.getWriteConnection().rollback();
+                connection.getWriteConnection().rollback();
             } finally {
-                closeConnectionBeanWithOutCommit(conn);
+                closeConnectionBeanWithOutCommit(connection);
             }
         }
     }
@@ -127,8 +127,8 @@ public class ConnectionPool {
         if (rs != null) {
             Statement stmt = rs.getStatement();
             rs.close();
-            rs = null;
             stmt.close();
+            rs = null;
             stmt = null;
         }
     }
