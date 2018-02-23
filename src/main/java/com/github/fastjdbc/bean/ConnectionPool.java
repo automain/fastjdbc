@@ -123,19 +123,13 @@ public class ConnectionPool {
         }
     }
 
-    public static void close(Statement stmt) throws SQLException {
-        if (stmt != null) {
-            stmt.close();
-            stmt = null;
-        }
-    }
-
     public static void close(ResultSet rs) throws SQLException {
         if (rs != null) {
             Statement stmt = rs.getStatement();
-            close(stmt);
             rs.close();
             rs = null;
+            stmt.close();
+            stmt = null;
         }
     }
 

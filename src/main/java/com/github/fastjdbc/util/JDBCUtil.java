@@ -31,22 +31,18 @@ import java.util.List;
 public class JDBCUtil {
 
     protected static <T> int executeUpdate(ConnectionBean connection, String sql, List<T> parameters) throws SQLException {
-        PreparedStatement stmt = null;
         if (connection != null) {
             Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
-                try {
+                try (PreparedStatement stmt = writeConnection.prepareStatement(sql)) {
                     if (connection.isPrintSql()) {
                         System.out.println(makeLogSql(sql, parameters));
                     }
-                    stmt = writeConnection.prepareStatement(sql);
                     setParameters(stmt, parameters);
                     return stmt.executeUpdate();
                 } catch (SQLException e) {
                     printError(sql, parameters);
                     throw e;
-                } finally {
-                    ConnectionPool.close(stmt);
                 }
             }
         }
@@ -54,26 +50,21 @@ public class JDBCUtil {
     }
 
     private static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         if (connection != null) {
             Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
-                try {
+                try (PreparedStatement stmt = writeConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     if (connection.isPrintSql()) {
                         System.out.println(makeLogSql(sql, parameters));
                     }
-                    stmt = writeConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     setParameters(stmt, parameters);
                     stmt.executeUpdate();
-                    rs = stmt.getGeneratedKeys();
-                    return rs.next() ? rs.getLong(1) : 0L;
+                    try (ResultSet rs = stmt.getGeneratedKeys()) {
+                        return rs.next() ? rs.getLong(1) : 0L;
+                    }
                 } catch (SQLException e) {
                     printError(sql, parameters);
                     throw e;
-                } finally {
-                    ConnectionPool.close(stmt);
-                    ConnectionPool.close(rs);
                 }
             }
         }
@@ -95,8 +86,8 @@ public class JDBCUtil {
     protected static <T extends BaseBean> List<T> executeSelectReturnList(ConnectionBean connection, String sql, List<Object> parameters, T bean) throws SQLException {
         ResultSet rs = null;
         try {
-            List<T> resultList = new ArrayList<T>();
             rs = executeSelectReturnResultSet(connection, sql, parameters);
+            List<T> resultList = new ArrayList<T>();
             while (rs.next()) {
                 resultList.add((T) bean.pickBeanFromResultSet(rs));
             }
@@ -106,7 +97,7 @@ public class JDBCUtil {
         }
     }
 
-    public static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
+    protected static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
         if (connection != null) {
             Connection queryConnection = connection.getReadConnection();
             if (queryConnection != null && !queryConnection.isClosed()) {
