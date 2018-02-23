@@ -30,11 +30,10 @@ import java.util.List;
  * <p>In business,we usually need to customize the query conditions and return the {@link PageBean} object,
  * a new method is needed to be added to the DAO class in this condition.</p>
  *
- * @param <T> an object which extends {@link BaseBean}
  * @see BaseDao
  * @since 1.0
  */
-public interface CommonDao<T extends BaseBean> {
+public interface CommonDao {
 
     /**
      * Insert the not null properties of bean.
@@ -46,7 +45,7 @@ public interface CommonDao<T extends BaseBean> {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    int insertIntoTable(ConnectionBean connection, T bean) throws SQLException;
+    int insertIntoTable(ConnectionBean connection, BaseBean bean) throws SQLException;
 
     /**
      * Insert the not null properties of bean and return the generated primary key.
@@ -58,7 +57,7 @@ public interface CommonDao<T extends BaseBean> {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException;
+    Long insertIntoTableReturnId(ConnectionBean connection, BaseBean bean) throws SQLException;
 
     /**
      * Update the not null properties of bean by the primary key of bean, the primary key
@@ -71,7 +70,7 @@ public interface CommonDao<T extends BaseBean> {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    int updateTable(ConnectionBean connection, T bean) throws SQLException;
+    int updateTable(ConnectionBean connection, BaseBean bean) throws SQLException;
 
     /**
      * Update the not null properties of bean by the given id list.
@@ -84,7 +83,7 @@ public interface CommonDao<T extends BaseBean> {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException;
+    int updateTableByIdList(ConnectionBean connection, BaseBean bean, List<Long> idList) throws SQLException;
 
     /**
      * Update the not null properties of bean by the query result of param bean.
@@ -99,7 +98,7 @@ public interface CommonDao<T extends BaseBean> {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException;
+    int updateTable(ConnectionBean connection, BaseBean paramBean, BaseBean newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException;
 
     /**
      * Soft delete a bean by the given id.
@@ -108,12 +107,13 @@ public interface CommonDao<T extends BaseBean> {
      * {@code 0} represent the row is effective.
      *
      * @param connection ConnectionBean object
+     * @param bean       bean object
      * @param id         id of the bean
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    int softDeleteTableById(ConnectionBean connection, Long id) throws SQLException;
+    int softDeleteTableById(ConnectionBean connection, BaseBean bean, Long id) throws SQLException;
 
     /**
      * Soft delete a bean by the given id list.
@@ -122,34 +122,37 @@ public interface CommonDao<T extends BaseBean> {
      * {@code 0} represent the row is effective.
      *
      * @param connection ConnectionBean object
+     * @param bean       bean object
      * @param idList     a list id of the beans which will be soft deleted
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    int softDeleteTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException;
+    int softDeleteTableByIdList(ConnectionBean connection, BaseBean bean, List<Long> idList) throws SQLException;
 
     /**
      * Query a bean by the given id.
      *
      * @param connection ConnectionBean object
+     * @param bean       bean object
      * @param id         id of the bean
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    T selectTableById(ConnectionBean connection, Long id) throws SQLException;
+    BaseBean selectTableById(ConnectionBean connection, BaseBean bean, Long id) throws SQLException;
 
     /**
      * Query a bean by the given id list.
      *
      * @param connection ConnectionBean object
+     * @param bean       bean object
      * @param idList     a list id of the beans to query
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    List<T> selectTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException;
+    List<BaseBean> selectTableByIdList(ConnectionBean connection, BaseBean bean, List<Long> idList) throws SQLException;
 
     /**
      * Query a bean by the param bean, match all the not null properties equals.
@@ -161,7 +164,7 @@ public interface CommonDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    T selectOneTableByBean(ConnectionBean connection, T bean) throws SQLException;
+    BaseBean selectOneTableByBean(ConnectionBean connection, BaseBean bean) throws SQLException;
 
     /**
      * Query list of beans by the param bean, match all the not null properties equals.
@@ -172,17 +175,18 @@ public interface CommonDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    List<T> selectTableByBean(ConnectionBean connection, T bean) throws SQLException;
+    List<BaseBean> selectTableByBean(ConnectionBean connection, BaseBean bean) throws SQLException;
 
     /**
      * Query all rows.
      *
      * @param connection ConnectionBean object
+     * @param bean       bean object
      * @return all rows
      * @throws SQLException exception when query
      * @since 1.0
      */
-    List<T> selectAllTable(ConnectionBean connection) throws SQLException;
+    List<BaseBean> selectAllTable(ConnectionBean connection, BaseBean bean) throws SQLException;
 
     /**
      * Query list of beans by the param bean for page, match all the not null properties equals.
@@ -196,5 +200,5 @@ public interface CommonDao<T extends BaseBean> {
      * @see PageBean
      * @since 1.0
      */
-    PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception;
+    PageBean<BaseBean> selectTableForPage(ConnectionBean connection, BaseBean bean, int page, int limit) throws Exception;
 }

@@ -49,7 +49,7 @@ public class JDBCUtil {
         return 0;
     }
 
-    private static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
+    protected static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
         if (connection != null) {
             Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
