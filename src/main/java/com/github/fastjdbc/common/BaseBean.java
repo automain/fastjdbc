@@ -57,8 +57,8 @@ public interface BaseBean<T extends BaseBean> {
     /**
      * <p>The key of result map is column name in the database,
      * the value of map is this property value of the child bean.</p>
-     * eg: if there is a primary key column name <tt>test_id</tt>
-     * and an other column name <tt>test_name</tt>
+     * eg: if there is a primary key column name {@code test_id}
+     * and an other column name {@code test_name}
      * the child method should like this:
      * <pre> {@code
      * Map<String, Object> map = new HashMap<String, Object>();
@@ -76,9 +76,9 @@ public interface BaseBean<T extends BaseBean> {
 
     /**
      * <p>Get an object of the child bean from {@link ResultSet}.</p>
-     * eg: if there is a primary key column name <tt>test_id</tt>
-     * and an other column name <tt>test_name</tt>
-     * and the child bean name is <tt>TbTest</tt>
+     * eg: if there is a primary key column name {@code test_id}
+     * and an other column name {@code test_name}
+     * and the child bean name is {@code TbTest}
      * the child method should like this:
      * <pre>{@code
      *  TbTest bean = new TbTest();
@@ -96,9 +96,9 @@ public interface BaseBean<T extends BaseBean> {
 
     /**
      * <p>Get an object of the child bean from {@link HttpServletRequest}.</p>
-     * eg: if there is a primary key column name <tt>test_id</tt>
-     * and an other column name <tt>test_name</tt>
-     * and the child bean name is <tt>TbTest</tt>
+     * eg: if there is a primary key column name {@code test_id}
+     * and an other column name {@code test_name}
+     * and the child bean name is {@code TbTest}
      * the child method should like this:
      * <pre>{@code
      *  TbTest bean = new TbTest();
@@ -106,7 +106,7 @@ public interface BaseBean<T extends BaseBean> {
      *  bean.setTestName(getString("testName", request));
      *  return bean;
      * }</pre>
-     * <p>Note: the mothod <tt>getInt</tt> and <tt>getString</tt> are from {@link com.github.fastjdbc.util.RequestUtil}</p>
+     * <p>Note: the method {@code getInt} and {@code getString} are from {@link com.github.fastjdbc.util.RequestUtil}</p>
      *
      * @param request the request object
      * @return the object of child

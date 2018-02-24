@@ -96,7 +96,7 @@ public class RequestUtil {
 
     /**
      * <p>Get Integer from request object.</p>
-     * <p>Note: the method name is <tt>getInt</tt> instead of <tt>getInteger</tt>
+     * <p>Note: the method name is {@code getInt} instead of {@code getInteger}
      * is just keep the same method name with {@link java.sql.ResultSet#getInt(String)}</p>
      *
      * @param key     the key of the value
@@ -111,7 +111,7 @@ public class RequestUtil {
 
     /**
      * <p>Get Integer from request object.</p>
-     * <p>Note: the method name is <tt>getInt</tt> instead of <tt>getInteger</tt>
+     * <p>Note: the method name is {@code getInt} instead of {@code getInteger}
      * is just keep the same method name with {@link java.sql.ResultSet#getInt(String)}</p>
      *
      * @param key          the key of the value

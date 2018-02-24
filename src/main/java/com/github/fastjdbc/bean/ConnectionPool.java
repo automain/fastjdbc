@@ -28,17 +28,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>A connection pool class.</p>
+ * <p>You should call {@link #init(String, HikariConfig, List)} method to init the global connection pool
+ * on system start, this pool only support {@code HikariCP} data source.</p>
+ *
+ * @since 1.0
+ */
 public class ConnectionPool {
 
+    /**
+     * Database name.
+     *
+     * @since 1.0
+     */
     private static String DATABASE_NAME;
 
+    /**
+     * Master database connection pool.
+     *
+     * @since 1.0
+     */
     private static DataSource MASTER_POOL;
 
+    /**
+     * Default slave database connection pool.
+     *
+     * @since 1.0
+     */
     private static DataSource DEFAULT_SLAVE_POOL;
 
+    /**
+     * Slave databases connection pool map, key is pool name, value is {@link DataSource} object.
+     *
+     * @since 1.0
+     */
     private static Map<String, DataSource> POOL_MAP = new HashMap<>();
 
-    private static void init(String databaseName, HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
+    /**
+     * <p>Initialization method for init global connection pool.</p>
+     * <p>{@code poolName} should be set for each {@link HikariConfig} and keep distinct.</p>
+     *
+     * @param databaseName    database name
+     * @param masterConfig    the {@link HikariConfig} object of master datasource
+     * @param slaveConfigList the {@link HikariConfig} object of slave datasources
+     * @since 1.0
+     */
+    public static void init(String databaseName, HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
         if (DATABASE_NAME == null || MASTER_POOL == null || DEFAULT_SLAVE_POOL == null || POOL_MAP == null) {
             if (databaseName == null || masterConfig == null) {
                 throw new RuntimeException("connection pool initialization failure");
@@ -63,11 +99,25 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Inner method to change autoCommit to {@code false} and allowPoolSuspension to {@code true}.
+     *
+     * @param config {@link HikariConfig} object
+     * @since 1.0
+     */
     private static void initConfig(HikariConfig config) {
         config.setAutoCommit(false);
         config.setAllowPoolSuspension(true);
     }
 
+    /**
+     * <p>Get slave datasource object by given pool name.</p>
+     * <p>When pool name is {@code null} or not in {@link #POOL_MAP}, {@link #DEFAULT_SLAVE_POOL} will be returned.</p>
+     *
+     * @param poolName the pool name
+     * @return slave pool datasource object
+     * @since 1.0
+     */
     private static DataSource getSlaveDataSource(String poolName) {
         return POOL_MAP.getOrDefault(poolName, DEFAULT_SLAVE_POOL);
     }

@@ -21,11 +21,11 @@ import java.sql.SQLException;
 
 /**
  * <p>A container of {@link Connection},
- * the <tt>writeConnection</tt> property means a connection from master data connection pool,
- * the <tt>readConnection</tt> property means a connection from slave data connection pool.</p>
+ * the {@code writeConnection} property means a connection from master data connection pool,
+ * the {@code readConnection} property means a connection from slave data connection pool.</p>
  * <p>You should set all properties for initialization, and for safety, there is no setter method for properties.</p>
- * <p>When you want to execute a query sql to query the data which you just update or insert in a same transaction, </p>
- * <p>you should call the {@link #closeReadUseWrite()} method before use the {@link ConnectionBean}</p>
+ * <p>When you want to execute a query sql to query the data which you just update or insert in a same transaction,
+ * you should call the {@link #closeReadUseWrite()} method before use the {@link ConnectionBean}</p>
  *
  * @since 1.0
  */
