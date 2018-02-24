@@ -30,15 +30,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A common template of DAO layer, all the classes of DAO layer should extends this class.
+ * <p>A common template of DAO layer, all the classes of DAO layer should extends this class</p>
+ * <p>Considering performance and large amount of data support,
+ * the primary key of table should be long type(bigint in mysql) and auto increment.</p>
+ * <p>Data permissions should be considered when design the table in database.</p>
+ * <p>In business,we usually need to customize the query conditions and return the {@link PageBean} object,
+ * a new method is needed to be added to the DAO class in this condition.</p>
  *
- * @see CommonDao
  * @since 1.0
  */
-public class BaseDao extends JDBCUtil implements CommonDao {
+public class BaseDao extends JDBCUtil {
 
-    @Override
-    public int insertIntoTable(ConnectionBean connection, BaseBean bean) throws SQLException {
+    /**
+     * Insert the not null properties of bean.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to insert
+     * @return count of insert rows
+     * @throws SQLException exception when insert failed
+     * @see BaseBean#notNullColumnMap()
+     * @since 1.0
+     */
+    public static <T extends BaseBean> int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
         if (sql != null) {
@@ -47,8 +60,17 @@ public class BaseDao extends JDBCUtil implements CommonDao {
         return 0;
     }
 
-    @Override
-    public Long insertIntoTableReturnId(ConnectionBean connection, BaseBean bean) throws SQLException {
+    /**
+     * Insert the not null properties of bean and return the generated primary key.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to insert
+     * @return generated primary key
+     * @throws SQLException exception when insert failed
+     * @see BaseBean#notNullColumnMap()
+     * @since 1.0
+     */
+    public static <T extends BaseBean> Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
         if (sql != null) {
@@ -57,9 +79,19 @@ public class BaseDao extends JDBCUtil implements CommonDao {
         return 0L;
     }
 
-    @Override
+    /**
+     * Update the not null properties of bean by the primary key of bean, the primary key
+     * property should not null otherwise nothing will be updated.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to update
+     * @return count of updated rows
+     * @throws SQLException exception when update failed
+     * @see BaseBean#notNullColumnMap()
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    public int updateTable(ConnectionBean connection, BaseBean bean) throws SQLException {
+    public static <T extends BaseBean> int updateTable(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -81,9 +113,57 @@ public class BaseDao extends JDBCUtil implements CommonDao {
         return 0;
     }
 
-    @Override
+    /**
+     * Update the not null properties of bean by the given id list.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to update
+     * @param idList     a list id of the beans which will be updated
+     * @return count of updated rows
+     * @throws SQLException exception when update failed
+     * @see BaseBean#notNullColumnMap()
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    public int updateTable(ConnectionBean connection, BaseBean paramBean, BaseBean newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException {
+    public static <T extends BaseBean> int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+        if (bean != null && idList != null && !idList.isEmpty()) {
+            String tableName = bean.tableName();
+            if (tableName != null) {
+                Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
+                StringBuilder sqlBuilder = null;
+                List<Object> objectList = null;
+                if (!entrySet.isEmpty()) {
+                    int idSize = idList.size();
+                    String inStr = makeInStr(idList);
+                    objectList = new ArrayList<Object>(entrySet.size() + idSize);
+                    sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
+                    sqlBuilder.append(makeNotNullColumnParamSql(entrySet, objectList, ", "));
+                    sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(" IN(").append(inStr).append(")");
+                    objectList.addAll(idList);
+                }
+                if (sqlBuilder != null) {
+                    return executeUpdate(connection, sqlBuilder.toString(), objectList);
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Update the not null properties of bean by the query result of param bean.
+     *
+     * @param connection         ConnectionBean object
+     * @param paramBean          param bean to query the rows to update
+     * @param newBean            bean to update
+     * @param insertWhenNotExist whether or not to insert when the query returns nothing
+     * @param updateMulti        whether or not to update multi result when the query returns more than one result
+     * @return count of updated rows
+     * @throws SQLException exception when update failed
+     * @see BaseBean#notNullColumnMap()
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseBean> int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException {
         if (paramBean != null && newBean != null) {
             String tableName = paramBean.tableName();
             String tableNameCheck = newBean.tableName();
@@ -120,20 +200,91 @@ public class BaseDao extends JDBCUtil implements CommonDao {
         return 0;
     }
 
-    @Override
-    public int softDeleteTableById(ConnectionBean connection, BaseBean bean, Long id) throws SQLException {
+    /**
+     * Soft delete a bean by the given id.
+     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
+     * {@code 1} represent the row is deleted,
+     * {@code 0} represent the row is effective.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @param id         id of the bean
+     * @return count of soft deleted rows
+     * @throws SQLException exception when soft delete
+     * @since 1.0
+     */
+    public static <T extends BaseBean> int softDeleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
         String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + " = ?";
         return executeUpdate(connection, sql, Collections.singletonList(id));
     }
 
-    @Override
-    public BaseBean selectTableById(ConnectionBean connection, BaseBean bean, Long id) throws SQLException {
+    /**
+     * Soft delete a bean by the given id list.
+     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
+     * {@code 1} represent the row is deleted,
+     * {@code 0} represent the row is effective.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @param idList     a list id of the beans which will be soft deleted
+     * @return count of soft deleted rows
+     * @throws SQLException exception when soft delete
+     * @since 1.0
+     */
+    public static <T extends BaseBean> int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+        String inStr = makeInStr(idList);
+        if (inStr == null) {
+            return 0;
+        }
+        String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + " IN(" + inStr + ")";
+        return executeUpdate(connection, sql, idList);
+    }
+
+    /**
+     * Query a bean by the given id.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @param id         id of the bean
+     * @return the bean of query result
+     * @throws SQLException exception when query
+     * @since 1.0
+     */
+    public static <T extends BaseBean> T selectTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
         return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", Collections.singletonList(id), bean);
     }
 
-    @Override
+    /**
+     * Query a bean by the given id list.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @param idList     a list id of the beans to query
+     * @return the bean list of query result
+     * @throws SQLException exception when query
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    public BaseBean selectOneTableByBean(ConnectionBean connection, BaseBean bean) throws SQLException {
+    public static <T extends BaseBean> List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+        String inStr = makeInStr(idList);
+        if (inStr == null) {
+            return new ArrayList<T>(1);
+        }
+        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " IN(" + inStr + ")", new ArrayList<Object>(idList), bean);
+    }
+
+    /**
+     * Query a bean by the param bean, match all the not null properties equals.
+     * When multi rows match the condition, return the first one.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       the param bean
+     * @return the first of query results
+     * @throws SQLException exception when query
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseBean> T selectOneTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -148,9 +299,17 @@ public class BaseDao extends JDBCUtil implements CommonDao {
         return null;
     }
 
-    @Override
+    /**
+     * Query list of beans by the param bean, match all the not null properties equals.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       the param bean
+     * @return all query results
+     * @throws SQLException exception when query
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    public List selectTableByBean(ConnectionBean connection, BaseBean bean) throws SQLException {
+    public static <T extends BaseBean> List<T> selectTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -162,18 +321,37 @@ public class BaseDao extends JDBCUtil implements CommonDao {
                 return executeSelectReturnList(connection, sql, objectList, bean);
             }
         }
-        return new ArrayList<BaseBean>(1);
+        return new ArrayList<T>(1);
     }
 
-    @Override
+    /**
+     * Query all rows.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @return all rows
+     * @throws SQLException exception when query
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    public List<BaseBean> selectAllTable(ConnectionBean connection, BaseBean bean) throws SQLException {
+    public static <T extends BaseBean> List<T> selectAllTable(ConnectionBean connection, T bean) throws SQLException {
         return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName(), null, bean);
     }
 
-    @Override
+    /**
+     * Query list of beans by the param bean for page, match all the not null properties equals.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       the param bean
+     * @param page       page number
+     * @param limit      the count of data displayed on each page
+     * @return {@link PageBean} object
+     * @throws Exception exception when query
+     * @see PageBean
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    public PageBean<BaseBean> selectTableForPage(ConnectionBean connection, BaseBean bean, int page, int limit) throws Exception {
+    public static <T extends BaseBean> PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception {
         PageBean pageBean = new PageBean();
         if (bean != null) {
             String sql = null;
@@ -191,7 +369,7 @@ public class BaseDao extends JDBCUtil implements CommonDao {
                 page = page < 1 ? 1 : page;
                 ResultSet countResult = null;
                 ResultSet pageResult = null;
-                List<BaseBean> data = new ArrayList<BaseBean>();
+                List<T> data = new ArrayList<T>();
                 try {
                     countResult = executeSelectReturnResultSet(connection, makeCountSql(sql), parameters);
                     int count = 0;
@@ -203,7 +381,7 @@ public class BaseDao extends JDBCUtil implements CommonDao {
                     parameters.add(limit);
                     pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameters);
                     while (pageResult.next()) {
-                        data.add(bean.pickBeanFromResultSet(pageResult));
+                        data.add((T) bean.pickBeanFromResultSet(pageResult));
                     }
                     pageBean.setCurr(page);
                     pageBean.setData(data);
@@ -214,52 +392,6 @@ public class BaseDao extends JDBCUtil implements CommonDao {
             }
         }
         return pageBean;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<BaseBean> selectTableByIdList(ConnectionBean connection, BaseBean bean, List<Long> idList) throws SQLException {
-        String inStr = makeInStr(idList);
-        if (inStr == null) {
-            return new ArrayList<BaseBean>(1);
-        }
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " IN(" + inStr + ")", new ArrayList<Object>(idList), bean);
-    }
-
-    @Override
-    public int softDeleteTableByIdList(ConnectionBean connection, BaseBean bean, List<Long> idList) throws SQLException {
-        String inStr = makeInStr(idList);
-        if (inStr == null) {
-            return 0;
-        }
-        String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + " IN(" + inStr + ")";
-        return executeUpdate(connection, sql, idList);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public int updateTableByIdList(ConnectionBean connection, BaseBean bean, List<Long> idList) throws SQLException {
-        if (bean != null && idList != null && !idList.isEmpty()) {
-            String tableName = bean.tableName();
-            if (tableName != null) {
-                Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
-                StringBuilder sqlBuilder = null;
-                List<Object> objectList = null;
-                if (!entrySet.isEmpty()) {
-                    int idSize = idList.size();
-                    String inStr = makeInStr(idList);
-                    objectList = new ArrayList<Object>(entrySet.size() + idSize);
-                    sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
-                    sqlBuilder.append(makeNotNullColumnParamSql(entrySet, objectList, ", "));
-                    sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(" IN(").append(inStr).append(")");
-                    objectList.addAll(idList);
-                }
-                if (sqlBuilder != null) {
-                    return executeUpdate(connection, sqlBuilder.toString(), objectList);
-                }
-            }
-        }
-        return 0;
     }
 
     @SuppressWarnings("unchecked")

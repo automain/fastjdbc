@@ -30,7 +30,7 @@ import java.util.List;
 
 public class JDBCUtil {
 
-    protected static <T> int executeUpdate(ConnectionBean connection, String sql, List<T> parameters) throws SQLException {
+    protected static int executeUpdate(ConnectionBean connection, String sql, List<?> parameters) throws SQLException {
         if (connection != null) {
             Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
@@ -49,7 +49,7 @@ public class JDBCUtil {
         return 0;
     }
 
-    protected static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
+    protected static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<?> parameters) throws SQLException {
         if (connection != null) {
             Connection writeConnection = connection.getWriteConnection();
             if (writeConnection != null && !writeConnection.isClosed()) {
@@ -72,7 +72,7 @@ public class JDBCUtil {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseBean> T executeSelectReturnBean(ConnectionBean connection, String sql, List<Object> parameters, T bean) throws SQLException {
+    protected static <T extends BaseBean> T executeSelectReturnBean(ConnectionBean connection, String sql, List<?> parameters, T bean) throws SQLException {
         ResultSet rs = null;
         try {
             rs = executeSelectReturnResultSet(connection, sql, parameters);
@@ -83,7 +83,7 @@ public class JDBCUtil {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseBean> List<T> executeSelectReturnList(ConnectionBean connection, String sql, List<Object> parameters, T bean) throws SQLException {
+    protected static <T extends BaseBean> List<T> executeSelectReturnList(ConnectionBean connection, String sql, List<?> parameters, T bean) throws SQLException {
         ResultSet rs = null;
         try {
             rs = executeSelectReturnResultSet(connection, sql, parameters);
@@ -97,18 +97,17 @@ public class JDBCUtil {
         }
     }
 
-    protected static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<Object> parameters) throws SQLException {
+    protected static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<?> parameters) throws SQLException {
         if (connection != null) {
             Connection queryConnection = connection.getReadConnection();
             if (queryConnection != null && !queryConnection.isClosed()) {
                 try {
-                    PreparedStatement stmt = queryConnection.prepareStatement(sql);
-                    setParameters(stmt, parameters);
-                    ResultSet rs = stmt.executeQuery();
                     if (connection.isPrintSql()) {
                         System.out.println(makeLogSql(sql, parameters));
                     }
-                    return rs;
+                    PreparedStatement stmt = queryConnection.prepareStatement(sql);
+                    setParameters(stmt, parameters);
+                    return stmt.executeQuery();
                 } catch (SQLException e) {
                     printError(sql, parameters);
                     throw e;
@@ -118,7 +117,7 @@ public class JDBCUtil {
         return null;
     }
 
-    public static <T> String makeInStr(List<T> parameters) {
+    public static String makeInStr(List<?> parameters) {
         if (parameters == null || parameters.isEmpty()) {
             return null;
         } else {
@@ -133,7 +132,7 @@ public class JDBCUtil {
         }
     }
 
-    private static <T> void setParameters(PreparedStatement stmt, List<T> parameters) throws SQLException {
+    private static void setParameters(PreparedStatement stmt, List<?> parameters) throws SQLException {
         if (parameters != null) {
             int offset = 1;
             for (Object param : parameters) {
@@ -143,13 +142,13 @@ public class JDBCUtil {
         }
     }
 
-    private static <T> void printError(String sql, List<T> parameters) {
+    private static void printError(String sql, List<?> parameters) {
         System.err.println("===============================JDBC Error Start==============================");
         System.err.println(makeLogSql(sql, parameters));
         System.err.println("===============================JDBC Error End================================");
     }
 
-    private static <T> String makeLogSql(String sql, List<T> parameters) {
+    private static String makeLogSql(String sql, List<?> parameters) {
         if (parameters != null) {
             for (Object o : parameters) {
                 sql = sql.replaceFirst("\\?", "'" + o.toString() + "'");
