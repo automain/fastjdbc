@@ -117,21 +117,6 @@ public class JDBCUtil {
         return null;
     }
 
-    public static String makeInStr(List<?> parameters) {
-        if (parameters == null || parameters.isEmpty()) {
-            return null;
-        } else {
-            StringBuilder builder = new StringBuilder();
-            for (int i = parameters.size(); i > 0; i--) {
-                builder.append("?");
-                if (i > 1) {
-                    builder.append(", ");
-                }
-            }
-            return builder.toString();
-        }
-    }
-
     private static void setParameters(PreparedStatement stmt, List<?> parameters) throws SQLException {
         if (parameters != null) {
             int offset = 1;
