@@ -23,13 +23,9 @@ import java.util.Map;
 
 /**
  * <p>An object that all the database bean object should implement.</p>
- * <p>This is one of the basic compositions of fastjdbc, all transmission operations will be around this.</p>
- * <p>You can write a code generator to generate the implement classes,
- * and then if database changed, you only need to maintain the implement class with less changed.</p>
  * <p>Note: the implement classes of {@link BaseBean} should extends {@link com.github.fastjdbc.util.RequestUtil}</p>
  *
- * @param <T> an object which implement this
- *            for override {@link #pickBeanFromRequest(HttpServletRequest)}
+ * @param <T> a class which implement this
  * @since 1.0
  */
 public interface BaseBean<T extends BaseBean> {

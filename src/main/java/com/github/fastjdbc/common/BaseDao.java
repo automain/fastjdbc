@@ -51,7 +51,7 @@ public class BaseDao extends JDBCUtil {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    public static <T extends BaseBean> int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
+    protected static <T extends BaseBean> int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
         if (sql != null) {
@@ -70,7 +70,7 @@ public class BaseDao extends JDBCUtil {
      * @see BaseBean#notNullColumnMap()
      * @since 1.0
      */
-    public static <T extends BaseBean> Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
+    protected static <T extends BaseBean> Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
         if (sql != null) {
@@ -91,7 +91,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTable(ConnectionBean connection, T bean) throws SQLException {
+    protected static <T extends BaseBean> int updateTable(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -125,7 +125,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    protected static <T extends BaseBean> int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
         if (bean != null && idList != null && !idList.isEmpty()) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -163,7 +163,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException {
+    protected static <T extends BaseBean> int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException {
         if (paramBean != null && newBean != null) {
             String tableName = paramBean.tableName();
             String tableNameCheck = newBean.tableName();
@@ -213,7 +213,7 @@ public class BaseDao extends JDBCUtil {
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public static <T extends BaseBean> int softDeleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
+    protected static <T extends BaseBean> int softDeleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
         String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + " = ?";
         return executeUpdate(connection, sql, Collections.singletonList(id));
     }
@@ -231,7 +231,7 @@ public class BaseDao extends JDBCUtil {
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public static <T extends BaseBean> int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    protected static <T extends BaseBean> int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
         String inStr = makeInStr(idList);
         if (inStr == null) {
             return 0;
@@ -250,7 +250,7 @@ public class BaseDao extends JDBCUtil {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public static <T extends BaseBean> T selectTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
+    protected static <T extends BaseBean> T selectTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
         return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", Collections.singletonList(id), bean);
     }
 
@@ -265,7 +265,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    protected static <T extends BaseBean> List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
         String inStr = makeInStr(idList);
         if (inStr == null) {
             return new ArrayList<T>(1);
@@ -284,7 +284,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> T selectOneTableByBean(ConnectionBean connection, T bean) throws SQLException {
+    protected static <T extends BaseBean> T selectOneTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -309,7 +309,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> List<T> selectTableByBean(ConnectionBean connection, T bean) throws SQLException {
+    protected static <T extends BaseBean> List<T> selectTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -334,7 +334,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> List<T> selectAllTable(ConnectionBean connection, T bean) throws SQLException {
+    protected static <T extends BaseBean> List<T> selectAllTable(ConnectionBean connection, T bean) throws SQLException {
         return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName(), null, bean);
     }
 
@@ -351,7 +351,7 @@ public class BaseDao extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception {
+    protected static <T extends BaseBean> PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception {
         PageBean pageBean = new PageBean();
         if (bean != null) {
             String sql = null;
