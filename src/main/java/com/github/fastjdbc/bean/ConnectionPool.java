@@ -100,7 +100,7 @@ public class ConnectionPool {
     }
 
     /**
-     * Inner method to change autoCommit to {@code false} and allowPoolSuspension to {@code true}.
+     * Method to change autoCommit to {@code false} and allowPoolSuspension to {@code true}.
      *
      * @param config {@link HikariConfig} object
      * @since 1.0
@@ -122,13 +122,13 @@ public class ConnectionPool {
         return POOL_MAP.getOrDefault(poolName, DEFAULT_SLAVE_POOL);
     }
 
-    private static void closeConnectionBeanWithOutCommit(ConnectionBean connection) throws SQLException {
-        if (connection != null) {
-            close(connection.getWriteConnection());
-            close(connection.getReadConnection());
-        }
-    }
-
+    /**
+     * Close the given connection without commit.
+     *
+     * @param connection the connection to close
+     * @throws SQLException exception when close failed
+     * @since 1.0
+     */
     private static void close(Connection connection) throws SQLException {
         if (connection != null) {
             connection.close();
@@ -136,6 +136,13 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Commit the connection and then close.
+     *
+     * @param connection the connection to close
+     * @throws SQLException exception when close failed
+     * @since 1.0
+     */
     private static void commitAndClose(Connection connection) throws SQLException {
         if (connection != null) {
             try {
@@ -146,16 +153,40 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Get the database name.
+     *
+     * @return database name
+     * @since 1.0
+     */
     public static String getDatabaseName() {
         return DATABASE_NAME;
     }
 
+    /**
+     * <p>Get {@link ConnectionBean} object by the given slave pool name.</p>
+     * <p>The write connection is a connection from master datasource.</p>
+     * <p>The read connection is a connection from slave datasource which pool name is the given pool name.</p>
+     * <p>When slave pool not found, a connection from default slave pool will be used as read connection.</p>
+     *
+     * @param slavePoolName slave pool name
+     * @return an object of {@link ConnectionBean}
+     * @throws SQLException exception when get connection failed
+     * @since 1.0
+     */
     public static ConnectionBean getConnectionBean(String slavePoolName) throws SQLException {
         Connection writeConnection = MASTER_POOL.getConnection();
         writeConnection.setAutoCommit(false);
         return new ConnectionBean(writeConnection, getSlaveDataSource(slavePoolName).getConnection());
     }
 
+    /**
+     * Close the write connection with commit and close the read connection without commit.
+     *
+     * @param connection the connection to close
+     * @throws SQLException exception when close failed
+     * @since 1.0
+     */
     public static void closeConnectionBean(ConnectionBean connection) throws SQLException {
         if (connection != null) {
             commitAndClose(connection.getWriteConnection());
@@ -163,16 +194,33 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Roll back the write connection when exception occurred and close both connection without commit.
+     *
+     * @param connection the connection to roll back
+     * @throws SQLException exception when roll back failed
+     * @since 1.0
+     */
     public static void rollbackConnectionBean(ConnectionBean connection) throws SQLException {
         if (connection != null && connection.getWriteConnection() != null) {
             try {
                 connection.getWriteConnection().rollback();
             } finally {
-                closeConnectionBeanWithOutCommit(connection);
+                close(connection.getWriteConnection());
+                close(connection.getReadConnection());
             }
         }
     }
 
+    /**
+     * <p>Close the {@link ResultSet} object.</p>
+     * <p>When {@link com.github.fastjdbc.util.JDBCUtil#executeSelectReturnResultSet(ConnectionBean, String, List)} called,
+     * this method should be called to close {@link ResultSet} at last.</p>
+     *
+     * @param rs {@link ResultSet} object to close
+     * @throws SQLException exception when close failed
+     * @since 1.0
+     */
     public static void close(ResultSet rs) throws SQLException {
         if (rs != null) {
             Statement stmt = rs.getStatement();

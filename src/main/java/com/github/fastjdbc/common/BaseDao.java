@@ -270,7 +270,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         if (inStr == null) {
             return new ArrayList<T>(1);
         }
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " IN(" + inStr + ")", new ArrayList<Object>(idList), bean);
+        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " IN(" + inStr + ")", idList, bean);
     }
 
     /**
