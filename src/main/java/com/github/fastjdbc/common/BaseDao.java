@@ -533,9 +533,4 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         }
     }
 
-    public static void main(String[] args) {
-        String sql = "select (select a from table2) a, (select b from table3) b from table where 1=1";
-        System.out.println(makeCountSql(sql));
-    }
-
 }
