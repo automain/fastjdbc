@@ -97,16 +97,16 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
                 StringBuilder sqlBuilder = null;
-                List<Object> objectList = null;
+                List<Object> parameterList = null;
                 if (!entrySet.isEmpty()) {
-                    objectList = new ArrayList<Object>(entrySet.size() + 1);
+                    parameterList = new ArrayList<Object>(entrySet.size() + 1);
                     sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
-                    sqlBuilder.append(makeNotNullColumnParamSql(entrySet, objectList, ", "));
+                    sqlBuilder.append(makeNotNullColumnParamSql(entrySet, parameterList, ", "));
                     sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(" = ?");
-                    objectList.add(bean.primaryValue());
+                    parameterList.add(bean.primaryValue());
                 }
                 if (sqlBuilder != null) {
-                    return executeUpdate(connection, sqlBuilder.toString(), objectList);
+                    return executeUpdate(connection, sqlBuilder.toString(), parameterList);
                 }
             }
         }
@@ -131,18 +131,18 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
                 StringBuilder sqlBuilder = null;
-                List<Object> objectList = null;
+                List<Object> parameterList = null;
                 if (!entrySet.isEmpty()) {
                     int idSize = idList.size();
                     String inStr = makeInStr(idList);
-                    objectList = new ArrayList<Object>(entrySet.size() + idSize);
+                    parameterList = new ArrayList<Object>(entrySet.size() + idSize);
                     sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
-                    sqlBuilder.append(makeNotNullColumnParamSql(entrySet, objectList, ", "));
+                    sqlBuilder.append(makeNotNullColumnParamSql(entrySet, parameterList, ", "));
                     sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(" IN(").append(inStr).append(")");
-                    objectList.addAll(idList);
+                    parameterList.addAll(idList);
                 }
                 if (sqlBuilder != null) {
-                    return executeUpdate(connection, sqlBuilder.toString(), objectList);
+                    return executeUpdate(connection, sqlBuilder.toString(), parameterList);
                 }
             }
         }
@@ -291,9 +291,9 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
                 int size = entrySet.size();
                 size = size > 0 ? size : 1;
-                List<Object> objectList = new ArrayList<Object>(size);
-                String sql = makeSelectTableSql(bean, entrySet, objectList) + " LIMIT 1";
-                return executeSelectReturnBean(connection, sql, objectList, bean);
+                List<Object> parameterList = new ArrayList<Object>(size);
+                String sql = makeSelectTableSql(bean, entrySet, parameterList) + " LIMIT 1";
+                return executeSelectReturnBean(connection, sql, parameterList, bean);
             }
         }
         return null;
@@ -316,9 +316,9 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
                 int size = entrySet.size();
                 size = size > 0 ? size : 1;
-                List<Object> objectList = new ArrayList<Object>(size);
-                String sql = makeSelectTableSql(bean, entrySet, objectList);
-                return executeSelectReturnList(connection, sql, objectList, bean);
+                List<Object> parameterList = new ArrayList<Object>(size);
+                String sql = makeSelectTableSql(bean, entrySet, parameterList);
+                return executeSelectReturnList(connection, sql, parameterList, bean);
             }
         }
         return new ArrayList<T>(1);
@@ -355,14 +355,14 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         PageBean pageBean = new PageBean();
         if (bean != null) {
             String sql = null;
-            List<Object> parameters = null;
+            List<Object> parameterList = null;
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.notNullColumnMap().entrySet();
                 int size = entrySet.size();
                 size = size > 0 ? size : 1;
-                parameters = new ArrayList<Object>(size);
-                sql = makeSelectTableSql(bean, entrySet, parameters);
+                parameterList = new ArrayList<Object>(size);
+                sql = makeSelectTableSql(bean, entrySet, parameterList);
             }
             if (sql != null) {
                 limit = limit < 1 ? 1 : limit;
@@ -371,15 +371,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 ResultSet pageResult = null;
                 List<T> data = new ArrayList<T>();
                 try {
-                    countResult = executeSelectReturnResultSet(connection, makeCountSql(sql), parameters);
+                    countResult = executeSelectReturnResultSet(connection, makeCountSql(sql), parameterList);
                     int count = 0;
                     if (countResult.next()) {
                         count = countResult.getInt(1);
                     }
                     pageBean.setCount(count);
-                    parameters.add((page - 1) * limit);
-                    parameters.add(limit);
-                    pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameters);
+                    parameterList.add((page - 1) * limit);
+                    parameterList.add(limit);
+                    pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
                     while (pageResult.next()) {
                         data.add((T) bean.pickBeanFromResultSet(pageResult));
                     }
@@ -394,12 +394,19 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         return pageBean;
     }
 
-    public static String makeInStr(List<?> parameters) {
-        if (parameters == null || parameters.isEmpty()) {
+    /**
+     * Join the placeholder by the parameter list size for sql statement.
+     *
+     * @param parameterList parameter list
+     * @return string of sql placeholder
+     * @since 1.0
+     */
+    public static String makeInStr(List<?> parameterList) {
+        if (parameterList == null || parameterList.isEmpty()) {
             return null;
         } else {
             StringBuilder builder = new StringBuilder();
-            for (int i = parameters.size(); i > 0; i--) {
+            for (int i = parameterList.size(); i > 0; i--) {
                 builder.append("?");
                 if (i > 1) {
                     builder.append(", ");
@@ -409,8 +416,17 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         }
     }
 
+    /**
+     * Join the sql of insert into table and add parameter to parameter list.
+     *
+     * @param bean          bean object
+     * @param parameterList parameter list
+     * @param <T>           class which implement {@link BaseBean}
+     * @return sql string for insert into table
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
-    private static <T extends BaseBean> String getInsertSql(T bean, List<Object> paramList) {
+    private static <T extends BaseBean> String getInsertSql(T bean, List<Object> parameterList) {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
@@ -423,7 +439,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     int offset = 1;
                     for (Map.Entry<String, Object> entry : entrySet) {
                         sqlBuilder.append(entry.getKey());
-                        paramList.add(entry.getValue());
+                        parameterList.add(entry.getValue());
                         valueBuilder.append("?");
                         if (offset < size) {
                             sqlBuilder.append(", ");
@@ -441,13 +457,22 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         return null;
     }
 
-    private static String makeNotNullColumnParamSql(Set<Map.Entry<String, Object>> entrySet, List<Object> objectList, String separator) {
+    /**
+     * Join the not null column sql by separator and add parameter to parameter list.
+     *
+     * @param entrySet      the not null column map collection
+     * @param parameterList parameter list
+     * @param separator     the separator to connect sql string
+     * @return sql string
+     * @since 1.0
+     */
+    private static String makeNotNullColumnParamSql(Set<Map.Entry<String, Object>> entrySet, List<Object> parameterList, String separator) {
         StringBuilder sqlBuilder = new StringBuilder();
         int size = entrySet.size();
         int offset = 1;
         for (Map.Entry<String, Object> entry : entrySet) {
             sqlBuilder.append(entry.getKey()).append(" = ?");
-            objectList.add(entry.getValue());
+            parameterList.add(entry.getValue());
             if (offset < size) {
                 sqlBuilder.append(separator);
             }
@@ -456,6 +481,16 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         return sqlBuilder.toString();
     }
 
+    /**
+     * Join the not null column sql for select and add parameter to parameter list.
+     *
+     * @param bean          bean object
+     * @param entrySet      the not null column map collection
+     * @param parameterList parameter list
+     * @param <T>           class which implement {@link BaseBean}
+     * @return sql string
+     * @since 1.0
+     */
     private static <T extends BaseBean> String makeSelectTableSql(T bean, Set<Map.Entry<String, Object>> entrySet, List<Object> parameterList) {
         StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ").append(bean.tableName());
         int size = entrySet.size();
@@ -474,6 +509,13 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         return sqlBuilder.toString();
     }
 
+    /**
+     * Make a count total rows sql for select table for page.
+     *
+     * @param sql the select for page sql
+     * @return count sql
+     * @since 1.0
+     */
     private static String makeCountSql(String sql) {
         int firstFrom = sql.indexOf("FROM");
         int beginIndex = sql.indexOf("SELECT") + 6;
@@ -484,6 +526,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         return sql;
     }
 
+    /**
+     * Find outermost {@code FROM} index for make count sql.
+     *
+     * @param sql       the select for page sql
+     * @param fromIndex the index of {@code FROM}
+     * @param count     {@code SELECT} count
+     * @return outermost {@code FROM} index
+     * @since 1.0
+     */
     private static int getFromIndex(String sql, int fromIndex, int count) {
         int nextIndex = sql.indexOf("FROM", fromIndex);
         if (count > 0) {
