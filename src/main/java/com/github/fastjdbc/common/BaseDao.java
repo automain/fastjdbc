@@ -52,10 +52,10 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     public int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
-        List<Object> paramList = new ArrayList<Object>();
-        String sql = getInsertSql(bean, paramList);
+        List<Object> parameterList = new ArrayList<Object>();
+        String sql = getInsertSql(bean, parameterList);
         if (sql != null) {
-            return executeUpdate(connection, sql, paramList);
+            return executeUpdate(connection, sql, parameterList);
         }
         return 0;
     }
@@ -71,10 +71,10 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     public Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
-        List<Object> paramList = new ArrayList<Object>();
-        String sql = getInsertSql(bean, paramList);
+        List<Object> parameterList = new ArrayList<Object>();
+        String sql = getInsertSql(bean, parameterList);
         if (sql != null) {
-            return executeUpdateReturnId(connection, sql, paramList);
+            return executeUpdateReturnId(connection, sql, parameterList);
         }
         return 0L;
     }
@@ -138,7 +138,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     parameterList = new ArrayList<Object>(entrySet.size() + idSize);
                     sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
                     sqlBuilder.append(makeNotNullColumnParamSql(entrySet, parameterList, ", "));
-                    sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(" IN(").append(inStr).append(")");
+                    sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(inStr);
                     parameterList.addAll(idList);
                 }
                 if (sqlBuilder != null) {
@@ -172,14 +172,14 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 if (!newEntrySet.isEmpty()) {
                     Set<Map.Entry<String, Object>> paramEntrySet = paramBean.notNullColumnMap().entrySet();
                     StringBuilder paramBuilder = new StringBuilder();
-                    List<Object> paramList = null;
+                    List<Object> parameterList = null;
                     List<Object> newList = new ArrayList<Object>(newEntrySet.size());
                     if (!paramEntrySet.isEmpty()) {
-                        paramList = new ArrayList<Object>(paramEntrySet.size());
-                        paramBuilder.append(" WHERE ").append(makeNotNullColumnParamSql(paramEntrySet, paramList, " AND "));
+                        parameterList = new ArrayList<Object>(paramEntrySet.size());
+                        paramBuilder.append(" WHERE ").append(makeNotNullColumnParamSql(paramEntrySet, parameterList, " AND "));
                     }
                     if (insertWhenNotExist) {
-                        ResultSet resultSet = executeSelectReturnResultSet(connection, "SELECT COUNT(1) FROM " + tableName + paramBuilder, paramList);
+                        ResultSet resultSet = executeSelectReturnResultSet(connection, "SELECT COUNT(1) FROM " + tableName + paramBuilder.toString(), parameterList);
                         boolean hasRecord = resultSet.next() && resultSet.getInt(1) > 0;
                         ConnectionPool.close(resultSet);
                         if (!hasRecord) {
@@ -190,8 +190,8 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     if (!updateMulti) {
                         updateBuilder.append(" LIMIT 1");
                     }
-                    if (paramList != null) {
-                        newList.addAll(paramList);
+                    if (parameterList != null) {
+                        newList.addAll(parameterList);
                     }
                     return executeUpdate(connection, updateBuilder.toString(), newList);
                 }
@@ -236,7 +236,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         if (inStr == null) {
             return 0;
         }
-        String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + " IN(" + inStr + ")";
+        String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + inStr;
         return executeUpdate(connection, sql, idList);
     }
 
@@ -270,7 +270,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         if (inStr == null) {
             return new ArrayList<T>(1);
         }
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " IN(" + inStr + ")", idList, bean);
+        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr, idList, bean);
     }
 
     /**
@@ -405,13 +405,14 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         if (parameterList == null || parameterList.isEmpty()) {
             return null;
         } else {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new StringBuilder(" IN(");
             for (int i = parameterList.size(); i > 0; i--) {
                 builder.append("?");
                 if (i > 1) {
                     builder.append(", ");
                 }
             }
+            builder.append(")");
             return builder.toString();
         }
     }
@@ -495,16 +496,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ").append(bean.tableName());
         int size = entrySet.size();
         if (size > 0) {
-            sqlBuilder.append(" WHERE ");
-            int offset = 1;
-            for (Map.Entry<String, Object> entry : entrySet) {
-                sqlBuilder.append(entry.getKey()).append(" = ?");
-                parameterList.add(entry.getValue());
-                if (offset < size) {
-                    sqlBuilder.append(" AND ");
-                }
-                offset++;
-            }
+            sqlBuilder.append(" WHERE ").append(makeNotNullColumnParamSql(entrySet, parameterList, " AND "));
         }
         return sqlBuilder.toString();
     }
@@ -517,31 +509,33 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     private static String makeCountSql(String sql) {
-        int firstFrom = sql.indexOf("FROM");
-        int beginIndex = sql.indexOf("SELECT") + 6;
-        String head = sql.substring(beginIndex, firstFrom);
-        int selectCount = head.split("SELECT").length - 1;
-        int endIndex = getFromIndex(sql, 0, selectCount);
-        sql = sql.replace(sql.substring(beginIndex, endIndex), " COUNT(1) ");
-        return sql;
+        String upperSql = sql.toUpperCase();
+        int beginIndex = upperSql.indexOf("SELECT") + 6;
+        int endIndex = getFromIndex(upperSql, beginIndex);
+        return sql.replace(sql.substring(beginIndex, endIndex), " COUNT(1) ");
     }
 
     /**
      * Find outermost {@code FROM} index for make count sql.
      *
-     * @param sql       the select for page sql
-     * @param fromIndex the index of {@code FROM}
-     * @param count     {@code SELECT} count
+     * @param sql        the select for page sql
+     * @param beginIndex begin index to find
      * @return outermost {@code FROM} index
      * @since 1.0
      */
-    private static int getFromIndex(String sql, int fromIndex, int count) {
-        int nextIndex = sql.indexOf("FROM", fromIndex);
-        if (count > 0) {
-            return getFromIndex(sql, nextIndex + 4, count - 1);
+    private static int getFromIndex(String sql, int beginIndex) {
+        int nextFromIndex = sql.indexOf("FROM", beginIndex);
+        int nextSelectIndex = sql.indexOf("SELECT", beginIndex);
+        if (nextSelectIndex < nextFromIndex && nextSelectIndex > 0) {
+            return getFromIndex(sql, nextFromIndex + 4);
         } else {
-            return nextIndex;
+            return nextFromIndex;
         }
+    }
+
+    public static void main(String[] args) {
+        String sql = "select (select a from table2) a, (select b from table3) b from table where 1=1";
+        System.out.println(makeCountSql(sql));
     }
 
 }
