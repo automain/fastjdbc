@@ -71,7 +71,7 @@ public class ConnectionPool {
      *
      * @param databaseName    database name
      * @param masterConfig    the {@link HikariConfig} object of master datasource
-     * @param slaveConfigList the {@link HikariConfig} object of slave datasources
+     * @param slaveConfigList the {@link HikariConfig} object of slave datasource
      * @since 1.0
      */
     public static void init(String databaseName, HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {

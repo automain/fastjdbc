@@ -198,7 +198,7 @@ public class JDBCUtil {
     }
 
     /**
-     * Join a complete slq for print to console.
+     * Join a complete sql for print to console.
      *
      * @param sql           the original sql
      * @param parameterList parameter list
@@ -211,11 +211,11 @@ public class JDBCUtil {
     }
 
     /**
-     * Join a complete slq for print or log.
+     * Join a complete sql for print or log.
      *
      * @param sql           the original sql
      * @param parameterList parameter list
-     * @return the complete slq
+     * @return the complete sql
      * @since 1.0
      */
     private static String makeLogSql(String sql, List<?> parameterList) {
