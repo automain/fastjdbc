@@ -160,7 +160,7 @@ public class RequestUtil {
             return defaultValue;
         }
         try {
-            return Long.valueOf(key);
+            return Long.valueOf(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
