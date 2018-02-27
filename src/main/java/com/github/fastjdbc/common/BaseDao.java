@@ -352,7 +352,6 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      */
     @SuppressWarnings("unchecked")
     public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception {
-        PageBean pageBean = new PageBean();
         if (bean != null) {
             String sql = null;
             List<Object> parameterList = null;
@@ -364,31 +363,51 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 parameterList = new ArrayList<Object>(size);
                 sql = makeSelectTableSql(bean, entrySet, parameterList);
             }
-            if (sql != null) {
-                limit = limit < 1 ? 1 : limit;
-                page = page < 1 ? 1 : page;
-                ResultSet countResult = null;
-                ResultSet pageResult = null;
-                List<T> data = new ArrayList<T>();
-                try {
-                    countResult = executeSelectReturnResultSet(connection, makeCountSql(sql), parameterList);
-                    int count = 0;
-                    if (countResult.next()) {
-                        count = countResult.getInt(1);
-                    }
-                    pageBean.setCount(count);
-                    parameterList.add((page - 1) * limit);
-                    parameterList.add(limit);
-                    pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
-                    while (pageResult.next()) {
-                        data.add((T) bean.pickBeanFromResultSet(pageResult));
-                    }
-                    pageBean.setCurr(page);
-                    pageBean.setData(data);
-                } finally {
-                    ConnectionPool.close(countResult);
-                    ConnectionPool.close(pageResult);
+            return selectTableForPage(connection, bean, sql, parameterList, page, limit);
+        }
+        return new PageBean();
+    }
+
+    /**
+     * Query list of beans by the param bean for page by given sql and parameter list.
+     *
+     * @param connection    ConnectionBean object
+     * @param bean          bean object
+     * @param sql           sql
+     * @param parameterList parameter list
+     * @param page          page number
+     * @param limit         the count of data displayed on each page
+     * @return {@link PageBean} object
+     * @throws Exception exception when query
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, String sql, List<Object> parameterList, int page, int limit) throws Exception {
+        PageBean pageBean = new PageBean();
+        if (bean != null && sql != null) {
+            limit = limit < 1 ? 1 : limit;
+            page = page < 1 ? 1 : page;
+            ResultSet countResult = null;
+            ResultSet pageResult = null;
+            List<T> data = new ArrayList<T>();
+            try {
+                countResult = executeSelectReturnResultSet(connection, makeCountSql(sql), parameterList);
+                int count = 0;
+                if (countResult.next()) {
+                    count = countResult.getInt(1);
                 }
+                pageBean.setCount(count);
+                parameterList.add((page - 1) * limit);
+                parameterList.add(limit);
+                pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
+                while (pageResult.next()) {
+                    data.add((T) bean.pickBeanFromResultSet(pageResult));
+                }
+                pageBean.setCurr(page);
+                pageBean.setData(data);
+            } finally {
+                ConnectionPool.close(countResult);
+                ConnectionPool.close(pageResult);
             }
         }
         return pageBean;
