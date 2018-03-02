@@ -66,7 +66,7 @@ public class ConnectionPool {
      * @param slaveConfigList the {@link HikariConfig} object of slave datasource
      * @since 1.0
      */
-    public static void init(HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
+    public static synchronized void init(HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
         if (MASTER_POOL == null || DEFAULT_SLAVE_POOL == null || POOL_MAP == null) {
             if (masterConfig == null) {
                 throw new RuntimeException("connection pool initialization failure");

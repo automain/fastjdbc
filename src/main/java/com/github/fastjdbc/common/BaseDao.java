@@ -44,13 +44,6 @@ import java.util.Set;
 public class BaseDao<T extends BaseBean> extends JDBCUtil {
 
     /**
-     * Date format for time range select.
-     *
-     * @since 1.0
-     */
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    /**
      * Insert the not null properties of bean.
      *
      * @param connection ConnectionBean object
@@ -455,6 +448,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      */
     public static void setTimeRange(String rangeParam, List<Object> parameterList) throws Exception {
         String time[] = rangeParam.split(" - ");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Timestamp start = new Timestamp(sdf.parse(time[0]).getTime());
         Timestamp end = new Timestamp(sdf.parse(time[1]).getTime());
         parameterList.add(start);
