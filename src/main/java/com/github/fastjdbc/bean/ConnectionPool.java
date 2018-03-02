@@ -30,19 +30,12 @@ import java.util.Map;
 
 /**
  * <p>A connection pool class.</p>
- * <p>You should call {@link #init(String, HikariConfig, List)} method to init the global connection pool
+ * <p>You should call {@link #init(HikariConfig, List)} method to init the global connection pool
  * on system start, this pool only support {@code HikariCP} data source.</p>
  *
  * @since 1.0
  */
 public class ConnectionPool {
-
-    /**
-     * Database name.
-     *
-     * @since 1.0
-     */
-    private static String DATABASE_NAME;
 
     /**
      * Master database connection pool.
@@ -69,17 +62,15 @@ public class ConnectionPool {
      * <p>Initialization method for init global connection pool.</p>
      * <p>{@code poolName} should be set for each {@link HikariConfig} and keep distinct.</p>
      *
-     * @param databaseName    database name
      * @param masterConfig    the {@link HikariConfig} object of master datasource
      * @param slaveConfigList the {@link HikariConfig} object of slave datasource
      * @since 1.0
      */
-    public static void init(String databaseName, HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
-        if (DATABASE_NAME == null || MASTER_POOL == null || DEFAULT_SLAVE_POOL == null || POOL_MAP == null) {
-            if (databaseName == null || masterConfig == null) {
+    public static void init(HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
+        if (MASTER_POOL == null || DEFAULT_SLAVE_POOL == null || POOL_MAP == null) {
+            if (masterConfig == null) {
                 throw new RuntimeException("connection pool initialization failure");
             }
-            DATABASE_NAME = databaseName;
             initConfig(masterConfig);
             MASTER_POOL = new HikariDataSource(masterConfig);
             POOL_MAP.put(masterConfig.getPoolName(), MASTER_POOL);
@@ -151,16 +142,6 @@ public class ConnectionPool {
                 close(connection);
             }
         }
-    }
-
-    /**
-     * Get the database name.
-     *
-     * @return database name
-     * @since 1.0
-     */
-    public static String getDatabaseName() {
-        return DATABASE_NAME;
     }
 
     /**

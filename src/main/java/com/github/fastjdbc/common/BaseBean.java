@@ -52,7 +52,7 @@ public interface BaseBean<T extends BaseBean> {
      * @return the primary value of the child object
      * @since 1.0
      */
-    Object primaryValue();
+    Long primaryValue();
 
     /**
      * <p>The key of result map is column name in the database,
