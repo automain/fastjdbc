@@ -401,7 +401,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 parameterList.add(limit);
                 pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
                 while (pageResult.next()) {
-                    data.add((T) bean.pickBeanFromResultSet(pageResult));
+                    data.add((T) bean.beanFromResultSet(pageResult));
                 }
                 pageBean.setCurr(page);
                 pageBean.setData(data);

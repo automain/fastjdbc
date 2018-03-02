@@ -114,7 +114,7 @@ public class JDBCUtil {
         ResultSet rs = null;
         try {
             rs = executeSelectReturnResultSet(connection, sql, parameterList);
-            return rs.next() ? (T) bean.pickBeanFromResultSet(rs) : null;
+            return rs.next() ? (T) bean.beanFromResultSet(rs) : null;
         } finally {
             ConnectionPool.close(rs);
         }
@@ -139,7 +139,7 @@ public class JDBCUtil {
             rs = executeSelectReturnResultSet(connection, sql, parameterList);
             List<T> resultList = new ArrayList<T>();
             while (rs.next()) {
-                resultList.add((T) bean.pickBeanFromResultSet(rs));
+                resultList.add((T) bean.beanFromResultSet(rs));
             }
             return resultList;
         } finally {

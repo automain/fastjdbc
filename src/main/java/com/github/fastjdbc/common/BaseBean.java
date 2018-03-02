@@ -92,7 +92,7 @@ public interface BaseBean<T extends BaseBean> {
      * @throws SQLException the exception of parse value
      * @since 1.0
      */
-    T pickBeanFromResultSet(ResultSet rs) throws SQLException;
+    T beanFromResultSet(ResultSet rs) throws SQLException;
 
     /**
      * <p>Get an object of the child bean from {@link HttpServletRequest}.</p>
@@ -112,5 +112,5 @@ public interface BaseBean<T extends BaseBean> {
      * @return the object of child
      * @since 1.0
      */
-    T pickBeanFromRequest(HttpServletRequest request);
+    T beanFromRequest(HttpServletRequest request);
 }
