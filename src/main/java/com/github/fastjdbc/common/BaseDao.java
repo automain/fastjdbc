@@ -23,6 +23,8 @@ import com.github.fastjdbc.util.JDBCUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +42,13 @@ import java.util.Set;
  * @since 1.0
  */
 public class BaseDao<T extends BaseBean> extends JDBCUtil {
+
+    /**
+     * Date format for time range select.
+     *
+     * @since 1.0
+     */
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * Insert the not null properties of bean.
@@ -434,6 +443,22 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
             builder.append(")");
             return builder.toString();
         }
+    }
+
+    /**
+     * Format time range parameter to Timestamp range.
+     *
+     * @param rangeParam    time range parameter
+     * @param parameterList parameter list
+     * @throws Exception exception when format
+     * @since 1.0
+     */
+    public static void setTimeRange(String rangeParam, List<Object> parameterList) throws Exception {
+        String time[] = rangeParam.split(" - ");
+        Timestamp start = new Timestamp(sdf.parse(time[0]).getTime());
+        Timestamp end = new Timestamp(sdf.parse(time[1]).getTime());
+        parameterList.add(start);
+        parameterList.add(end);
     }
 
     /**
