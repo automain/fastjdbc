@@ -32,13 +32,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <p>A common template of DAO layer, all the classes of DAO layer should extends this class</p>
+ * <p>A common template of DAO layer, all the classes of DAO layer should extends this class.</p>
  * <p>Considering performance and large amount of data support,
  * the primary key of table should be long type(bigint in mysql) and auto increment.</p>
  * <p>Data permissions should be considered when design the table in database.</p>
  * <p>In business,we usually need to customize the query conditions and return the {@link PageBean} object,
  * a new method is needed to be added to the DAO class in this condition.</p>
  *
+ * @param <T> an object which implement {@link BaseBean}
  * @since 1.0
  */
 public class BaseDao<T extends BaseBean> extends JDBCUtil {
