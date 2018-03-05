@@ -29,7 +29,7 @@ import java.util.List;
  * <p>String, Integer, Long, BigDecimal, Boolean, Timestamp, String[], List&lt;Integer&gt; are supported.</p>
  * <p>Double and Float can replace by BigDecimal, Date and Time can replace by Timestamp.</p>
  * <p>Every method can set default value except {@link #getStringValues(String, HttpServletRequest)}
- * and {@link #getIntegerValues(String, HttpServletRequest)}, if the parameter is {@code null} or empty,
+ * and {@link #getLongValues(String, HttpServletRequest)}, if the parameter is {@code null} or empty,
  * the default value will be return.</p>
  *
  * @since 1.0
@@ -292,21 +292,21 @@ public class RequestUtil {
     }
 
     /**
-     * Get Integer List from request object.
+     * Get Long List from request object.
      *
      * @param key     the key of the value
      * @param request the request object
      * @return {@code null} if the value is empty, otherwise return the a List of Integer
      * @since 1.0
      */
-    public static List<Integer> getIntegerValues(String key, HttpServletRequest request) {
+    public static List<Long> getLongValues(String key, HttpServletRequest request) {
         String[] values = getStringValues(key, request);
-        List<Integer> list = null;
+        List<Long> list = null;
         if (values != null) {
-            list = new ArrayList<>(values.length);
+            list = new ArrayList<Long>(values.length);
             for (String value : values) {
                 if (isNumericString(value)) {
-                    list.add(Integer.valueOf(value));
+                    list.add(Long.valueOf(value));
                 }
             }
         }
