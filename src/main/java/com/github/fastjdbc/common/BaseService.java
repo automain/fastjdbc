@@ -36,19 +36,26 @@ import java.util.List;
 public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends RequestUtil {
 
     /**
-     * dao object.
+     * Dao object.
      *
      * @since 1.0
      */
     private D dao;
 
     /**
+     * Bean object.
+     */
+    private T bean;
+
+    /**
      * Constructor with dao object.
      *
-     * @param dao dao object
+     * @param bean bean object
+     * @param dao  dao object
      * @since 1.0
      */
-    public BaseService(D dao) {
+    public BaseService(T bean, D dao) {
+        this.bean = bean;
         this.dao = dao;
     }
 
@@ -134,13 +141,12 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * {@code 0} represent the row is effective.
      *
      * @param connection ConnectionBean object
-     * @param bean       bean object
      * @param id         id of the bean
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
+    public int softDeleteTableById(ConnectionBean connection, Long id) throws SQLException {
         return dao.softDeleteTableById(connection, bean, id);
     }
 
@@ -151,13 +157,12 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * {@code 0} represent the row is effective.
      *
      * @param connection ConnectionBean object
-     * @param bean       bean object
      * @param idList     a list id of the beans which will be soft deleted
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    public int softDeleteTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException {
         return dao.softDeleteTableByIdList(connection, bean, idList);
     }
 
@@ -165,13 +170,12 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * Query a bean by the given id.
      *
      * @param connection ConnectionBean object
-     * @param bean       bean object
      * @param id         id of the bean
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public T selectTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
+    public T selectTableById(ConnectionBean connection, Long id) throws SQLException {
         return dao.selectTableById(connection, bean, id);
     }
 
@@ -179,13 +183,12 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * Query a bean by the given id list.
      *
      * @param connection ConnectionBean object
-     * @param bean       bean object
      * @param idList     a list id of the beans to query
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    public List<T> selectTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException {
         return dao.selectTableByIdList(connection, bean, idList);
     }
 
@@ -220,12 +223,11 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * Query all rows.
      *
      * @param connection ConnectionBean object
-     * @param bean       bean object
      * @return all rows
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public List<T> selectAllTable(ConnectionBean connection, T bean) throws SQLException {
+    public List<T> selectAllTable(ConnectionBean connection) throws SQLException {
         return dao.selectAllTable(connection, bean);
     }
 
