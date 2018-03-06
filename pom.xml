@@ -7,6 +7,11 @@
     <groupId>com.github.automain</groupId>
     <artifactId>fastjdbc</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>fastjdbc</name>
+    <url>https://github.com/automain/fastjdbc</url>
+    <description>fastjdbc com.github.automain jar</description>
 
     <licenses>
         <license>
@@ -15,12 +20,14 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <scm>
         <tag>master</tag>
         <url>git@github.com:automain/fastjdbc.git</url>
         <connection>scm:git:git@github.com:automain/fastjdbc.git</connection>
         <developerConnection>scm:git:git@github.com:automain/fastjdbc.git</developerConnection>
     </scm>
+
     <developers>
         <developer>
             <name>zhangyu</name>
@@ -34,6 +41,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
     </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -91,6 +99,16 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>OSSRH-38239</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>OSSRH-38239</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
