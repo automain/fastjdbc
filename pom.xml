@@ -112,6 +112,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.sonatype.oss</groupId>
+            <artifactId>oss-parent</artifactId>
+            <version>9</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.0</version>
