@@ -59,6 +59,14 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
         this.dao = dao;
     }
 
+    public D getDao() {
+        return dao;
+    }
+
+    public T getBean() {
+        return bean;
+    }
+
     /**
      * Insert the not null properties of bean.
      *
