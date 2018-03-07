@@ -13,7 +13,7 @@ Overview
 
 version history
 ---
-###1.0(2018-03-07):
+### 1.0(2018-03-07):
 * init commit(see __javadoc__)
 * [generator](https://github.com/automain/generator) release to generate __Bean__,__Dao__,__Service__
 * maven dependence
