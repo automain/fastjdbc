@@ -13,7 +13,9 @@ Overview
 
 version history
 ---
-### 1.0(2018-03-07):
+### 1.1(2018-03-07):
+* __pom.xml__ and __README.md__ adjust
+### 1.0(2018-03-06):
 * init commit(see __javadoc__)
 * [generator](https://github.com/automain/generator) release to generate __Bean__,__Dao__,__Service__
 * maven dependence
