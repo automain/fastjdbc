@@ -251,9 +251,29 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @since 1.0
      */
     public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, HttpServletRequest request) throws Exception {
-        int page = getInt("page", request, 1);
-        int limit = getInt("limit", request, 1);
-        return dao.selectTableForPage(connection, bean, page, limit);
+        return dao.selectTableForPage(connection, bean, pageFromRequest(request), limitFromRequest(request));
+    }
+
+    /**
+     * Get current page number from {@link HttpServletRequest} object, default 1
+     *
+     * @param request {@link HttpServletRequest} object
+     * @return current page number
+     * @since 1.2
+     */
+    public int pageFromRequest(HttpServletRequest request) {
+        return getInt("page", request, 1);
+    }
+
+    /**
+     * Get current page limit from {@link HttpServletRequest} object, default 10
+     *
+     * @param request {@link HttpServletRequest} object
+     * @return current page limit
+     * @since 1.2
+     */
+    public int limitFromRequest(HttpServletRequest request) {
+        return getInt("limit", request, 10);
     }
 
 }
