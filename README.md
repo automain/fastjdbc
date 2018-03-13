@@ -13,6 +13,9 @@ Overview
 
 version history
 ---
+### 1.2(2018-03-13):
+* add __pageFromRequest__ function to get current page from request, default: __1__
+* add __limitFromRequest__ function to get page limit from request, default: __10__
 ### 1.1(2018-03-07):
 * __pom.xml__ and __README.md__ adjust
 ### 1.0(2018-03-06):
