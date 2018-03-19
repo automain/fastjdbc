@@ -244,6 +244,40 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
     }
 
     /**
+     * Delete a bean by the given id.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @param id         id of the bean
+     * @return count of deleted rows
+     * @throws SQLException exception when delete
+     * @since 1.3
+     */
+    public int deleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
+        String sql = "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?";
+        return executeUpdate(connection, sql, Collections.singletonList(id));
+    }
+
+    /**
+     * Delete a bean by the given id list.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean object
+     * @param idList     a list id of the beans which will be deleted
+     * @return count of deleted rows
+     * @throws SQLException exception when delete
+     * @since 1.3
+     */
+    public int deleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+        String inStr = makeInStr(idList);
+        if (inStr == null) {
+            return 0;
+        }
+        String sql = "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr;
+        return executeUpdate(connection, sql, idList);
+    }
+
+    /**
      * Query a bean by the given id.
      *
      * @param connection ConnectionBean object

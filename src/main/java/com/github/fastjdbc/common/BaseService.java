@@ -175,6 +175,32 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
     }
 
     /**
+     * Delete a bean by the given id.
+     *
+     * @param connection ConnectionBean object
+     * @param id         id of the bean
+     * @return count of deleted rows
+     * @throws SQLException exception when delete
+     * @since 1.3
+     */
+    public int deleteTableById(ConnectionBean connection, Long id) throws SQLException {
+        return dao.deleteTableById(connection, bean, id);
+    }
+
+    /**
+     * Delete a bean by the given id list.
+     *
+     * @param connection ConnectionBean object
+     * @param idList     a list id of the beans which will be deleted
+     * @return count of deleted rows
+     * @throws SQLException exception when delete
+     * @since 1.3
+     */
+    public int deleteTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException {
+        return dao.deleteTableByIdList(connection, bean, idList);
+    }
+
+    /**
      * Query a bean by the given id.
      *
      * @param connection ConnectionBean object
