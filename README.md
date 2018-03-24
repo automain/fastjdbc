@@ -13,6 +13,9 @@ Overview
 
 version history
 ---
+### 1.3(2018-03-24):
+* add __deleteTableById__ function
+* add __deleteTableByIdList__ function
 ### 1.2(2018-03-13):
 * add __pageFromRequest__ function to get current page from request, default: __1__
 * add __limitFromRequest__ function to get page limit from request, default: __10__
