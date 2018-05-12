@@ -7,7 +7,6 @@ Overview
 * [Servlet](https://javaee.github.io/servlet-spec/) is necessary.
 * The primary key in the database table should be the __bigint__ type in mysql (__java.lang.Long__ type in java), or same level type in other database.
 * The primary key in the database table should be __auto increment__.
-* Database physical deletion is not supported, but can be added to where it is needed.
 * Logical deletion(soft delete) are recommended and the delete flag column should be named by '__is_delete__' and __tinyint__ type in mysql(__java.lang.Integer__ type in java) or same level type in other database.
 '__0__' means the row is effective and '__1__' means the row is deleted.
 
