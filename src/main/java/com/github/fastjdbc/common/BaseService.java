@@ -74,7 +74,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @param bean       bean to insert
      * @return count of insert rows
      * @throws SQLException exception when insert failed
-     * @see BaseBean#notNullColumnMap()
+     * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
     public int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
@@ -88,11 +88,25 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @param bean       bean to insert
      * @return generated primary key
      * @throws SQLException exception when insert failed
-     * @see BaseBean#notNullColumnMap()
+     * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
     public Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
         return dao.insertIntoTableReturnId(connection, bean);
+    }
+
+    /**
+     * Batch insert the properties of bean list.
+     *
+     * @param connection ConnectionBean object
+     * @param list       list of bean to insert
+     * @return count of insert rows
+     * @throws SQLException exception when insert failed
+     * @see BaseBean#columnMap(boolean)
+     * @since 1.4
+     */
+    public int batchInsertIntoTable(ConnectionBean connection, List<T> list) throws SQLException {
+        return dao.batchInsertIntoTable(connection, list);
     }
 
     /**
@@ -101,13 +115,14 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      *
      * @param connection ConnectionBean object
      * @param bean       bean to update
+     * @param all        true to update all column of bean, false to update not null column of bean
      * @return count of updated rows
      * @throws SQLException exception when update failed
-     * @see BaseBean#notNullColumnMap()
+     * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public int updateTable(ConnectionBean connection, T bean) throws SQLException {
-        return dao.updateTable(connection, bean);
+    public int updateTable(ConnectionBean connection, T bean, boolean all) throws SQLException {
+        return dao.updateTable(connection, bean, all);
     }
 
     /**
@@ -116,13 +131,14 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @param connection ConnectionBean object
      * @param bean       bean to update
      * @param idList     a list id of the beans which will be updated
+     * @param all        true to update all column of bean, false to update not null column of bean
      * @return count of updated rows
      * @throws SQLException exception when update failed
-     * @see BaseBean#notNullColumnMap()
+     * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
-        return dao.updateTableByIdList(connection, bean, idList);
+    public int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList, boolean all) throws SQLException {
+        return dao.updateTableByIdList(connection, bean, idList, all);
     }
 
     /**
@@ -133,13 +149,14 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @param newBean            bean to update
      * @param insertWhenNotExist whether or not to insert when the query returns nothing
      * @param updateMulti        whether or not to update multi result when the query returns more than one result
+     * @param all                true to update all column of bean, false to update not null column of bean
      * @return count of updated rows
      * @throws SQLException exception when update failed
-     * @see BaseBean#notNullColumnMap()
+     * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti) throws SQLException {
-        return dao.updateTable(connection, paramBean, newBean, insertWhenNotExist, updateMulti);
+    public int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
+        return dao.updateTable(connection, paramBean, newBean, insertWhenNotExist, updateMulti, all);
     }
 
     /**

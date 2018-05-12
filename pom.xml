@@ -6,7 +6,7 @@
 
     <groupId>com.github.automain</groupId>
     <artifactId>fastjdbc</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <packaging>jar</packaging>
 
     <name>fastjdbc</name>
@@ -144,12 +144,12 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.0</version>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.7.8</version>
+            <version>3.1.0</version>
         </dependency>
     </dependencies>
 </project>

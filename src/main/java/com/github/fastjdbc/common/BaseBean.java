@@ -62,17 +62,18 @@ public interface BaseBean<T extends BaseBean> {
      * the child method should like this:
      * <pre> {@code
      * Map<String, Object> map = new HashMap<String, Object>();
-     * if (this.getTestName() != null) {
+     * if (all || this.getTestName() != null) {
      *      map.put("test_name", this.getTestName());
      * }
      * return map;
      * }</pre>
      * <p>Note: the primary key value pair should not in this map!</p>
      *
-     * @return the notNullColumnMap of the child object
-     * @since 1.0
+     * @param all get all or not null column map
+     * @return the all or not null column map of the child object
+     * @since 1.4
      */
-    Map<String, Object> notNullColumnMap();
+    Map<String, Object> columnMap(boolean all);
 
     /**
      * <p>Get an object of the child bean from {@link ResultSet}.</p>

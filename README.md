@@ -13,6 +13,10 @@ Overview
 
 version history
 ---
+### 1.4(2018-05-13):
+* replace __notNullColumnMap()__ function in __BaseBean__ by __columnMap(boolean all)__
+* add __batchInsertIntoTable__ function
+* add __all__ param in __updateTable__/__updateTableByIdList__ function to distinguish whether update all columns or the not null columns
 ### 1.3(2018-03-24):
 * add __deleteTableById__ function
 * add __deleteTableByIdList__ function
