@@ -146,7 +146,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
-     * @since 1.0
+     * @since 1.4
      */
     @SuppressWarnings("unchecked")
     public int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList, boolean all) throws SQLException {
@@ -185,7 +185,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
-     * @since 1.0
+     * @since 1.4
      */
     @SuppressWarnings("unchecked")
     public int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {

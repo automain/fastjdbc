@@ -119,7 +119,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
-     * @since 1.0
+     * @since 1.4
      */
     public int updateTable(ConnectionBean connection, T bean, boolean all) throws SQLException {
         return dao.updateTable(connection, bean, all);
@@ -135,7 +135,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
-     * @since 1.0
+     * @since 1.4
      */
     public int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList, boolean all) throws SQLException {
         return dao.updateTableByIdList(connection, bean, idList, all);
@@ -153,7 +153,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
-     * @since 1.0
+     * @since 1.4
      */
     public int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
         return dao.updateTable(connection, paramBean, newBean, insertWhenNotExist, updateMulti, all);
