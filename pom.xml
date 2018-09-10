@@ -6,7 +6,7 @@
 
     <groupId>com.github.automain</groupId>
     <artifactId>fastjdbc</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>fastjdbc</name>
@@ -47,7 +47,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -73,7 +73,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.0.1</version>
                         <configuration>
                             <charset>UTF-8</charset>
                             <encoding>UTF-8</encoding>
@@ -149,7 +149,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.0</version>
         </dependency>
     </dependencies>
 </project>

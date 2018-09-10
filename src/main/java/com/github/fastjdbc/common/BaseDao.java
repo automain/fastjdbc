@@ -19,6 +19,7 @@ package com.github.fastjdbc.common;
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.ConnectionPool;
 import com.github.fastjdbc.bean.PageBean;
+import com.github.fastjdbc.bean.PageParameterBean;
 import com.github.fastjdbc.util.JDBCUtil;
 
 import java.sql.ResultSet;
@@ -205,7 +206,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     }
                     if (insertWhenNotExist) {
                         ResultSet resultSet = executeSelectReturnResultSet(connection, "SELECT COUNT(1) FROM " + tableName + paramBuilder.toString(), parameterList);
-                        boolean hasRecord = resultSet.next() && resultSet.getInt(1) > 0;
+                        boolean hasRecord = resultSet != null && resultSet.next() && resultSet.getInt(1) > 0;
                         ConnectionPool.close(resultSet);
                         if (!hasRecord) {
                             return insertIntoTable(connection, newBean);
@@ -412,17 +413,28 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
     @SuppressWarnings("unchecked")
     public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception {
         if (bean != null) {
+            String countSql = null;
             String sql = null;
             List<Object> parameterList = null;
             String tableName = bean.tableName();
+            PageParameterBean pageParameterBean = new PageParameterBean();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
                 int size = entrySet.size();
                 size = size > 0 ? size : 1;
                 parameterList = new ArrayList<Object>(size);
                 sql = makeSelectTableSql(bean, entrySet, parameterList);
+                countSql = "SELECT COUNT(1)" + sql.substring(8);
+                pageParameterBean.setConnection(connection);
+                pageParameterBean.setBean(bean);
+                pageParameterBean.setCountSql(countSql);
+                pageParameterBean.setCountParameterList(parameterList);
+                pageParameterBean.setSql(sql);
+                pageParameterBean.setParameterList(parameterList);
+                pageParameterBean.setPage(page);
+                pageParameterBean.setLimit(limit);
             }
-            return selectTableForPage(connection, bean, sql, parameterList, page, limit);
+            return selectTableForPage(pageParameterBean);
         }
         return new PageBean();
     }
@@ -430,43 +442,63 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
     /**
      * Query list of beans by the param bean for page by given sql and parameter list.
      *
-     * @param connection    ConnectionBean object
-     * @param bean          bean object
-     * @param sql           sql
-     * @param parameterList parameter list
-     * @param page          page number
-     * @param limit         the count of data displayed on each page
+     * @param pageParameterBean {@link PageParameterBean} object
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, String sql, List<Object> parameterList, int page, int limit) throws Exception {
+    public PageBean<T> selectTableForPage(PageParameterBean<T> pageParameterBean) throws Exception {
         PageBean pageBean = new PageBean();
-        if (bean != null && sql != null) {
-            limit = limit < 1 ? 1 : limit;
-            page = page < 1 ? 1 : page;
-            ResultSet countResult = null;
-            ResultSet pageResult = null;
-            List<T> data = new ArrayList<T>();
-            try {
-                countResult = executeSelectReturnResultSet(connection, makeCountSql(sql), parameterList);
-                int count = 0;
-                if (countResult.next()) {
-                    count = countResult.getInt(1);
+        if (pageParameterBean != null) {
+            T bean = pageParameterBean.getBean();
+            String countSql = pageParameterBean.getCountSql();
+            String sql = pageParameterBean.getSql();
+            int limit = pageParameterBean.getLimit();
+            int page = pageParameterBean.getPage();
+            ConnectionBean connection = pageParameterBean.getConnection();
+            List<Object> parameterList = pageParameterBean.getParameterList();
+            if (bean != null && countSql != null && sql != null) {
+                limit = limit < 1 ? 1 : limit;
+                page = page < 1 ? 1 : page;
+                ResultSet countResult = null;
+                ResultSet pageResult = null;
+                List<T> data = new ArrayList<T>();
+                try {
+                    int count = 0;
+                    countResult = executeSelectReturnResultSet(connection, countSql, pageParameterBean.getCountParameterList());
+                    if (countResult != null && countResult.next()) {
+                        count = countResult.getInt(1);
+                    }
+                    if (count == 0) {
+                        pageBean.setCurr(1);
+                        pageBean.setData(data);
+                    } else {
+                        pageBean.setCount(count);
+                        int offset = (page - 1) * limit;
+                        if (offset > count) {
+                            page = count / limit + 1;
+                        } else if (offset == count) {
+                            page = count / limit;
+                        }
+                        parameterList.add((page - 1) * limit);
+                        parameterList.add(limit);
+                        pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
+                        if (pageResult != null) {
+                            while (pageResult.next()) {
+                                data.add((T) bean.beanFromResultSet(pageResult));
+                            }
+                            pageBean.setCurr(page);
+                            pageBean.setData(data);
+                        } else {
+                            pageBean.setCurr(1);
+                            pageBean.setData(data);
+                        }
+                    }
+                } finally {
+                    ConnectionPool.close(countResult);
+                    ConnectionPool.close(pageResult);
                 }
-                pageBean.setCount(count);
-                parameterList.add((page - 1) * limit);
-                parameterList.add(limit);
-                pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
-                while (pageResult.next()) {
-                    data.add((T) bean.beanFromResultSet(pageResult));
-                }
-                pageBean.setCurr(page);
-                pageBean.setData(data);
-            } finally {
-                ConnectionPool.close(countResult);
-                ConnectionPool.close(pageResult);
             }
         }
         return pageBean;
@@ -649,38 +681,6 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
             sqlBuilder.append(" WHERE ").append(makeColumnParamSql(entrySet, parameterList, " AND "));
         }
         return sqlBuilder.toString();
-    }
-
-    /**
-     * Make a count total rows sql for select table for page.
-     *
-     * @param sql the select for page sql
-     * @return count sql
-     * @since 1.0
-     */
-    private static String makeCountSql(String sql) {
-        String upperSql = sql.toUpperCase();
-        int beginIndex = upperSql.indexOf("SELECT") + 6;
-        int endIndex = getFromIndex(upperSql, beginIndex);
-        return sql.replace(sql.substring(beginIndex, endIndex), " COUNT(1) ");
-    }
-
-    /**
-     * Find outermost {@code FROM} index for make count sql.
-     *
-     * @param sql        the select for page sql
-     * @param beginIndex begin index to find
-     * @return outermost {@code FROM} index
-     * @since 1.0
-     */
-    private static int getFromIndex(String sql, int beginIndex) {
-        int nextFromIndex = sql.indexOf("FROM", beginIndex);
-        int nextSelectIndex = sql.indexOf("SELECT", beginIndex);
-        if (nextSelectIndex < nextFromIndex && nextSelectIndex > 0) {
-            return getFromIndex(sql, nextFromIndex + 4);
-        } else {
-            return nextFromIndex;
-        }
     }
 
 }

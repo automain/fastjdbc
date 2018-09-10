@@ -12,6 +12,11 @@ Overview
 
 version history
 ---
+### 1.5(2018-09-11):
+* add __PageParameterBean__ as parameter of __selectTableForPage__ function in __BaseDao__
+* bug fix: when execute __selectTableForPage__ function, the count sql should not be auto generated, so there is a property in __PageParameterBean__ named __countSql__ for customization
+* bug fix: when count result is zero in __selectTableForPage__, the query sql will not executed and return an empty list
+* bug fix: __executeSelectReturnResultSet__ function in __JDBCUtil__ can be return null, and the null result should be handled
 ### 1.4(2018-05-13):
 * replace __notNullColumnMap()__ function in __BaseBean__ by __columnMap(boolean all)__
 * add __batchInsertIntoTable__ function
