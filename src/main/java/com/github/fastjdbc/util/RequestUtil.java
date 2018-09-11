@@ -89,6 +89,9 @@ public class RequestUtil {
      * @since 1.0
      */
     public static String getString(String key, HttpServletRequest request, String defaultValue) {
+        if (request == null) {
+            return defaultValue;
+        }
         String value = request.getParameter(key);
         value = value == null ? null : value.trim();
         return isEmptyString(value) ? defaultValue : value;
@@ -288,7 +291,7 @@ public class RequestUtil {
      * @since 1.0
      */
     public static String[] getStringValues(String key, HttpServletRequest request) {
-        return request.getParameterValues(key);
+        return request == null ? null : request.getParameterValues(key);
     }
 
     /**

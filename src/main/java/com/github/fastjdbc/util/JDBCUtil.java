@@ -221,7 +221,11 @@ public class JDBCUtil {
     private static String makeLogSql(String sql, List<?> parameterList) {
         if (parameterList != null) {
             for (Object o : parameterList) {
-                sql = sql.replaceFirst("\\?", "'" + o.toString() + "'");
+                if (o == null) {
+                    sql = sql.replaceFirst("\\?", "NULL");
+                } else {
+                    sql = sql.replaceFirst("\\?", "'" + o.toString() + "'");
+                }
             }
         }
         return sql;

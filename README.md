@@ -14,6 +14,7 @@ version history
 ---
 ### 1.5(2018-09-11):
 * add __PageParameterBean__ as parameter of __selectTableForPage__ function in __BaseDao__
+* add all main function test in test package, see __MainTestThread__ 
 * bug fix: when execute __selectTableForPage__ function, the count sql should not be auto generated, so there is a property in __PageParameterBean__ named __countSql__ for customization
 * bug fix: when count result is zero in __selectTableForPage__, the query sql will not executed and return an empty list
 * bug fix: __executeSelectReturnResultSet__ function in __JDBCUtil__ can be return null, and the null result should be handled
@@ -32,12 +33,13 @@ version history
 ### 1.0(2018-03-06):
 * init commit(see __javadoc__)
 * [generator](https://github.com/automain/generator) release to generate __Bean__,__Dao__,__Service__
+---
 * maven dependence
     ```
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>1.0</version>
+        <version>1.5</version>
     </dependency>
     ```
 license

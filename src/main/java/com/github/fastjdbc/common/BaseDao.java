@@ -471,6 +471,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                         count = countResult.getInt(1);
                     }
                     if (count == 0) {
+                        pageBean.setCount(0);
                         pageBean.setCurr(1);
                         pageBean.setData(data);
                     } else {
