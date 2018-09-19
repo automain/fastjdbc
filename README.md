@@ -41,7 +41,7 @@ version history
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
     </dependency>
     ```
 license
