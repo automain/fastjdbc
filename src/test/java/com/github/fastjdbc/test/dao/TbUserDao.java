@@ -29,14 +29,15 @@ public class TbUserDao extends BaseDao<TbUser> {
 
     @SuppressWarnings("unchecked")
     public PageBean<TbUser> selectTableForCustomPage(ConnectionBean connection, TbUser bean, int page, int limit) throws Exception {
+        List<Object> countParameterList = new ArrayList<Object>();
         List<Object> parameterList = new ArrayList<Object>();
-        String countSql = setSearchCondition(bean, new ArrayList<Object>(), true);
+        String countSql = setSearchCondition(bean, countParameterList, true);
         String sql = setSearchCondition(bean, parameterList, false);
         PageParameterBean pageParameterBean = new PageParameterBean();
         pageParameterBean.setConnection(connection);
         pageParameterBean.setBean(bean);
         pageParameterBean.setCountSql(countSql);
-        pageParameterBean.setCountParameterList(parameterList);
+        pageParameterBean.setCountParameterList(countParameterList);
         pageParameterBean.setSql(sql);
         pageParameterBean.setParameterList(parameterList);
         pageParameterBean.setPage(page);

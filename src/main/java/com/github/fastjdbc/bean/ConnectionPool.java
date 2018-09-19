@@ -16,9 +16,6 @@
 
 package com.github.fastjdbc.bean;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -30,8 +27,8 @@ import java.util.Map;
 
 /**
  * <p>A connection pool class.</p>
- * <p>You should call {@link #init(HikariConfig, List)} method to init the global connection pool
- * on system start, this pool only support {@code HikariCP} data source.</p>
+ * <p>You should call {@link #init(DataSource, Map)} method to init the global connection pool
+ * on system start only one time.</p>
  *
  * @since 1.0
  */
@@ -60,45 +57,24 @@ public class ConnectionPool {
 
     /**
      * <p>Initialization method for init global connection pool.</p>
-     * <p>{@code poolName} should be set for each {@link HikariConfig} and keep distinct.</p>
      *
-     * @param masterConfig    the {@link HikariConfig} object of master datasource
-     * @param slaveConfigList the {@link HikariConfig} object of slave datasource
+     * @param masterPool   master datasource
+     * @param slavePoolMap map of slave datasource, key is slave pool name, value is datasource object
      * @since 1.0
      */
-    public static synchronized void init(HikariConfig masterConfig, List<HikariConfig> slaveConfigList) {
-        if (MASTER_POOL == null || DEFAULT_SLAVE_POOL == null || POOL_MAP == null) {
-            if (masterConfig == null) {
-                throw new RuntimeException("connection pool initialization failure");
+    public static synchronized void init(DataSource masterPool, Map<String, DataSource> slavePoolMap) {
+        if (MASTER_POOL == null || DEFAULT_SLAVE_POOL == null) {
+            if (masterPool == null) {
+                throw new RuntimeException("master pool must not null");
             }
-            initConfig(masterConfig);
-            MASTER_POOL = new HikariDataSource(masterConfig);
-            POOL_MAP.put(masterConfig.getPoolName(), MASTER_POOL);
-            if (slaveConfigList == null || slaveConfigList.isEmpty()) {
-                DEFAULT_SLAVE_POOL = MASTER_POOL;
+            MASTER_POOL = masterPool;
+            if (slavePoolMap != null && !slavePoolMap.isEmpty()) {
+                DEFAULT_SLAVE_POOL = slavePoolMap.values().iterator().next();
+                POOL_MAP.putAll(slavePoolMap);
             } else {
-                HikariDataSource dataSource = null;
-                for (HikariConfig config : slaveConfigList) {
-                    initConfig(config);
-                    dataSource = new HikariDataSource(config);
-                    if (DEFAULT_SLAVE_POOL == null) {
-                        DEFAULT_SLAVE_POOL = dataSource;
-                    }
-                    POOL_MAP.put(config.getPoolName(), dataSource);
-                }
+                DEFAULT_SLAVE_POOL = masterPool;
             }
         }
-    }
-
-    /**
-     * Method to change autoCommit to {@code false} and allowPoolSuspension to {@code true}.
-     *
-     * @param config {@link HikariConfig} object
-     * @since 1.0
-     */
-    private static void initConfig(HikariConfig config) {
-        config.setAutoCommit(false);
-        config.setAllowPoolSuspension(true);
     }
 
     /**

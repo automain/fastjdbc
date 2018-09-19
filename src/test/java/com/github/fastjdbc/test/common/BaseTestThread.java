@@ -22,6 +22,7 @@ import com.github.fastjdbc.test.bean.TbUser;
 import com.github.fastjdbc.test.dao.TbUserDao;
 import com.github.fastjdbc.test.service.TbUserService;
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +39,8 @@ public class BaseTestThread extends Thread {
             Properties properties = new Properties();
             properties.load(is);
             HikariConfig config = new HikariConfig(properties);
-            ConnectionPool.init(config, null);
+            HikariDataSource masterPool = new HikariDataSource(config);
+            ConnectionPool.init(masterPool, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

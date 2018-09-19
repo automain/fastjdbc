@@ -6,7 +6,7 @@
 
     <groupId>com.github.automain</groupId>
     <artifactId>fastjdbc</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
 
     <name>fastjdbc</name>
@@ -150,6 +150,7 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>3.2.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>

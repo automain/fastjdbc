@@ -3,7 +3,6 @@ Overview
 #### *fastjdbc* is a lightweight jdbc frame. It's designed around fast development, fast working and fast maintenance.
 #### **The following constraints must be accepted to use this frame:**
 * Java EE 8 or later is necessary.
-* [HikariCP](https://github.com/brettwooldridge/HikariCP) connection pool is necessary.
 * [Servlet](https://javaee.github.io/servlet-spec/) is necessary.
 * The primary key in the database table should be the __bigint__ type in mysql (__java.lang.Long__ type in java), or same level type in other database.
 * The primary key in the database table should be __auto increment__.
@@ -12,6 +11,9 @@ Overview
 
 version history
 ---
+### 1.6(2018-09-19):
+* change __init__ function in __ConnectionPool__ from HikariCP config to given datasource
+* add RuntimeException at necessary position
 ### 1.5(2018-09-11):
 * add __PageParameterBean__ as parameter of __selectTableForPage__ function in __BaseDao__
 * add all main function test in test package, see __MainTestThread__ 

@@ -46,22 +46,23 @@ public class JDBCUtil {
      * @since 1.0
      */
     protected static int executeUpdate(ConnectionBean connection, String sql, List<?> parameterList) throws SQLException {
-        if (connection != null) {
-            Connection writeConnection = connection.getWriteConnection();
-            if (writeConnection != null && !writeConnection.isClosed()) {
-                try (PreparedStatement stmt = writeConnection.prepareStatement(sql)) {
-                    if (connection.isPrintSql()) {
-                        System.out.println(makeLogSql(sql, parameterList));
-                    }
-                    setParameters(stmt, parameterList);
-                    return stmt.executeUpdate();
-                } catch (SQLException e) {
-                    printError(sql, parameterList);
-                    throw e;
-                }
-            }
+        if (connection == null) {
+            throw new RuntimeException("ConnectionBean object must not null");
         }
-        return 0;
+        Connection writeConnection = connection.getWriteConnection();
+        if (writeConnection == null || writeConnection.isClosed()) {
+            throw new RuntimeException("write connection must not null and not closed");
+        }
+        try (PreparedStatement stmt = writeConnection.prepareStatement(sql)) {
+            if (connection.isPrintSql()) {
+                System.out.println(makeLogSql(sql, parameterList));
+            }
+            setParameters(stmt, parameterList);
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            printError(sql, parameterList);
+            throw e;
+        }
     }
 
     /**
@@ -76,25 +77,26 @@ public class JDBCUtil {
      * @since 1.0
      */
     protected static Long executeUpdateReturnId(ConnectionBean connection, String sql, List<?> parameterList) throws SQLException {
-        if (connection != null) {
-            Connection writeConnection = connection.getWriteConnection();
-            if (writeConnection != null && !writeConnection.isClosed()) {
-                try (PreparedStatement stmt = writeConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                    if (connection.isPrintSql()) {
-                        System.out.println(makeLogSql(sql, parameterList));
-                    }
-                    setParameters(stmt, parameterList);
-                    stmt.executeUpdate();
-                    try (ResultSet rs = stmt.getGeneratedKeys()) {
-                        return rs.next() ? rs.getLong(1) : 0L;
-                    }
-                } catch (SQLException e) {
-                    printError(sql, parameterList);
-                    throw e;
-                }
-            }
+        if (connection == null) {
+            throw new RuntimeException("ConnectionBean object must not null");
         }
-        return 0L;
+        Connection writeConnection = connection.getWriteConnection();
+        if (writeConnection == null || writeConnection.isClosed()) {
+            throw new RuntimeException("write connection must not null and not closed");
+        }
+        try (PreparedStatement stmt = writeConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (connection.isPrintSql()) {
+                System.out.println(makeLogSql(sql, parameterList));
+            }
+            setParameters(stmt, parameterList);
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                return rs.next() ? rs.getLong(1) : 0L;
+            }
+        } catch (SQLException e) {
+            printError(sql, parameterList);
+            throw e;
+        }
     }
 
     /**
@@ -160,23 +162,24 @@ public class JDBCUtil {
      * @since 1.0
      */
     protected static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<?> parameterList) throws SQLException {
-        if (connection != null) {
-            Connection queryConnection = connection.getReadConnection();
-            if (queryConnection != null && !queryConnection.isClosed()) {
-                try {
-                    if (connection.isPrintSql()) {
-                        System.out.println(makeLogSql(sql, parameterList));
-                    }
-                    PreparedStatement stmt = queryConnection.prepareStatement(sql);
-                    setParameters(stmt, parameterList);
-                    return stmt.executeQuery();
-                } catch (SQLException e) {
-                    printError(sql, parameterList);
-                    throw e;
-                }
-            }
+        if (connection == null) {
+            throw new RuntimeException("ConnectionBean object must not null");
         }
-        return null;
+        Connection readConnection = connection.getReadConnection();
+        if (readConnection == null || readConnection.isClosed()) {
+            throw new RuntimeException("read connection must not null and not closed");
+        }
+        try {
+            if (connection.isPrintSql()) {
+                System.out.println(makeLogSql(sql, parameterList));
+            }
+            PreparedStatement stmt = readConnection.prepareStatement(sql);
+            setParameters(stmt, parameterList);
+            return stmt.executeQuery();
+        } catch (SQLException e) {
+            printError(sql, parameterList);
+            throw e;
+        }
     }
 
     /**
