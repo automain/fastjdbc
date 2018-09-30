@@ -218,6 +218,17 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
     }
 
     /**
+     * @param connection ConnectionBean object
+     * @param bean       the param bean
+     * @return amount of rows which match the param bean
+     * @throws SQLException exception when query
+     * @since 1.7
+     */
+    public int countTableByBean(ConnectionBean connection, T bean) throws SQLException {
+        return dao.countTableByBean(connection, bean);
+    }
+
+    /**
      * Query a bean by the given id.
      *
      * @param connection ConnectionBean object

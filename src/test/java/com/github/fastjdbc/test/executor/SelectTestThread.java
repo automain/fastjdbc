@@ -38,6 +38,7 @@ public class SelectTestThread extends BaseTestThread {
         selectAll(connection, service);
         selectForPage(connection, service);
         selectForCustomerPage(connection, service);
+        countByBean(connection, service);
     }
 
     private void selectById(ConnectionBean connection, TbUserService service) throws Exception {
@@ -120,6 +121,13 @@ public class SelectTestThread extends BaseTestThread {
                 System.out.println("=====Select for customer page username is " + user.getUserName());
             }
         }
+    }
+
+    private void countByBean(ConnectionBean connection, TbUserService service) throws Exception {
+        TbUser bean = new TbUser();
+        bean.setIsDelete(0);
+        int count = service.countTableByBean(connection, bean);
+        System.out.println("=====Count by bean count is " + count);
     }
 
 }

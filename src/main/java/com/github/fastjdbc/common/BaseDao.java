@@ -205,11 +205,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                         paramBuilder.append(" WHERE ").append(makeColumnParamSql(paramEntrySet, parameterList, " AND "));
                     }
                     if (insertWhenNotExist) {
-                        ResultSet resultSet = executeSelectReturnResultSet(connection, "SELECT COUNT(1) FROM " + tableName + paramBuilder.toString(), parameterList);
-                        boolean hasRecord = resultSet != null && resultSet.next() && resultSet.getInt(1) > 0;
-                        ConnectionPool.close(resultSet);
-                        if (!hasRecord) {
-                            return insertIntoTable(connection, newBean);
+                        ResultSet rs = null;
+                        try {
+                            rs = executeSelectReturnResultSet(connection, "SELECT COUNT(1) FROM " + tableName + paramBuilder.toString(), parameterList);
+                            boolean hasRecord = rs.next() && rs.getInt(1) > 0;
+                            if (!hasRecord) {
+                                return insertIntoTable(connection, newBean);
+                            }
+                        } finally {
+                            ConnectionPool.close(rs);
                         }
                     }
                     StringBuilder updateBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ").append(makeColumnParamSql(newEntrySet, newList, ", ")).append(paramBuilder);
@@ -298,6 +302,40 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         }
         String sql = "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr;
         return executeUpdate(connection, sql, idList);
+    }
+
+    /**
+     * Count the columns by the param bean.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       the param bean
+     * @return amount of rows which match the param bean
+     * @throws SQLException exception when query
+     * @since 1.7
+     */
+    @SuppressWarnings("unchecked")
+    public int countTableByBean(ConnectionBean connection, T bean) throws SQLException {
+        if (bean != null) {
+            String tableName = bean.tableName();
+            if (tableName != null) {
+                Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
+                int size = entrySet.size();
+                size = size > 0 ? size : 1;
+                List<Object> parameterList = new ArrayList<Object>(size);
+                String sql = makeSelectTableSql(bean, entrySet, parameterList);
+                String countSql = "SELECT COUNT(1)" + sql.substring(8);
+                ResultSet rs = null;
+                try {
+                    rs = executeSelectReturnResultSet(connection, countSql, parameterList);
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                } finally {
+                    ConnectionPool.close(rs);
+                }
+            }
+        }
+        return 0;
     }
 
     /**
@@ -467,7 +505,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 try {
                     int count = 0;
                     countResult = executeSelectReturnResultSet(connection, countSql, pageParameterBean.getCountParameterList());
-                    if (countResult != null && countResult.next()) {
+                    if (countResult.next()) {
                         count = countResult.getInt(1);
                     }
                     if (count == 0) {
@@ -485,16 +523,11 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                         parameterList.add((page - 1) * limit);
                         parameterList.add(limit);
                         pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
-                        if (pageResult != null) {
-                            while (pageResult.next()) {
-                                data.add((T) bean.beanFromResultSet(pageResult));
-                            }
-                            pageBean.setCurr(page);
-                            pageBean.setData(data);
-                        } else {
-                            pageBean.setCurr(1);
-                            pageBean.setData(data);
+                        while (pageResult.next()) {
+                            data.add((T) bean.beanFromResultSet(pageResult));
                         }
+                        pageBean.setCurr(page);
+                        pageBean.setData(data);
                     }
                 } finally {
                     ConnectionPool.close(countResult);
@@ -601,15 +634,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
             T bean = list.get(0);
             String tableName = bean.tableName();
             if (tableName != null) {
-                Set<Map.Entry<String, Object>> entrySet = bean.columnMap(true).entrySet();
+                Set<String> columnSet = bean.columnMap(true).keySet();
                 StringBuilder sqlBuilder = new StringBuilder();
-                if (!entrySet.isEmpty()) {
-                    int size = entrySet.size();
+                if (!columnSet.isEmpty()) {
+                    int size = columnSet.size();
                     sqlBuilder.append("INSERT INTO ").append(tableName).append("(");
                     StringBuilder valueBuilder = new StringBuilder(" (");
                     int offset = 1;
-                    for (Map.Entry<String, Object> entry : entrySet) {
-                        sqlBuilder.append(entry.getKey());
+                    for (String column : columnSet) {
+                        sqlBuilder.append(column);
                         valueBuilder.append("?");
                         if (offset < size) {
                             sqlBuilder.append(", ");
@@ -620,18 +653,12 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     sqlBuilder.append(") VALUES");
                     valueBuilder.append(")");
                     StringBuilder paramBuilder = new StringBuilder();
-                    offset = 1;
-                    int listSize = list.size();
-                    for (T obj : list) {
+                    for (int i = 0, listSize = list.size(), prev = listSize - 1; i < listSize; i++) {
                         paramBuilder.append(valueBuilder);
-                        if (offset < listSize) {
+                        if (i < prev) {
                             paramBuilder.append(", ");
                         }
-                        Set<Map.Entry<String, Object>> allColumn = obj.columnMap(true).entrySet();
-                        for (Map.Entry<String, Object> entry : allColumn) {
-                            parameterList.add(entry.getValue());
-                        }
-                        offset++;
+                        parameterList.addAll(list.get(i).columnMap(true).values());
                     }
                     sqlBuilder.append(paramBuilder);
                 }

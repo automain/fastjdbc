@@ -192,10 +192,8 @@ public class JDBCUtil {
      */
     private static void setParameters(PreparedStatement stmt, List<?> parameterList) throws SQLException {
         if (parameterList != null) {
-            int offset = 1;
-            for (Object param : parameterList) {
-                stmt.setObject(offset, param);
-                offset++;
+            for (int i = 0, size = parameterList.size(); i < size; i++) {
+                stmt.setObject(i + 1, parameterList.get(i));
             }
         }
     }
@@ -223,7 +221,9 @@ public class JDBCUtil {
      */
     private static String makeLogSql(String sql, List<?> parameterList) {
         if (parameterList != null) {
-            for (Object o : parameterList) {
+            Object o = null;
+            for (int i = 0, size = parameterList.size(); i < size; i++) {
+                o = parameterList.get(i);
                 if (o == null) {
                     sql = sql.replaceFirst("\\?", "NULL");
                 } else {

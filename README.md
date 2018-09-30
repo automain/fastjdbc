@@ -11,6 +11,10 @@ Overview
 
 version history
 ---
+### 1.7(2018-09-30):
+* add __countTableByBean__ function in __BaseDao__
+* other bug fix
+
 ### 1.6(2018-09-19):
 * change __init__ function in __ConnectionPool__ from HikariCP config to given datasource
 * add RuntimeException at necessary position
