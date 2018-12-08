@@ -24,8 +24,6 @@ import com.github.fastjdbc.util.JDBCUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -244,7 +242,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     public int softDeleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
-        String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + " = ?";
+        String sql = "UPDATE " + bean.tableName() + " SET is_delete = 1 WHERE " + bean.primaryKey() + " = ?";
         return executeUpdate(connection, sql, Collections.singletonList(id));
     }
 
@@ -266,7 +264,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
         if (inStr == null) {
             return 0;
         }
-        String sql = "UPDATE " + bean.tableName() + " SET is_delete = '1' WHERE " + bean.primaryKey() + inStr;
+        String sql = "UPDATE " + bean.tableName() + " SET is_delete = 1 WHERE " + bean.primaryKey() + inStr;
         return executeUpdate(connection, sql, idList);
     }
 
@@ -566,16 +564,14 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      *
      * @param rangeParam    time range parameter
      * @param parameterList parameter list
-     * @throws Exception exception when format
      * @since 1.0
      */
-    public static void setTimeRange(String rangeParam, List<Object> parameterList) throws Exception {
-        String time[] = rangeParam.split(" - ");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Timestamp start = new Timestamp(sdf.parse(time[0]).getTime());
-        Timestamp end = new Timestamp(sdf.parse(time[1]).getTime());
-        parameterList.add(start);
-        parameterList.add(end);
+    public static void setTimeRange(String rangeParam, List<Object> parameterList) {
+        if (rangeParam != null && rangeParam.indexOf("-") > 1) {
+            String[] time = rangeParam.split("-", 2);
+            parameterList.add(Integer.valueOf(time[0]));
+            parameterList.add(Integer.valueOf(time[1]));
+        }
     }
 
     /**

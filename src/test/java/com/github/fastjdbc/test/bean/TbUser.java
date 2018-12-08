@@ -22,7 +22,6 @@ import com.github.fastjdbc.util.RequestUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class TbUser extends RequestUtil implements BaseBean<TbUser> {
     private String cellphone;
 
     // 创建时间
-    private Timestamp createTime;
+    private Integer createTime;
 
     // 邮箱
     private String email;
@@ -96,11 +95,11 @@ public class TbUser extends RequestUtil implements BaseBean<TbUser> {
         this.cellphone = cellphone;
     }
 
-    public Timestamp getCreateTime() {
+    public Integer getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Timestamp createTime) {
+    public void setCreateTime(Integer createTime) {
         this.createTime = createTime;
     }
 
@@ -166,7 +165,7 @@ public class TbUser extends RequestUtil implements BaseBean<TbUser> {
         bean.setUserName(rs.getString("user_name"));
         bean.setPasswordMd5(rs.getString("password_md5"));
         bean.setCellphone(rs.getString("cellphone"));
-        bean.setCreateTime(rs.getTimestamp("create_time"));
+        bean.setCreateTime(rs.getInt("create_time"));
         bean.setEmail(rs.getString("email"));
         bean.setIsDelete(rs.getInt("is_delete"));
         return bean;
@@ -179,7 +178,7 @@ public class TbUser extends RequestUtil implements BaseBean<TbUser> {
         bean.setUserName(getString("userName", request));
         bean.setPasswordMd5(getString("passwordMd5", request));
         bean.setCellphone(getString("cellphone", request));
-        bean.setCreateTime(getTimestamp("createTime", request));
+        bean.setCreateTime(getInt("createTime", request));
         bean.setEmail(getString("email", request));
         bean.setIsDelete(getInt("isDelete", request, 0));
         bean.setCreateTimeRange(getString("createTimeRange", request));

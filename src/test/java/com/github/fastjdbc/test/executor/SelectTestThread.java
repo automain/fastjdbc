@@ -22,7 +22,6 @@ import com.github.fastjdbc.test.bean.TbUser;
 import com.github.fastjdbc.test.common.BaseTestThread;
 import com.github.fastjdbc.test.service.TbUserService;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -101,17 +100,16 @@ public class SelectTestThread extends BaseTestThread {
     }
 
     private void selectForCustomerPage(ConnectionBean connection, TbUserService service) throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        String dayStart = sdf.format(c.getTime());
+        int dayStart = (int) (c.getTime().getTime() / 1000);
         c.add(Calendar.DAY_OF_MONTH, 1);
-        String dayEnd = sdf.format(c.getTime());
+        int dayEnd = (int) (c.getTime().getTime() / 1000);
         TbUser bean = new TbUser();
-        bean.setCreateTimeRange(dayStart + " - " + dayEnd);
+        bean.setCreateTimeRange(dayStart + "-" + dayEnd);
         PageBean<TbUser> pageBean = service.selectTableForCustomPage(connection, bean, null);
         System.out.println("=====Select for customer page count is " + pageBean.getCount());
         System.out.println("=====Select for customer page curr is " + pageBean.getCurr());

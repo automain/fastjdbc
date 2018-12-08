@@ -18,16 +18,13 @@ package com.github.fastjdbc.util;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * <p>This class is only used to get request parameter.</p>
- * <p>String, Integer, Long, BigDecimal, Boolean, Timestamp, String[], List&lt;Integer&gt; are supported.</p>
- * <p>Double and Float can replace by BigDecimal, Date and Time can replace by Timestamp.</p>
+ * <p>String, Integer, Long, BigDecimal, Boolean, String[], List&lt;Long&gt;, List&lt;Integer&gt; are supported.</p>
+ * <p>Double and Float can replace by BigDecimal, Timestamp properties are suggested to replace with Integer type.</p>
  * <p>Every method can set default value except {@link #getStringValues(String, HttpServletRequest)}
  * and {@link #getLongValues(String, HttpServletRequest)}, if the parameter is {@code null} or empty,
  * the default value will be return.</p>
@@ -234,55 +231,6 @@ public class RequestUtil {
     }
 
     /**
-     * Get Timestamp from request object, the default time format is {@code yyyy-MM-dd HH:mm:ss}.
-     *
-     * @param key     the key of the value
-     * @param request the request object
-     * @return {@code null} if the value is empty or parse exception occurred, otherwise return the value
-     * @see #getTimestamp(String, HttpServletRequest, String, Timestamp)
-     * @since 1.0
-     */
-    public static Timestamp getTimestamp(String key, HttpServletRequest request) {
-        return getTimestamp(key, request, "yyyy-MM-dd HH:mm:ss");
-    }
-
-    /**
-     * Get Timestamp from request object.
-     *
-     * @param key     the key of the value
-     * @param request the request object
-     * @param pattern the time format pattern
-     * @return {@code null} if the value is empty or parse exception occurred, otherwise return the value
-     * @see #getTimestamp(String, HttpServletRequest, String, Timestamp)
-     * @since 1.0
-     */
-    public static Timestamp getTimestamp(String key, HttpServletRequest request, String pattern) {
-        return getTimestamp(key, request, pattern, null);
-    }
-
-    /**
-     * Get Timestamp from request object.
-     *
-     * @param key          the key of the value
-     * @param request      the request object
-     * @param pattern      the time format pattern
-     * @param defaultValue the default to return if the value is empty or parse exception occurred
-     * @return default value if the value is empty or parse exception occurred, otherwise return the value
-     * @since 1.0
-     */
-    public static Timestamp getTimestamp(String key, HttpServletRequest request, String pattern, Timestamp defaultValue) {
-        String value = getString(key, request);
-        if (isEmptyString(value)) {
-            return defaultValue;
-        }
-        try {
-            return new Timestamp(new SimpleDateFormat(pattern).parse(value).getTime());
-        } catch (ParseException e) {
-            return defaultValue;
-        }
-    }
-
-    /**
      * Get String array from request object.
      *
      * @param key     the key of the value
@@ -299,7 +247,7 @@ public class RequestUtil {
      *
      * @param key     the key of the value
      * @param request the request object
-     * @return {@code null} if the value is empty, otherwise return the a List of Integer
+     * @return {@code null} if the value is empty, otherwise return the a List of Long
      * @since 1.0
      */
     public static List<Long> getLongValues(String key, HttpServletRequest request) {
@@ -315,4 +263,27 @@ public class RequestUtil {
         }
         return list;
     }
+
+    /**
+     * Get Integer List from request object.
+     *
+     * @param key     the key of the value
+     * @param request the request object
+     * @return {@code null} if the value is empty, otherwise return the a List of Integer
+     * @since 1.8
+     */
+    public static List<Integer> getIntValues(String key, HttpServletRequest request) {
+        String[] values = getStringValues(key, request);
+        List<Integer> list = null;
+        if (values != null) {
+            list = new ArrayList<Integer>(values.length);
+            for (String value : values) {
+                if (isNumericString(value)) {
+                    list.add(Integer.valueOf(value));
+                }
+            }
+        }
+        return list;
+    }
+
 }

@@ -45,7 +45,7 @@ public class TbUserDao extends BaseDao<TbUser> {
         return selectTableForPage(pageParameterBean);
     }
 
-    private String setSearchCondition(TbUser bean, List<Object> parameterList, boolean isCountSql) throws Exception {
+    private String setSearchCondition(TbUser bean, List<Object> parameterList, boolean isCountSql) {
         StringBuilder sql = new StringBuilder("SELECT ");
         if (isCountSql) {
             sql.append("COUNT(1)");

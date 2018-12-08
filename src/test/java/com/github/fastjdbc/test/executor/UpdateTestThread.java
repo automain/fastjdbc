@@ -21,7 +21,6 @@ import com.github.fastjdbc.test.bean.TbUser;
 import com.github.fastjdbc.test.common.BaseTestThread;
 import com.github.fastjdbc.test.service.TbUserService;
 
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class UpdateTestThread extends BaseTestThread {
         bean.setUserId(2L);
         bean.setUserName("updateAllColumn");
         bean.setCellphone("11111111111");
-        bean.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        bean.setCreateTime((int) (System.currentTimeMillis() / 1000));
         bean.setPasswordMd5("e10adc3949ba59abbe56e057f20f883e");
         bean.setIsDelete(1);
         service.updateTable(connection, bean, true);
@@ -77,7 +76,7 @@ public class UpdateTestThread extends BaseTestThread {
         TbUser bean = new TbUser();
         bean.setUserName("UpdateNE");
         bean.setCellphone("11111111111");
-        bean.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        bean.setCreateTime((int) (System.currentTimeMillis() / 1000));
         bean.setEmail("email@email.com");
         bean.setPasswordMd5("e10adc3949ba59abbe56e057f20f883e");
         bean.setIsDelete(0);

@@ -21,7 +21,6 @@ import com.github.fastjdbc.test.bean.TbUser;
 import com.github.fastjdbc.test.common.BaseTestThread;
 import com.github.fastjdbc.test.service.TbUserService;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class InsertTestThread extends BaseTestThread {
             user = new TbUser();
             initUser(user);
             user.setUserName("user" + i);
-            user.setCreateTime(new Timestamp(user.getCreateTime().getTime() + (i * 2000)));
+            user.setCreateTime(user.getCreateTime() + (i * 2000));
             list.add(user);
         }
         service.batchInsertIntoTable(connection, list);
@@ -64,7 +63,7 @@ public class InsertTestThread extends BaseTestThread {
 
     private void initUser(TbUser user) {
         user.setCellphone("11111111111");
-        user.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        user.setCreateTime((int) (System.currentTimeMillis() / 1000));
         user.setEmail("email@email.com");
         user.setPasswordMd5("e10adc3949ba59abbe56e057f20f883e");
         user.setIsDelete(0);

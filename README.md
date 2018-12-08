@@ -11,6 +11,12 @@ Overview
 
 version history
 ---
+### 1.8(2018-12-08):
+* add __getIntValues__ function in __RequestUtil__
+* change __setTimeRange__ function in __BaseDao__, TimeStamp type property is deprecated and Integer type property with unix timestamp is 
+suggested.
+* remove __getTimestamp__ function in __RequestUtil__
+
 ### 1.7(2018-09-30):
 * add __countTableByBean__ function in __BaseDao__
 * other bug fix
@@ -45,7 +51,7 @@ version history
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
     </dependency>
     ```
 license

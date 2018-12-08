@@ -6,7 +6,7 @@
 
     <groupId>com.github.automain</groupId>
     <artifactId>fastjdbc</artifactId>
-    <version>1.7</version>
+    <version>1.8</version>
     <packaging>jar</packaging>
 
     <name>fastjdbc</name>
@@ -155,7 +155,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.12</version>
+            <version>8.0.13</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
