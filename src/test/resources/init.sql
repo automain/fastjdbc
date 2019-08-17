@@ -2,17 +2,17 @@ CREATE DATABASE `automain`;
 
 USE `automain`;
 
-DROP TABLE IF EXISTS `tb_user`;
+DROP TABLE IF EXISTS `test`;
 
-CREATE TABLE `tb_user` (
-  `user_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `user_name` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户名',
-  `password_md5` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码MD5值',
-  `cellphone` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '手机号',
+CREATE TABLE `test` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gid` char(36) NOT NULL COMMENT '测试GID',
   `create_time` int(10) unsigned NOT NULL COMMENT '创建时间',
-  `email` varchar(128) DEFAULT NULL COMMENT '邮箱',
-  `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除(0:否,1:是)',
-  PRIMARY KEY (`user_id`),
-  KEY `idx_cellphone` (`cellphone`),
-  KEY `uniq_user_name` (`user_name`)
+  `update_time` int(10) unsigned NOT NULL COMMENT '更新时间',
+  `is_valid` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否有效(0:否,1:是)',
+  `money` decimal(10,2) unsigned DEFAULT NULL COMMENT '金额',
+  `remark` varchar(256) DEFAULT NULL COMMENT '备注',
+  `test_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '测试名称',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_gid` (`gid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -16,14 +16,12 @@
 
 package com.github.fastjdbc.common;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
 /**
  * <p>An object that all the database bean object should implement.</p>
- * <p>Note: the implement classes of {@link BaseBean} should extends {@link com.github.fastjdbc.util.RequestUtil}</p>
  *
  * @param <T> a class which implement this
  * @since 1.0
@@ -52,7 +50,7 @@ public interface BaseBean<T extends BaseBean> {
      * @return the primary value of the child object
      * @since 1.0
      */
-    Long primaryValue();
+    Integer primaryValue();
 
     /**
      * <p>The key of result map is column name in the database,
@@ -77,15 +75,14 @@ public interface BaseBean<T extends BaseBean> {
 
     /**
      * <p>Get an object of the child bean from {@link ResultSet}.</p>
-     * eg: if there is a primary key column name {@code test_id}
+     * eg: if there is a primary key column name {@code id}
      * and an other column name {@code test_name}
-     * and the child bean name is {@code TbTest}
+     * and the child bean name is {@code Test}
      * the child method should like this:
      * <pre>{@code
-     *  TbTest bean = new TbTest();
-     *  bean.setTestId(rs.getInt("test_id"));
-     *  bean.setTestName(rs.getString("test_name"));
-     *  return bean;
+     *  return new Test()
+     *      .setId(rs.getInt("id"))
+     *      .setTestName(rs.getString("test_name"));
      * }</pre>
      *
      * @param rs the ResultSet of query
@@ -95,23 +92,4 @@ public interface BaseBean<T extends BaseBean> {
      */
     T beanFromResultSet(ResultSet rs) throws SQLException;
 
-    /**
-     * <p>Get an object of the child bean from {@link HttpServletRequest}.</p>
-     * eg: if there is a primary key column name {@code test_id}
-     * and an other column name {@code test_name}
-     * and the child bean name is {@code TbTest}
-     * the child method should like this:
-     * <pre>{@code
-     *  TbTest bean = new TbTest();
-     *  bean.setTestId(getInt("testId", request));
-     *  bean.setTestName(getString("testName", request));
-     *  return bean;
-     * }</pre>
-     * <p>Note: the method {@code getInt} and {@code getString} are from {@link com.github.fastjdbc.util.RequestUtil}</p>
-     *
-     * @param request the request object
-     * @return the object of child
-     * @since 1.0
-     */
-    T beanFromRequest(HttpServletRequest request);
 }

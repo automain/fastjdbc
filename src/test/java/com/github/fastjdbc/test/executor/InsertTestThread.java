@@ -17,55 +17,52 @@
 package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.bean.ConnectionBean;
-import com.github.fastjdbc.test.bean.TbUser;
+import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
-import com.github.fastjdbc.test.service.TbUserService;
+import com.github.fastjdbc.test.service.TestService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class InsertTestThread extends BaseTestThread {
 
     @Override
-    protected void test(ConnectionBean connection, TbUserService service) throws Exception {
+    protected void test(ConnectionBean connection, TestService service) throws Exception {
         insertOne(connection, service);
         insertOneReturnId(connection, service);
         batchInsertTable(connection, service);
     }
 
-    private void insertOne(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser user = new TbUser();
-        initUser(user);
-        user.setUserName("userInsertOne");
-        service.insertIntoTable(connection, user);
+    private void insertOne(ConnectionBean connection, TestService service) throws Exception {
+        Test test = initTest().setTestName("testInsertOne");
+        service.insertIntoTable(connection, test);
     }
 
-    private void insertOneReturnId(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser user = new TbUser();
-        initUser(user);
-        user.setUserName("userReturnId");
-        Long id = service.insertIntoTableReturnId(connection, user);
+    private void insertOneReturnId(ConnectionBean connection, TestService service) throws Exception {
+        Test test = initTest().setTestName("testReturnId");
+        Integer id = service.insertIntoTableReturnId(connection, test);
         System.out.println("=====Insert one table return id is " + id + "=====");
     }
 
-    private void batchInsertTable(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser user = null;
-        List<TbUser> list = new ArrayList<TbUser>(10);
+    private void batchInsertTable(ConnectionBean connection, TestService service) throws Exception {
+        Test test = null;
+        List<Test> list = new ArrayList<Test>(10);
         for (int i = 0; i < 10; i++) {
-            user = new TbUser();
-            initUser(user);
-            user.setUserName("user" + i);
-            user.setCreateTime(user.getCreateTime() + (i * 2000));
-            list.add(user);
+            test = initTest().setTestName("test" + i).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
+            list.add(test);
         }
         service.batchInsertIntoTable(connection, list);
     }
 
-    private void initUser(TbUser user) {
-        user.setCellphone("11111111111");
-        user.setCreateTime((int) (System.currentTimeMillis() / 1000));
-        user.setEmail("email@email.com");
-        user.setPasswordMd5("e10adc3949ba59abbe56e057f20f883e");
-        user.setIsDelete(0);
+    private Test initTest() {
+        return new Test()
+                .setCreateTime((int) (System.currentTimeMillis() / 1000))
+                .setUpdateTime((int) (System.currentTimeMillis() / 1000))
+                .setGid(UUID.randomUUID().toString())
+                .setIsValid(1)
+                .setMoney(BigDecimal.TEN)
+                .setRemark("test remark");
     }
 }

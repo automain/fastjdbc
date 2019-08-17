@@ -33,14 +33,14 @@ public class PageBean<T extends BaseBean> {
      *
      * @since 1.0
      */
-    private Integer curr;
+    private Integer page;
 
     /**
      * Total number of records conforming to query conditions.
      *
      * @since 1.0
      */
-    private Integer count;
+    private Integer total;
 
     /**
      * The record of the current page.
@@ -49,27 +49,39 @@ public class PageBean<T extends BaseBean> {
      */
     private List<T> data;
 
-    public Integer getCurr() {
-        return curr;
+    public Integer getPage() {
+        return page;
     }
 
-    public void setCurr(Integer curr) {
-        this.curr = curr;
+    public PageBean<T> setPage(Integer page) {
+        this.page = page;
+        return this;
     }
 
-    public Integer getCount() {
-        return count;
+    public Integer getTotal() {
+        return total;
     }
 
-    public void setCount(Integer count) {
-        this.count = count;
+    public PageBean<T> setTotal(Integer total) {
+        this.total = total;
+        return this;
     }
 
     public List<T> getData() {
         return data;
     }
 
-    public void setData(List<T> data) {
+    public PageBean<T> setData(List<T> data) {
         this.data = data;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "PageBean{" +
+                "page=" + page +
+                ", total=" + total +
+                ", data=" + data +
+                '}';
     }
 }

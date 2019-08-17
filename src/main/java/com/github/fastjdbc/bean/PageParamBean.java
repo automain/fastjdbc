@@ -21,12 +21,12 @@ import com.github.fastjdbc.common.BaseBean;
 import java.util.List;
 
 /**
- * A bean for set the parameter of query for page.
+ * A bean for set the param of query for page.
  *
  * @param <T> an object which implement {@link BaseBean}
  * @since 1.5
  */
-public class PageParameterBean<T extends BaseBean> {
+public class PageParamBean<T extends BaseBean> {
 
     /**
      * {@link ConnectionBean} object.
@@ -51,11 +51,11 @@ public class PageParameterBean<T extends BaseBean> {
     private String countSql;
 
     /**
-     * Parameter list for the count sql.
+     * Param list for the count sql.
      *
      * @since 1.5
      */
-    private List<Object> countParameterList;
+    private List<Object> countParamList;
 
 
     /**
@@ -66,11 +66,11 @@ public class PageParameterBean<T extends BaseBean> {
     private String sql;
 
     /**
-     * Parameter list for the query sql.
+     * Param list for the query sql.
      *
      * @since 1.5
      */
-    private List<Object> parameterList;
+    private List<Object> paramList;
 
     /**
      * Page number.
@@ -84,69 +84,91 @@ public class PageParameterBean<T extends BaseBean> {
      *
      * @since 1.5
      */
-    private int limit;
+    private int size;
 
     public ConnectionBean getConnection() {
         return connection;
     }
 
-    public void setConnection(ConnectionBean connection) {
+    public PageParamBean<T> setConnection(ConnectionBean connection) {
         this.connection = connection;
+        return this;
     }
 
     public T getBean() {
         return bean;
     }
 
-    public void setBean(T bean) {
+    public PageParamBean<T> setBean(T bean) {
         this.bean = bean;
+        return this;
     }
 
     public String getCountSql() {
         return countSql;
     }
 
-    public void setCountSql(String countSql) {
+    public PageParamBean<T> setCountSql(String countSql) {
         this.countSql = countSql;
+        return this;
     }
 
-    public List<Object> getCountParameterList() {
-        return countParameterList;
+    public List<Object> getCountParamList() {
+        return countParamList;
     }
 
-    public void setCountParameterList(List<Object> countParameterList) {
-        this.countParameterList = countParameterList;
+    public PageParamBean<T> setCountParamList(List<Object> countParamList) {
+        this.countParamList = countParamList;
+        return this;
     }
 
     public String getSql() {
         return sql;
     }
 
-    public void setSql(String sql) {
+    public PageParamBean<T> setSql(String sql) {
         this.sql = sql;
+        return this;
     }
 
-    public List<Object> getParameterList() {
-        return parameterList;
+    public List<Object> getParamList() {
+        return paramList;
     }
 
-    public void setParameterList(List<Object> parameterList) {
-        this.parameterList = parameterList;
+    public PageParamBean<T> setParamList(List<Object> paramList) {
+        this.paramList = paramList;
+        return this;
     }
 
     public int getPage() {
         return page;
     }
 
-    public void setPage(int page) {
+    public PageParamBean<T> setPage(int page) {
         this.page = page;
+        return this;
     }
 
-    public int getLimit() {
-        return limit;
+    public int getSize() {
+        return size;
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
+    public PageParamBean<T> setSize(int size) {
+        this.size = size;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "PageParamBean{" +
+                "connection=" + connection +
+                ", bean=" + bean +
+                ", countSql='" + countSql + '\'' +
+                ", countParamList=" + countParamList +
+                ", sql='" + sql + '\'' +
+                ", paramList=" + paramList +
+                ", page=" + page +
+                ", size=" + size +
+                '}';
     }
 }

@@ -17,17 +17,18 @@
 package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.bean.ConnectionBean;
-import com.github.fastjdbc.test.bean.TbUser;
+import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
-import com.github.fastjdbc.test.service.TbUserService;
+import com.github.fastjdbc.test.service.TestService;
 
-import java.util.Arrays;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public class UpdateTestThread extends BaseTestThread {
 
     @Override
-    protected void test(ConnectionBean connection, TbUserService service) throws Exception {
+    protected void test(ConnectionBean connection, TestService service) throws Exception {
         updateByIdForNotNullColumn(connection, service);
         updateByIdForAllColumn(connection, service);
         updateByParamOne(connection, service);
@@ -36,58 +37,50 @@ public class UpdateTestThread extends BaseTestThread {
         updateByIdList(connection, service);
     }
 
-    private void updateByIdForNotNullColumn(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser bean = new TbUser();
-        bean.setUserId(1L);
-        bean.setEmail("updateNotNull@email.com");
-        service.updateTable(connection, bean, false);
+    private void updateByIdForNotNullColumn(ConnectionBean connection, TestService service) throws Exception {
+        service.updateTable(connection, new Test().setId(1).setRemark("update test remark"), false);
     }
 
-    private void updateByIdForAllColumn(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser bean = new TbUser();
-        bean.setUserId(2L);
-        bean.setUserName("updateAllColumn");
-        bean.setCellphone("11111111111");
-        bean.setCreateTime((int) (System.currentTimeMillis() / 1000));
-        bean.setPasswordMd5("e10adc3949ba59abbe56e057f20f883e");
-        bean.setIsDelete(1);
+    private void updateByIdForAllColumn(ConnectionBean connection, TestService service) throws Exception {
+        Test bean = new Test()
+                .setId(2)
+                .setRemark("update test all remark")
+                .setTestName("update test all testName")
+                .setMoney(BigDecimal.ONE)
+                .setIsValid(1)
+                .setGid(UUID.randomUUID().toString())
+                .setUpdateTime((int) (System.currentTimeMillis() / 1000))
+                .setCreateTime((int) (System.currentTimeMillis() / 1000));
         service.updateTable(connection, bean, true);
     }
 
-    private void updateByParamOne(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser param = new TbUser();
-        param.setEmail("email@email.com");
-        TbUser bean = new TbUser();
-        bean.setEmail("updateByParamOne@email.com");
+    private void updateByParamOne(ConnectionBean connection, TestService service) throws Exception {
+        Test param = new Test().setRemark("test remark");
+        Test bean = new Test().setRemark("update one by bean remark");
         service.updateTable(connection, param, bean, false, false, false);
     }
 
-    private void updateByParamMulti(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser param = new TbUser();
-        param.setIsDelete(0);
-        TbUser bean = new TbUser();
-        bean.setCellphone("22222222222");
+    private void updateByParamMulti(ConnectionBean connection, TestService service) throws Exception {
+        Test param = new Test().setRemark("test remark");
+        Test bean = new Test().setRemark("update all by bean remark");
         service.updateTable(connection, param, bean, false, true, false);
     }
 
-    private void updateByParamInsertWhenNotExist(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser param = new TbUser();
-        param.setIsDelete(0);
-        TbUser bean = new TbUser();
-        bean.setUserName("UpdateNE");
-        bean.setCellphone("11111111111");
-        bean.setCreateTime((int) (System.currentTimeMillis() / 1000));
-        bean.setEmail("email@email.com");
-        bean.setPasswordMd5("e10adc3949ba59abbe56e057f20f883e");
-        bean.setIsDelete(0);
+    private void updateByParamInsertWhenNotExist(ConnectionBean connection, TestService service) throws Exception {
+        Test param = new Test().setRemark("update test when not exists remark");
+        Test bean = new Test()
+                .setRemark("update test when not exists remark")
+                .setTestName("update test when not exists  testName")
+                .setMoney(BigDecimal.ZERO)
+                .setIsValid(0)
+                .setGid(UUID.randomUUID().toString())
+                .setUpdateTime((int) (System.currentTimeMillis() / 1000))
+                .setCreateTime((int) (System.currentTimeMillis() / 1000));
         service.updateTable(connection, param, bean, true, false, false);
     }
 
-    private void updateByIdList(ConnectionBean connection, TbUserService service) throws Exception {
-        List<Long> idList = Arrays.asList(4L, 5L, 6L);
-        TbUser bean = new TbUser();
-        bean.setEmail("updateByIdList@email.com");
-        service.updateTableByIdList(connection, bean, idList, false);
+    private void updateByIdList(ConnectionBean connection, TestService service) throws Exception {
+        service.updateTableByIdList(connection, new Test().setRemark("update by id List remark"), List.of(4, 5, 6), false);
     }
 
 }

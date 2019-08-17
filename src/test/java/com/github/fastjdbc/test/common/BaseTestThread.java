@@ -18,9 +18,9 @@ package com.github.fastjdbc.test.common;
 
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.ConnectionPool;
-import com.github.fastjdbc.test.bean.TbUser;
-import com.github.fastjdbc.test.dao.TbUserDao;
-import com.github.fastjdbc.test.service.TbUserService;
+import com.github.fastjdbc.test.bean.Test;
+import com.github.fastjdbc.test.dao.TestDao;
+import com.github.fastjdbc.test.service.TestService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class BaseTestThread extends Thread {
 
@@ -40,13 +41,13 @@ public class BaseTestThread extends Thread {
             properties.load(is);
             HikariConfig config = new HikariConfig(properties);
             HikariDataSource masterPool = new HikariDataSource(config);
-            ConnectionPool.init(masterPool, null);
+            ConnectionPool.init(masterPool, null, Logger.getLogger("system"));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    protected void test(ConnectionBean connection, TbUserService service) throws Exception {
+    protected void test(ConnectionBean connection, TestService service) throws Exception {
     }
 
     @Override
@@ -55,7 +56,7 @@ public class BaseTestThread extends Thread {
         try {
             connection = ConnectionPool.getConnectionBean(null);
             connection.setPrintSql(true);
-            TbUserService service = new TbUserService(new TbUser(), new TbUserDao());
+            TestService service = new TestService(new Test(), new TestDao());
             test(connection, service);
         } catch (Exception e) {
             e.printStackTrace();

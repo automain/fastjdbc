@@ -18,18 +18,18 @@ package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.PageBean;
-import com.github.fastjdbc.test.bean.TbUser;
+import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
-import com.github.fastjdbc.test.service.TbUserService;
+import com.github.fastjdbc.test.service.TestService;
 
-import java.util.Arrays;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 public class SelectTestThread extends BaseTestThread {
 
     @Override
-    protected void test(ConnectionBean connection, TbUserService service) throws Exception {
+    protected void test(ConnectionBean connection, TestService service) throws Exception {
         selectById(connection, service);
         selectByIdList(connection, service);
         selectOneByBean(connection, service);
@@ -40,90 +40,85 @@ public class SelectTestThread extends BaseTestThread {
         countByBean(connection, service);
     }
 
-    private void selectById(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser user = service.selectTableById(connection, 1L);
-        if (user != null) {
-            System.out.println("=====Select by id username is " + user.getUserName());
+    private void selectById(ConnectionBean connection, TestService service) throws Exception {
+        Test test = service.selectTableById(connection, 1);
+        if (test != null) {
+            System.out.println("=====Select by id testName is " + test.getTestName());
         }
     }
 
-    private void selectByIdList(ConnectionBean connection, TbUserService service) throws Exception {
-        List<TbUser> userList = service.selectTableByIdList(connection, Arrays.asList(2L, 3L));
+    private void selectByIdList(ConnectionBean connection, TestService service) throws Exception {
+        List<Test> userList = service.selectTableByIdList(connection, List.of(2, 3));
         if (!userList.isEmpty()) {
-            for (TbUser user : userList) {
-                System.out.println("=====Select by id List username is " + user.getUserName());
+            for (Test test : userList) {
+                System.out.println("=====Select by id List testName is " + test.getTestName());
             }
         }
     }
 
-    private void selectOneByBean(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser bean = new TbUser();
-        bean.setIsDelete(0);
-        TbUser user = service.selectOneTableByBean(connection, bean);
-        if (user != null) {
-            System.out.println("=====Select one by bean username is " + user.getUserName());
+    private void selectOneByBean(ConnectionBean connection, TestService service) throws Exception {
+        Test bean = new Test();
+        bean.setIsValid(1);
+        Test test = service.selectOneTableByBean(connection, bean);
+        if (test != null) {
+            System.out.println("=====Select one by bean testName is " + test.getTestName());
         }
     }
 
-    private void selectByBean(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser bean = new TbUser();
-        bean.setIsDelete(0);
-        List<TbUser> userList = service.selectTableByBean(connection, bean);
-        if (!userList.isEmpty()) {
-            for (TbUser user : userList) {
-                System.out.println("=====Select by bean username is " + user.getUserName());
+    private void selectByBean(ConnectionBean connection, TestService service) throws Exception {
+        Test bean = new Test();
+        bean.setIsValid(1);
+        List<Test> testList = service.selectTableByBean(connection, bean);
+        if (!testList.isEmpty()) {
+            for (Test test : testList) {
+                System.out.println("=====Select by bean testName is " + test.getTestName());
             }
         }
     }
 
-    private void selectAll(ConnectionBean connection, TbUserService service) throws Exception {
-        List<TbUser> userList = service.selectAllTable(connection);
-        if (!userList.isEmpty()) {
-            for (TbUser user : userList) {
-                System.out.println("=====Select all username is " + user.getUserName());
+    private void selectAll(ConnectionBean connection, TestService service) throws Exception {
+        List<Test> testList = service.selectAllTable(connection);
+        if (!testList.isEmpty()) {
+            for (Test test : testList) {
+                System.out.println("=====Select all testName is " + test.getTestName());
             }
         }
     }
 
-    private void selectForPage(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser bean = new TbUser();
-        bean.setIsDelete(0);
-        PageBean<TbUser> pageBean = service.selectTableForPage(connection, bean, null);
-        System.out.println("=====Select for page count is " + pageBean.getCount());
-        System.out.println("=====Select for page curr is " + pageBean.getCurr());
-        List<TbUser> userList = pageBean.getData();
-        if (userList != null && !userList.isEmpty()) {
-            for (TbUser user : userList) {
-                System.out.println("=====Select for page username is " + user.getUserName());
+    private void selectForPage(ConnectionBean connection, TestService service) throws Exception {
+        Test bean = new Test();
+        bean.setIsValid(1);
+        PageBean<Test> pageBean = service.selectTableForPage(connection, bean, 1, 10);
+        System.out.println("=====Select for page total is " + pageBean.getTotal());
+        System.out.println("=====Select for page page is " + pageBean.getPage());
+        List<Test> testList = pageBean.getData();
+        if (testList != null && !testList.isEmpty()) {
+            for (Test test : testList) {
+                System.out.println("=====Select for page testName is " + test.getTestName());
             }
         }
     }
 
-    private void selectForCustomerPage(ConnectionBean connection, TbUserService service) throws Exception {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        int dayStart = (int) (c.getTime().getTime() / 1000);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        int dayEnd = (int) (c.getTime().getTime() / 1000);
-        TbUser bean = new TbUser();
-        bean.setCreateTimeRange(dayStart + "-" + dayEnd);
-        PageBean<TbUser> pageBean = service.selectTableForCustomPage(connection, bean, null);
-        System.out.println("=====Select for customer page count is " + pageBean.getCount());
-        System.out.println("=====Select for customer page curr is " + pageBean.getCurr());
-        List<TbUser> userList = pageBean.getData();
-        if (userList != null && !userList.isEmpty()) {
-            for (TbUser user : userList) {
-                System.out.println("=====Select for customer page username is " + user.getUserName());
+    private void selectForCustomerPage(ConnectionBean connection, TestService service) throws Exception {
+        int dayStart = (int) LocalDate.now().atStartOfDay().atZone(ZoneOffset.systemDefault()).toInstant().getEpochSecond();
+        int dayEnd = dayStart + 86400;
+        Test bean = new Test();
+        bean.setCreateTime(dayStart);
+        bean.setCreateTimeEnd(dayEnd);
+        PageBean<Test> pageBean = service.selectTableForCustomPage(connection, bean, 1, 10);
+        System.out.println("=====Select for customer page total is " + pageBean.getTotal());
+        System.out.println("=====Select for customer page page is " + pageBean.getPage());
+        List<Test> testList = pageBean.getData();
+        if (testList != null && !testList.isEmpty()) {
+            for (Test test : testList) {
+                System.out.println("=====Select for customer page testName is " + test.getTestName());
             }
         }
     }
 
-    private void countByBean(ConnectionBean connection, TbUserService service) throws Exception {
-        TbUser bean = new TbUser();
-        bean.setIsDelete(0);
+    private void countByBean(ConnectionBean connection, TestService service) throws Exception {
+        Test bean = new Test();
+        bean.setIsValid(1);
         int count = service.countTableByBean(connection, bean);
         System.out.println("=====Count by bean count is " + count);
     }

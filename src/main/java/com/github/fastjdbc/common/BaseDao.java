@@ -19,13 +19,14 @@ package com.github.fastjdbc.common;
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.ConnectionPool;
 import com.github.fastjdbc.bean.PageBean;
-import com.github.fastjdbc.bean.PageParameterBean;
-import com.github.fastjdbc.util.JDBCUtil;
+import com.github.fastjdbc.bean.PageParamBean;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +34,7 @@ import java.util.Set;
 /**
  * <p>A common template of DAO layer, all the classes of DAO layer should extends this class.</p>
  * <p>Considering performance and large amount of data support,
- * the primary key of table should be long type(bigint in mysql) and auto increment.</p>
+ * the primary key of table should be Integer type(int unsigned in mysql) and auto increment.</p>
  * <p>Data permissions should be considered when design the table in database.</p>
  * <p>In business,we usually need to customize the query conditions and return the {@link PageBean} object,
  * a new method is needed to be added to the DAO class in this condition.</p>
@@ -41,7 +42,7 @@ import java.util.Set;
  * @param <T> an object which implement {@link BaseBean}
  * @since 1.0
  */
-public class BaseDao<T extends BaseBean> extends JDBCUtil {
+public class BaseDao<T extends BaseBean> {
 
     /**
      * Insert the not null properties of bean.
@@ -53,11 +54,11 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
-        List<Object> parameterList = new ArrayList<Object>();
-        String sql = getInsertSql(bean, parameterList);
+    protected int insertIntoTable(ConnectionBean connection, T bean) throws SQLException {
+        List<Object> paramList = new ArrayList<Object>();
+        String sql = getInsertSql(bean, paramList);
         if (sql != null) {
-            return executeUpdate(connection, sql, parameterList);
+            return executeUpdate(connection, sql, paramList);
         }
         return 0;
     }
@@ -72,13 +73,13 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
-        List<Object> parameterList = new ArrayList<Object>();
-        String sql = getInsertSql(bean, parameterList);
+    protected Integer insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
+        List<Object> paramList = new ArrayList<Object>();
+        String sql = getInsertSql(bean, paramList);
         if (sql != null) {
-            return executeUpdateReturnId(connection, sql, parameterList);
+            return executeUpdateReturnId(connection, sql, paramList);
         }
-        return 0L;
+        return 0;
     }
 
     /**
@@ -91,11 +92,11 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
-    public int batchInsertIntoTable(ConnectionBean connection, List<T> list) throws SQLException {
-        List<Object> parameterList = new ArrayList<Object>();
-        String sql = getBatchInsertSql(list, parameterList);
+    protected int batchInsertIntoTable(ConnectionBean connection, List<T> list) throws SQLException {
+        List<Object> paramList = new ArrayList<Object>();
+        String sql = getBatchInsertSql(list, paramList);
         if (sql != null) {
-            return executeUpdate(connection, sql, parameterList);
+            return executeUpdate(connection, sql, paramList);
         }
         return 0;
     }
@@ -113,22 +114,19 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public int updateTable(ConnectionBean connection, T bean, boolean all) throws SQLException {
+    protected int updateTable(ConnectionBean connection, T bean, boolean all) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(all).entrySet();
-                StringBuilder sqlBuilder = null;
-                List<Object> parameterList = null;
                 if (!entrySet.isEmpty()) {
-                    parameterList = new ArrayList<Object>(entrySet.size() + 1);
-                    sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
-                    sqlBuilder.append(makeColumnParamSql(entrySet, parameterList, ", "));
-                    sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(" = ?");
-                    parameterList.add(bean.primaryValue());
-                }
-                if (sqlBuilder != null) {
-                    return executeUpdate(connection, sqlBuilder.toString(), parameterList);
+                    List<Object> paramList = new ArrayList<Object>(entrySet.size() + 1);
+                    StringBuilder sqlBuilder = new StringBuilder("UPDATE ")
+                            .append(tableName).append(" SET ")
+                            .append(makeColumnParamSql(entrySet, paramList, ", "))
+                            .append(" WHERE ").append(bean.primaryKey()).append(" = ?");
+                    paramList.add(bean.primaryValue());
+                    return executeUpdate(connection, sqlBuilder.toString(), paramList);
                 }
             }
         }
@@ -148,24 +146,21 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList, boolean all) throws SQLException {
+    protected int updateTableByIdList(ConnectionBean connection, T bean, List<Integer> idList, boolean all) throws SQLException {
         if (bean != null && idList != null && !idList.isEmpty()) {
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(all).entrySet();
-                StringBuilder sqlBuilder = null;
-                List<Object> parameterList = null;
                 if (!entrySet.isEmpty()) {
                     int idSize = idList.size();
                     String inStr = makeInStr(idList);
-                    parameterList = new ArrayList<Object>(entrySet.size() + idSize);
-                    sqlBuilder = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
-                    sqlBuilder.append(makeColumnParamSql(entrySet, parameterList, ", "));
-                    sqlBuilder.append(" WHERE ").append(bean.primaryKey()).append(inStr);
-                    parameterList.addAll(idList);
-                }
-                if (sqlBuilder != null) {
-                    return executeUpdate(connection, sqlBuilder.toString(), parameterList);
+                    List<Object> paramList = new ArrayList<Object>(entrySet.size() + idSize);
+                    StringBuilder sqlBuilder = new StringBuilder("UPDATE ")
+                            .append(tableName).append(" SET ")
+                            .append(makeColumnParamSql(entrySet, paramList, ", "))
+                            .append(" WHERE ").append(bean.primaryKey()).append(inStr);
+                    paramList.addAll(idList);
+                    return executeUpdate(connection, sqlBuilder.toString(), paramList);
                 }
             }
         }
@@ -187,7 +182,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
+    protected int updateTable(ConnectionBean connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
         if (paramBean != null && newBean != null) {
             String tableName = paramBean.tableName();
             String tableNameCheck = newBean.tableName();
@@ -196,18 +191,17 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                 if (!newEntrySet.isEmpty()) {
                     Set<Map.Entry<String, Object>> paramEntrySet = paramBean.columnMap(false).entrySet();
                     StringBuilder paramBuilder = new StringBuilder();
-                    List<Object> parameterList = null;
+                    List<Object> paramList = null;
                     List<Object> newList = new ArrayList<Object>(newEntrySet.size());
                     if (!paramEntrySet.isEmpty()) {
-                        parameterList = new ArrayList<Object>(paramEntrySet.size());
-                        paramBuilder.append(" WHERE ").append(makeColumnParamSql(paramEntrySet, parameterList, " AND "));
+                        paramList = new ArrayList<Object>(paramEntrySet.size());
+                        paramBuilder.append(" WHERE ").append(makeColumnParamSql(paramEntrySet, paramList, " AND "));
                     }
                     if (insertWhenNotExist) {
                         ResultSet rs = null;
                         try {
-                            rs = executeSelectReturnResultSet(connection, "SELECT COUNT(1) FROM " + tableName + paramBuilder.toString(), parameterList);
-                            boolean hasRecord = rs.next() && rs.getInt(1) > 0;
-                            if (!hasRecord) {
+                            rs = executeSelectReturnResultSet(connection, "SELECT 1 FROM " + tableName + paramBuilder.toString() + " LIMIT 1", paramList);
+                            if (!rs.next()) {
                                 return insertIntoTable(connection, newBean);
                             }
                         } finally {
@@ -218,8 +212,8 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     if (!updateMulti) {
                         updateBuilder.append(" LIMIT 1");
                     }
-                    if (parameterList != null) {
-                        newList.addAll(parameterList);
+                    if (paramList != null) {
+                        newList.addAll(paramList);
                     }
                     return executeUpdate(connection, updateBuilder.toString(), newList);
                 }
@@ -230,9 +224,9 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
 
     /**
      * Soft delete a bean by the given id.
-     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
-     * {@code 1} represent the row is deleted,
-     * {@code 0} represent the row is effective.
+     * The column of delete mark should named {@code is_valid} with int type(tinyint in mysql) and
+     * {@code 1} represent the row is valid,
+     * {@code 0} represent the row is invalid.
      *
      * @param connection ConnectionBean object
      * @param bean       bean object
@@ -241,16 +235,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
-        String sql = "UPDATE " + bean.tableName() + " SET is_delete = 1 WHERE " + bean.primaryKey() + " = ?";
-        return executeUpdate(connection, sql, Collections.singletonList(id));
+    protected int softDeleteTableById(ConnectionBean connection, T bean, Integer id) throws SQLException {
+        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE " + bean.primaryKey() + " = ?", List.of(id));
     }
 
     /**
      * Soft delete a bean by the given id list.
-     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
-     * {@code 1} represent the row is deleted,
-     * {@code 0} represent the row is effective.
+     * The column of delete mark should named {@code is_valid} with int type(tinyint in mysql) and
+     * {@code 1} represent the row is valid,
+     * {@code 0} represent the row is invalid.
      *
      * @param connection ConnectionBean object
      * @param bean       bean object
@@ -259,13 +252,13 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    protected int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Integer> idList) throws SQLException {
         String inStr = makeInStr(idList);
         if (inStr == null) {
             return 0;
+        } else {
+            return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE " + bean.primaryKey() + inStr, idList);
         }
-        String sql = "UPDATE " + bean.tableName() + " SET is_delete = 1 WHERE " + bean.primaryKey() + inStr;
-        return executeUpdate(connection, sql, idList);
     }
 
     /**
@@ -278,9 +271,8 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public int deleteTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
-        String sql = "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?";
-        return executeUpdate(connection, sql, Collections.singletonList(id));
+    protected int deleteTableById(ConnectionBean connection, T bean, Integer id) throws SQLException {
+        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", List.of(id));
     }
 
     /**
@@ -293,13 +285,13 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public int deleteTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    protected int deleteTableByIdList(ConnectionBean connection, T bean, List<Integer> idList) throws SQLException {
         String inStr = makeInStr(idList);
         if (inStr == null) {
             return 0;
+        } else {
+            return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr, idList);
         }
-        String sql = "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr;
-        return executeUpdate(connection, sql, idList);
     }
 
     /**
@@ -312,19 +304,18 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.7
      */
     @SuppressWarnings("unchecked")
-    public int countTableByBean(ConnectionBean connection, T bean) throws SQLException {
+    protected int countTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
                 int size = entrySet.size();
-                size = size > 0 ? size : 1;
-                List<Object> parameterList = new ArrayList<Object>(size);
-                String sql = makeSelectTableSql(bean, entrySet, parameterList);
+                List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
+                String sql = makeSelectTableSql(bean, entrySet, paramList);
                 String countSql = "SELECT COUNT(1)" + sql.substring(8);
                 ResultSet rs = null;
                 try {
-                    rs = executeSelectReturnResultSet(connection, countSql, parameterList);
+                    rs = executeSelectReturnResultSet(connection, countSql, paramList);
                     if (rs.next()) {
                         return rs.getInt(1);
                     }
@@ -346,8 +337,8 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public T selectTableById(ConnectionBean connection, T bean, Long id) throws SQLException {
-        return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", Collections.singletonList(id), bean);
+    protected T selectTableById(ConnectionBean connection, T bean, Integer id) throws SQLException {
+        return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", List.of(id), bean);
     }
 
     /**
@@ -361,12 +352,13 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Long> idList) throws SQLException {
+    protected List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Integer> idList) throws SQLException {
         String inStr = makeInStr(idList);
         if (inStr == null) {
             return new ArrayList<T>(1);
+        } else {
+            return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr, idList, bean);
         }
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + inStr, idList, bean);
     }
 
     /**
@@ -380,16 +372,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public T selectOneTableByBean(ConnectionBean connection, T bean) throws SQLException {
+    protected T selectOneTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
                 int size = entrySet.size();
-                size = size > 0 ? size : 1;
-                List<Object> parameterList = new ArrayList<Object>(size);
-                String sql = makeSelectTableSql(bean, entrySet, parameterList) + " LIMIT 1";
-                return executeSelectReturnBean(connection, sql, parameterList, bean);
+                List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
+                String sql = makeSelectTableSql(bean, entrySet, paramList) + " LIMIT 1";
+                return executeSelectReturnBean(connection, sql, paramList, bean);
             }
         }
         return null;
@@ -405,16 +396,15 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public List<T> selectTableByBean(ConnectionBean connection, T bean) throws SQLException {
+    protected List<T> selectTableByBean(ConnectionBean connection, T bean) throws SQLException {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
                 int size = entrySet.size();
-                size = size > 0 ? size : 1;
-                List<Object> parameterList = new ArrayList<Object>(size);
-                String sql = makeSelectTableSql(bean, entrySet, parameterList);
-                return executeSelectReturnList(connection, sql, parameterList, bean);
+                List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
+                String sql = makeSelectTableSql(bean, entrySet, paramList);
+                return executeSelectReturnList(connection, sql, paramList, bean);
             }
         }
         return new ArrayList<T>(1);
@@ -430,7 +420,7 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public List<T> selectAllTable(ConnectionBean connection, T bean) throws SQLException {
+    protected List<T> selectAllTable(ConnectionBean connection, T bean) throws SQLException {
         return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName(), null, bean);
     }
 
@@ -440,93 +430,83 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
      * @param connection ConnectionBean object
      * @param bean       the param bean
      * @param page       page number
-     * @param limit      the count of data displayed on each page
+     * @param size       the count of data displayed on each page
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @see PageBean
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int limit) throws Exception {
+    protected PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int size) throws Exception {
         if (bean != null) {
-            String countSql = null;
-            String sql = null;
-            List<Object> parameterList = null;
             String tableName = bean.tableName();
-            PageParameterBean pageParameterBean = new PageParameterBean();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
-                int size = entrySet.size();
-                size = size > 0 ? size : 1;
-                parameterList = new ArrayList<Object>(size);
-                sql = makeSelectTableSql(bean, entrySet, parameterList);
-                countSql = "SELECT COUNT(1)" + sql.substring(8);
-                pageParameterBean.setConnection(connection);
-                pageParameterBean.setBean(bean);
-                pageParameterBean.setCountSql(countSql);
-                pageParameterBean.setCountParameterList(parameterList);
-                pageParameterBean.setSql(sql);
-                pageParameterBean.setParameterList(parameterList);
-                pageParameterBean.setPage(page);
-                pageParameterBean.setLimit(limit);
+                int entrySize = entrySet.size();
+                List<Object> paramList = new ArrayList<Object>(entrySize > 0 ? entrySize : 1);
+                String sql = makeSelectTableSql(bean, entrySet, paramList);
+                String countSql = "SELECT COUNT(1)" + sql.substring(8);
+                PageParamBean pageParamBean = new PageParamBean()
+                        .setConnection(connection)
+                        .setBean(bean)
+                        .setCountSql(countSql)
+                        .setCountParamList(paramList)
+                        .setSql(sql)
+                        .setParamList(paramList)
+                        .setPage(page)
+                        .setSize(size);
+                return selectTableForPage(pageParamBean);
             }
-            return selectTableForPage(pageParameterBean);
         }
         return new PageBean();
     }
 
     /**
-     * Query list of beans by the param bean for page by given sql and parameter list.
+     * Query list of beans by the param bean for page by given sql and param list.
      *
-     * @param pageParameterBean {@link PageParameterBean} object
+     * @param pageParamBean {@link PageParamBean} object
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public PageBean<T> selectTableForPage(PageParameterBean<T> pageParameterBean) throws Exception {
+    protected PageBean<T> selectTableForPage(PageParamBean<T> pageParamBean) throws Exception {
         PageBean pageBean = new PageBean();
-        if (pageParameterBean != null) {
-            T bean = pageParameterBean.getBean();
-            String countSql = pageParameterBean.getCountSql();
-            String sql = pageParameterBean.getSql();
-            int limit = pageParameterBean.getLimit();
-            int page = pageParameterBean.getPage();
-            ConnectionBean connection = pageParameterBean.getConnection();
-            List<Object> parameterList = pageParameterBean.getParameterList();
+        if (pageParamBean != null) {
+            T bean = pageParamBean.getBean();
+            String countSql = pageParamBean.getCountSql();
+            String sql = pageParamBean.getSql();
             if (bean != null && countSql != null && sql != null) {
-                limit = limit < 1 ? 1 : limit;
-                page = page < 1 ? 1 : page;
+                int size = Math.max(1, pageParamBean.getSize());
+                int page = Math.max(1, pageParamBean.getPage());
+                ConnectionBean connection = pageParamBean.getConnection();
+                List<Object> paramList = pageParamBean.getParamList();
                 ResultSet countResult = null;
                 ResultSet pageResult = null;
                 List<T> data = new ArrayList<T>();
                 try {
-                    int count = 0;
-                    countResult = executeSelectReturnResultSet(connection, countSql, pageParameterBean.getCountParameterList());
+                    int total = 0;
+                    countResult = executeSelectReturnResultSet(connection, countSql, pageParamBean.getCountParamList());
                     if (countResult.next()) {
-                        count = countResult.getInt(1);
+                        total = countResult.getInt(1);
                     }
-                    if (count == 0) {
-                        pageBean.setCount(0);
-                        pageBean.setCurr(1);
-                        pageBean.setData(data);
+                    if (total == 0) {
+                        page = 1;
                     } else {
-                        pageBean.setCount(count);
-                        int offset = (page - 1) * limit;
-                        if (offset > count) {
-                            page = count / limit + 1;
-                        } else if (offset == count) {
-                            page = count / limit;
+                        int offset = (page - 1) * size;
+                        if (offset > total) {
+                            page = total / size + 1;
+                        } else if (offset == total) {
+                            page = total / size;
                         }
-                        parameterList.add((page - 1) * limit);
-                        parameterList.add(limit);
-                        pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", parameterList);
+                        paramList.add((page - 1) * size);
+                        paramList.add(size);
+                        pageResult = executeSelectReturnResultSet(connection, sql + " LIMIT ?, ?", paramList);
                         while (pageResult.next()) {
                             data.add((T) bean.beanFromResultSet(pageResult));
                         }
-                        pageBean.setCurr(page);
-                        pageBean.setData(data);
                     }
+                    pageBean.setTotal(total).setPage(page).setData(data);
                 } finally {
                     ConnectionPool.close(countResult);
                     ConnectionPool.close(pageResult);
@@ -537,18 +517,18 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
     }
 
     /**
-     * Join the placeholder by the parameter list size for sql statement.
+     * Join the placeholder by the param list size for sql statement.
      *
-     * @param parameterList parameter list
+     * @param paramList param list
      * @return string of sql placeholder
      * @since 1.0
      */
-    public static String makeInStr(List<?> parameterList) {
-        if (parameterList == null || parameterList.isEmpty()) {
+    protected static String makeInStr(List<?> paramList) {
+        if (paramList == null || paramList.isEmpty()) {
             return null;
         } else {
             StringBuilder builder = new StringBuilder(" IN(");
-            for (int i = parameterList.size(); i > 0; i--) {
+            for (int i = paramList.size(); i > 0; i--) {
                 builder.append("?");
                 if (i > 1) {
                     builder.append(", ");
@@ -560,44 +540,29 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
     }
 
     /**
-     * Format time range parameter to Timestamp range.
+     * Join the sql of insert into table and add param to param list.
      *
-     * @param rangeParam    time range parameter
-     * @param parameterList parameter list
-     * @since 1.0
-     */
-    public static void setTimeRange(String rangeParam, List<Object> parameterList) {
-        if (rangeParam != null && rangeParam.indexOf("-") > 1) {
-            String[] time = rangeParam.split("-", 2);
-            parameterList.add(Integer.valueOf(time[0]));
-            parameterList.add(Integer.valueOf(time[1]));
-        }
-    }
-
-    /**
-     * Join the sql of insert into table and add parameter to parameter list.
-     *
-     * @param bean          bean object
-     * @param parameterList parameter list
-     * @param <T>           class which implement {@link BaseBean}
+     * @param bean      bean object
+     * @param paramList param list
+     * @param <T>       class which implement {@link BaseBean}
      * @return sql string for insert into table
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    private static <T extends BaseBean> String getInsertSql(T bean, List<Object> parameterList) {
+    private static <T extends BaseBean> String getInsertSql(T bean, List<Object> paramList) {
         if (bean != null) {
             String tableName = bean.tableName();
             if (tableName != null) {
                 Set<Map.Entry<String, Object>> entrySet = bean.columnMap(false).entrySet();
-                StringBuilder sqlBuilder = new StringBuilder();
                 if (!entrySet.isEmpty()) {
                     int size = entrySet.size();
+                    StringBuilder sqlBuilder = new StringBuilder();
                     sqlBuilder.append("INSERT INTO ").append(tableName).append("(");
                     StringBuilder valueBuilder = new StringBuilder();
                     int offset = 1;
                     for (Map.Entry<String, Object> entry : entrySet) {
                         sqlBuilder.append(entry.getKey());
-                        parameterList.add(entry.getValue());
+                        paramList.add(entry.getValue());
                         valueBuilder.append("?");
                         if (offset < size) {
                             sqlBuilder.append(", ");
@@ -608,78 +573,78 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
                     sqlBuilder.append(") VALUES (");
                     valueBuilder.append(")");
                     sqlBuilder.append(valueBuilder);
+                    return sqlBuilder.toString();
                 }
-                return sqlBuilder.toString();
             }
         }
         return null;
     }
 
     /**
-     * Join the sql of batch insert into table and add parameter to parameter list.
+     * Join the sql of batch insert into table and add param to param list.
      *
-     * @param list          list of bean object
-     * @param parameterList parameter list
-     * @param <T>           class which implement {@link BaseBean}
+     * @param list      list of bean object
+     * @param paramList param list
+     * @param <T>       class which implement {@link BaseBean}
      * @return sql string for insert into table
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    private static <T extends BaseBean> String getBatchInsertSql(List<T> list, List<Object> parameterList) {
+    private static <T extends BaseBean> String getBatchInsertSql(List<T> list, List<Object> paramList) {
         if (list != null && !list.isEmpty()) {
             T bean = list.get(0);
             String tableName = bean.tableName();
             if (tableName != null) {
-                Set<String> columnSet = bean.columnMap(true).keySet();
-                StringBuilder sqlBuilder = new StringBuilder();
-                if (!columnSet.isEmpty()) {
-                    int size = columnSet.size();
+                List<String> columnList = new ArrayList<String>(bean.columnMap(true).keySet());
+                if (!columnList.isEmpty()) {
+                    StringBuilder sqlBuilder = new StringBuilder();
                     sqlBuilder.append("INSERT INTO ").append(tableName).append("(");
                     StringBuilder valueBuilder = new StringBuilder(" (");
-                    int offset = 1;
-                    for (String column : columnSet) {
-                        sqlBuilder.append(column);
+                    for (int i = 0, size = columnList.size(), prev = size - 1; i < size; i++) {
+                        sqlBuilder.append(columnList.get(i));
                         valueBuilder.append("?");
-                        if (offset < size) {
+                        if (i < prev) {
                             sqlBuilder.append(", ");
                             valueBuilder.append(", ");
                         }
-                        offset++;
                     }
                     sqlBuilder.append(") VALUES");
                     valueBuilder.append(")");
                     StringBuilder paramBuilder = new StringBuilder();
-                    for (int i = 0, listSize = list.size(), prev = listSize - 1; i < listSize; i++) {
+                    for (int i = 0, size = list.size(), prev = size - 1; i < size; i++) {
                         paramBuilder.append(valueBuilder);
                         if (i < prev) {
                             paramBuilder.append(", ");
                         }
-                        parameterList.addAll(list.get(i).columnMap(true).values());
+                        Map<String, Object> columnMap = list.get(i).columnMap(true);
+                        for (int j = 0, columnSize = columnList.size(); j < columnSize; j++) {
+                            paramList.add(columnMap.get(columnList.get(j)));
+                        }
                     }
                     sqlBuilder.append(paramBuilder);
+                    return sqlBuilder.toString();
                 }
-                return sqlBuilder.toString();
             }
         }
         return null;
     }
 
     /**
-     * Join the not null column sql by separator and add parameter to parameter list.
+     * Join the not null column sql by separator and add param to param list.
      *
-     * @param entrySet      the not null column map collection
-     * @param parameterList parameter list
-     * @param separator     the separator to connect sql string
+     * @param entrySet  the not null column map collection
+     * @param paramList param list
+     * @param separator the separator to connect sql string
      * @return sql string
      * @since 1.0
      */
-    private static String makeColumnParamSql(Set<Map.Entry<String, Object>> entrySet, List<Object> parameterList, String separator) {
+    private static String makeColumnParamSql(Set<Map.Entry<String, Object>> entrySet, List<Object> paramList, String separator) {
         StringBuilder sqlBuilder = new StringBuilder();
         int size = entrySet.size();
         int offset = 1;
         for (Map.Entry<String, Object> entry : entrySet) {
             sqlBuilder.append(entry.getKey()).append(" = ?");
-            parameterList.add(entry.getValue());
+            paramList.add(entry.getValue());
             if (offset < size) {
                 sqlBuilder.append(separator);
             }
@@ -689,22 +654,219 @@ public class BaseDao<T extends BaseBean> extends JDBCUtil {
     }
 
     /**
-     * Join the not null column sql for select and add parameter to parameter list.
+     * Join the not null column sql for select and add param to param list.
      *
-     * @param bean          bean object
-     * @param entrySet      the not null column map collection
-     * @param parameterList parameter list
-     * @param <T>           class which implement {@link BaseBean}
+     * @param bean      bean object
+     * @param entrySet  the not null column map collection
+     * @param paramList param list
+     * @param <T>       class which implement {@link BaseBean}
      * @return sql string
      * @since 1.0
      */
-    private static <T extends BaseBean> String makeSelectTableSql(T bean, Set<Map.Entry<String, Object>> entrySet, List<Object> parameterList) {
+    private static <T extends BaseBean> String makeSelectTableSql(T bean, Set<Map.Entry<String, Object>> entrySet, List<Object> paramList) {
         StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ").append(bean.tableName());
         int size = entrySet.size();
         if (size > 0) {
-            sqlBuilder.append(" WHERE ").append(makeColumnParamSql(entrySet, parameterList, " AND "));
+            sqlBuilder.append(" WHERE ").append(makeColumnParamSql(entrySet, paramList, " AND "));
         }
         return sqlBuilder.toString();
+    }
+
+    /**
+     * Execute update type sql.
+     *
+     * @param connection ConnectionBean object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return success rows count
+     * @throws SQLException exception when execute sql
+     * @since 1.0
+     */
+    protected static int executeUpdate(ConnectionBean connection, String sql, List<?> paramList) throws SQLException {
+        if (connection == null) {
+            throw new RuntimeException("ConnectionBean object must not null");
+        }
+        Connection writeConnection = connection.getWriteConnection();
+        if (writeConnection == null || writeConnection.isClosed()) {
+            throw new RuntimeException("write connection must not null and not closed");
+        }
+        try (PreparedStatement stmt = writeConnection.prepareStatement(sql)) {
+            if (connection.isPrintSql() && ConnectionPool.getLogger() != null) {
+                ConnectionPool.getLogger().info(makeLogSql(sql, paramList));
+            }
+            setParams(stmt, paramList);
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            printError(sql, paramList);
+            throw e;
+        }
+    }
+
+    /**
+     * Execute update type sql, only for insert sql and return id.
+     *
+     * @param connection ConnectionBean object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return success rows count
+     * @throws SQLException exception when execute sql
+     * @see com.github.fastjdbc.common.BaseDao#insertIntoTableReturnId(ConnectionBean, BaseBean)
+     * @since 1.0
+     */
+    protected static Integer executeUpdateReturnId(ConnectionBean connection, String sql, List<?> paramList) throws SQLException {
+        if (connection == null) {
+            throw new RuntimeException("ConnectionBean object must not null");
+        }
+        Connection writeConnection = connection.getWriteConnection();
+        if (writeConnection == null || writeConnection.isClosed()) {
+            throw new RuntimeException("write connection must not null and not closed");
+        }
+        try (PreparedStatement stmt = writeConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (connection.isPrintSql() && ConnectionPool.getLogger() != null) {
+                ConnectionPool.getLogger().info(makeLogSql(sql, paramList));
+            }
+            setParams(stmt, paramList);
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            printError(sql, paramList);
+            throw e;
+        }
+    }
+
+    /**
+     * Execute a select sql and return a child bean of {@link BaseBean}.
+     *
+     * @param connection ConnectionBean object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @param bean       bean object which type is same as the return one
+     * @param <T>        class which implement {@link BaseBean}
+     * @return child bean object of {@link BaseBean}
+     * @throws SQLException exception when execute sql
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    protected static <T extends BaseBean> T executeSelectReturnBean(ConnectionBean connection, String sql, List<?> paramList, T bean) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            return rs.next() ? (T) bean.beanFromResultSet(rs) : null;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a child bean list of {@link BaseBean}.
+     *
+     * @param connection ConnectionBean object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @param bean       bean object which type is same as the return one
+     * @param <T>        class which implement {@link BaseBean}
+     * @return list of child bean object of {@link BaseBean}
+     * @throws SQLException exception when execute sql
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    protected static <T extends BaseBean> List<T> executeSelectReturnList(ConnectionBean connection, String sql, List<?> paramList, T bean) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            List<T> resultList = new ArrayList<T>();
+            while (rs.next()) {
+                resultList.add((T) bean.beanFromResultSet(rs));
+            }
+            return resultList;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * <p>Execute a select sql and return a {@link ResultSet} object.</p>
+     * <p>Note: When the existing methods do not meet the requirements, you can call this for customer select sql,
+     * just as important, you must call {@link ConnectionPool#close(ResultSet)} to close the {@link ResultSet} object at last.</p>
+     *
+     * @param connection ConnectionBean object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return {@link ResultSet} object
+     * @throws SQLException exception when execute sql
+     * @since 1.0
+     */
+    public static ResultSet executeSelectReturnResultSet(ConnectionBean connection, String sql, List<?> paramList) throws SQLException {
+        if (connection == null) {
+            throw new RuntimeException("ConnectionBean object must not null");
+        }
+        Connection readConnection = connection.getReadConnection();
+        if (readConnection == null || readConnection.isClosed()) {
+            throw new RuntimeException("read connection must not null and not closed");
+        }
+        try {
+            if (connection.isPrintSql() && ConnectionPool.getLogger() != null) {
+                ConnectionPool.getLogger().info(makeLogSql(sql, paramList));
+            }
+            PreparedStatement stmt = readConnection.prepareStatement(sql);
+            setParams(stmt, paramList);
+            return stmt.executeQuery();
+        } catch (SQLException e) {
+            printError(sql, paramList);
+            throw e;
+        }
+    }
+
+    /**
+     * Set paramters for the prepared statement.
+     *
+     * @param stmt      the prepared statement
+     * @param paramList param list
+     * @throws SQLException exception when set paramter
+     * @since 1.0
+     */
+    private static void setParams(PreparedStatement stmt, List<?> paramList) throws SQLException {
+        if (paramList != null) {
+            for (int i = 0, size = paramList.size(); i < size; i++) {
+                stmt.setObject(i + 1, paramList.get(i));
+            }
+        }
+    }
+
+    /**
+     * Join a complete sql for print to console.
+     *
+     * @param sql       the original sql
+     * @param paramList param list
+     * @since 1.0
+     */
+    private static void printError(String sql, List<?> paramList) {
+        ConnectionPool.getLogger().severe("JDBC exception error sql: " + makeLogSql(sql, paramList));
+    }
+
+    /**
+     * Join a complete sql for print or log.
+     *
+     * @param sql       the original sql
+     * @param paramList param list
+     * @return the complete sql
+     * @since 1.0
+     */
+    private static String makeLogSql(String sql, List<?> paramList) {
+        if (paramList != null) {
+            Object o = null;
+            for (int i = 0, size = paramList.size(); i < size; i++) {
+                o = paramList.get(i);
+                if (o == null) {
+                    sql = sql.replaceFirst("\\?", "NULL");
+                } else {
+                    sql = sql.replaceFirst("\\?", "'" + o.toString() + "'");
+                }
+            }
+        }
+        return sql;
     }
 
 }

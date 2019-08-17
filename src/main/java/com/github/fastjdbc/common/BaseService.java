@@ -18,9 +18,7 @@ package com.github.fastjdbc.common;
 
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.PageBean;
-import com.github.fastjdbc.util.RequestUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -33,7 +31,7 @@ import java.util.List;
  * @param <D> an object which implement {@link BaseDao}
  * @since 1.0
  */
-public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends RequestUtil {
+public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
 
     /**
      * Dao object.
@@ -91,7 +89,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public Long insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
+    public Integer insertIntoTableReturnId(ConnectionBean connection, T bean) throws SQLException {
         return dao.insertIntoTableReturnId(connection, bean);
     }
 
@@ -137,7 +135,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
-    public int updateTableByIdList(ConnectionBean connection, T bean, List<Long> idList, boolean all) throws SQLException {
+    public int updateTableByIdList(ConnectionBean connection, T bean, List<Integer> idList, boolean all) throws SQLException {
         return dao.updateTableByIdList(connection, bean, idList, all);
     }
 
@@ -171,7 +169,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableById(ConnectionBean connection, Long id) throws SQLException {
+    public int softDeleteTableById(ConnectionBean connection, Integer id) throws SQLException {
         return dao.softDeleteTableById(connection, bean, id);
     }
 
@@ -187,7 +185,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException {
+    public int softDeleteTableByIdList(ConnectionBean connection, List<Integer> idList) throws SQLException {
         return dao.softDeleteTableByIdList(connection, bean, idList);
     }
 
@@ -200,7 +198,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public int deleteTableById(ConnectionBean connection, Long id) throws SQLException {
+    public int deleteTableById(ConnectionBean connection, Integer id) throws SQLException {
         return dao.deleteTableById(connection, bean, id);
     }
 
@@ -213,7 +211,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public int deleteTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException {
+    public int deleteTableByIdList(ConnectionBean connection, List<Integer> idList) throws SQLException {
         return dao.deleteTableByIdList(connection, bean, idList);
     }
 
@@ -237,7 +235,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public T selectTableById(ConnectionBean connection, Long id) throws SQLException {
+    public T selectTableById(ConnectionBean connection, Integer id) throws SQLException {
         return dao.selectTableById(connection, bean, id);
     }
 
@@ -250,7 +248,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public List<T> selectTableByIdList(ConnectionBean connection, List<Long> idList) throws SQLException {
+    public List<T> selectTableByIdList(ConnectionBean connection, List<Integer> idList) throws SQLException {
         return dao.selectTableByIdList(connection, bean, idList);
     }
 
@@ -298,36 +296,15 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> extends Reque
      *
      * @param connection ConnectionBean object
      * @param bean       the param bean
-     * @param request    {@link HttpServletRequest} object
+     * @param page       page number
+     * @param size       the count of data displayed on each page
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @see PageBean
      * @since 1.0
      */
-    public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, HttpServletRequest request) throws Exception {
-        return dao.selectTableForPage(connection, bean, pageFromRequest(request), limitFromRequest(request));
-    }
-
-    /**
-     * Get current page number from {@link HttpServletRequest} object, default 1
-     *
-     * @param request {@link HttpServletRequest} object
-     * @return current page number
-     * @since 1.2
-     */
-    public int pageFromRequest(HttpServletRequest request) {
-        return getInt("page", request, 1);
-    }
-
-    /**
-     * Get current page limit from {@link HttpServletRequest} object, default 10
-     *
-     * @param request {@link HttpServletRequest} object
-     * @return current page limit
-     * @since 1.2
-     */
-    public int limitFromRequest(HttpServletRequest request) {
-        return getInt("limit", request, 10);
+    public PageBean<T> selectTableForPage(ConnectionBean connection, T bean, int page, int size) throws Exception {
+        return dao.selectTableForPage(connection, bean, page, size);
     }
 
 }

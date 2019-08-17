@@ -19,19 +19,17 @@ package com.github.fastjdbc.test.service;
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.PageBean;
 import com.github.fastjdbc.common.BaseService;
-import com.github.fastjdbc.test.bean.TbUser;
-import com.github.fastjdbc.test.dao.TbUserDao;
+import com.github.fastjdbc.test.bean.Test;
+import com.github.fastjdbc.test.dao.TestDao;
 
-import javax.servlet.http.HttpServletRequest;
+public class TestService extends BaseService<Test, TestDao> {
 
-public class TbUserService extends BaseService<TbUser, TbUserDao> {
-
-    public TbUserService(TbUser bean, TbUserDao dao) {
+    public TestService(Test bean, TestDao dao) {
         super(bean, dao);
     }
 
-    public PageBean<TbUser> selectTableForCustomPage(ConnectionBean connection, TbUser bean, HttpServletRequest request) throws Exception {
-        return getDao().selectTableForCustomPage(connection, bean, pageFromRequest(request), limitFromRequest(request));
+    public PageBean<Test> selectTableForCustomPage(ConnectionBean connection, Test bean, int page, int size) throws Exception {
+        return getDao().selectTableForCustomPage(connection, bean, page, size);
     }
 
 }

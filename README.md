@@ -2,15 +2,19 @@ Overview
 ---
 #### *fastjdbc* is a lightweight jdbc frame. It's designed around fast development, fast working and fast maintenance.
 #### **The following constraints must be accepted to use this frame:**
-* Java EE 8 or later is necessary.
-* [Servlet](https://javaee.github.io/servlet-spec/) is necessary.
-* The primary key in the database table should be the __bigint__ type in mysql (__java.lang.Long__ type in java), or same level type in other database.
+* Java EE 12 or later is necessary.
+* The primary key in the database table should be the __int__ type in mysql (__java.lang.Integer__ type in java), or same level type in other database.
 * The primary key in the database table should be __auto increment__.
-* Logical deletion(soft delete) are recommended and the delete flag column should be named by '__is_delete__' and __tinyint__ type in mysql(__java.lang.Integer__ type in java) or same level type in other database.
-'__0__' means the row is effective and '__1__' means the row is deleted.
+* Logical deletion(soft delete) are recommended and the valid flag column should be named by '__is_valid__' and __tinyint__ type in mysql(__java.lang.Integer__ type in java) or same level type in other database.
+'__0__' means the row is invalid and '__1__' means the row is valid.
 
 version history
 ---
+### 2.0(2019-08-18):
+* disign upgrade for front and back end separation
+* remove __RequestUtil__ and __Servlet__ dependence
+* standardized naming for params and functions
+* Incompatible with older versions and version below 2.0 is deprecated
 ### 1.8(2018-12-08):
 * add __getIntValues__ function in __RequestUtil__
 * change __setTimeRange__ function in __BaseDao__, TimeStamp type property is deprecated and Integer type property with unix timestamp is 
@@ -44,20 +48,19 @@ suggested.
 * __pom.xml__ and __README.md__ adjust
 ### 1.0(2018-03-06):
 * init commit(see __javadoc__)
-* [generator](https://github.com/automain/generator) release to generate __Bean__,__Dao__,__Service__
 ---
 * maven dependence
     ```
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>1.8</version>
+        <version>2.0</version>
     </dependency>
     ```
 license
 ---
 ```
-Copyright 2018 fastjdbc
+Copyright 2019 fastjdbc
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

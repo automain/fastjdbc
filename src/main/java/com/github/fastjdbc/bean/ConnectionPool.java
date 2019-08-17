@@ -24,15 +24,23 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * <p>A connection pool class.</p>
- * <p>You should call {@link #init(DataSource, Map)} method to init the global connection pool
+ * <p>You should call {@link #init(DataSource, Map, Logger)} method to init the global connection pool
  * on system start only one time.</p>
  *
  * @since 1.0
  */
 public class ConnectionPool {
+
+    /**
+     * The logger object for print log.
+     *
+     * @since 2.0
+     */
+    private static Logger LOGGER;
 
     /**
      * Master database connection pool.
@@ -60,9 +68,10 @@ public class ConnectionPool {
      *
      * @param masterPool   master datasource
      * @param slavePoolMap map of slave datasource, key is slave pool name, value is datasource object
+     * @param logger       logger object for print log
      * @since 1.0
      */
-    public static synchronized void init(DataSource masterPool, Map<String, DataSource> slavePoolMap) {
+    public static synchronized void init(DataSource masterPool, Map<String, DataSource> slavePoolMap, Logger logger) {
         if (MASTER_POOL == null || DEFAULT_SLAVE_POOL == null) {
             if (masterPool == null) {
                 throw new RuntimeException("master pool must not null");
@@ -74,7 +83,17 @@ public class ConnectionPool {
             } else {
                 DEFAULT_SLAVE_POOL = masterPool;
             }
+            LOGGER = logger;
         }
+    }
+
+    /**
+     * Get the logger object to print log.
+     *
+     * @since 2.0
+     */
+    public static Logger getLogger() {
+        return LOGGER;
     }
 
     /**
@@ -171,7 +190,7 @@ public class ConnectionPool {
 
     /**
      * <p>Close the {@link ResultSet} object.</p>
-     * <p>When {@link com.github.fastjdbc.util.JDBCUtil#executeSelectReturnResultSet(ConnectionBean, String, List)} called,
+     * <p>When {@link com.github.fastjdbc.common.BaseDao#executeSelectReturnResultSet(ConnectionBean, String, List)} called,
      * this method should be called to close {@link ResultSet} at last.</p>
      *
      * @param rs {@link ResultSet} object to close

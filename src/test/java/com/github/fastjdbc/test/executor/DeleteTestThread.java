@@ -18,33 +18,18 @@ package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.test.common.BaseTestThread;
-import com.github.fastjdbc.test.service.TbUserService;
+import com.github.fastjdbc.test.service.TestService;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class DeleteTestThread extends BaseTestThread {
 
     @Override
-    protected void test(ConnectionBean connection, TbUserService service) throws Exception {
-        softDeleteById(connection, service);
-        softDeleteByIdList(connection, service);
-        deleteById(connection, service);
-        deleteByIdList(connection, service);
+    protected void test(ConnectionBean connection, TestService service) throws Exception {
+        service.softDeleteTableById(connection, 9);
+        service.softDeleteTableByIdList(connection, List.of(7, 8));
+        service.deleteTableById(connection, 10);
+        service.deleteTableByIdList(connection, List.of(11, 12));
     }
 
-    private void softDeleteById(ConnectionBean connection, TbUserService service) throws Exception {
-        service.softDeleteTableById(connection, 9L);
-    }
-
-    private void softDeleteByIdList(ConnectionBean connection, TbUserService service) throws Exception {
-        service.softDeleteTableByIdList(connection, Arrays.asList(7L, 8L));
-    }
-
-    private void deleteById(ConnectionBean connection, TbUserService service) throws Exception {
-        service.deleteTableById(connection, 10L);
-    }
-
-    private void deleteByIdList(ConnectionBean connection, TbUserService service) throws Exception {
-        service.deleteTableByIdList(connection, Arrays.asList(11L, 12L));
-    }
 }
