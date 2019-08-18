@@ -28,55 +28,20 @@ public class Test implements BaseBean<Test> {
 
     // 主键
     private Integer id;
-
     // 测试GID
     private String gid;
-
     // 创建时间
     private Integer createTime;
-
     // 更新时间
     private Integer updateTime;
-
     // 是否有效(0:否,1:是)
     private Integer isValid;
-
     // 金额
     private BigDecimal money;
-
     // 备注
     private String remark;
-
     // 测试名称
     private String testName;
-
-    // ========== additional column begin ==========
-
-    // 创建时间结束
-    private Integer createTimeEnd;
-
-    // 更新时间结束
-    private Integer updateTimeEnd;
-
-    public Integer getCreateTimeEnd() {
-        return createTimeEnd;
-    }
-
-    public Test setCreateTimeEnd(Integer createTimeEnd) {
-        this.createTimeEnd = createTimeEnd;
-        return this;
-    }
-
-    public Integer getUpdateTimeEnd() {
-        return updateTimeEnd;
-    }
-
-    public Test setUpdateTimeEnd(Integer updateTimeEnd) {
-        this.updateTimeEnd = updateTimeEnd;
-        return this;
-    }
-
-    // ========== additional column end ==========
 
     public Integer getId() {
         return id;
@@ -167,7 +132,7 @@ public class Test implements BaseBean<Test> {
 
     @Override
     public Map<String, Object> columnMap(boolean all) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<String, Object>(7);
         if (all || this.getGid() != null) {
             map.put("gid", this.getGid());
         }
@@ -205,4 +170,17 @@ public class Test implements BaseBean<Test> {
                 .setTestName(rs.getString("test_name"));
     }
 
+    @Override
+    public String toString() {
+        return "Test{" +
+                "id=" + id +
+                ", gid='" + gid + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", isValid=" + isValid +
+                ", money=" + money +
+                ", remark='" + remark + '\'' +
+                ", testName='" + testName + '\'' +
+                '}';
+    }
 }

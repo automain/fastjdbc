@@ -22,11 +22,11 @@ import java.util.concurrent.Executors;
 public class MainTestExecutor {
 
     public static void main(String[] args) {
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
 //        executorService.execute(new InsertTestThread());
 //        executorService.execute(new UpdateTestThread());
-//        executorService.execute(new DeleteTestThread());
 //        executorService.execute(new SelectTestThread());
+//        executorService.execute(new DeleteTestThread());
         executorService.shutdown();
     }
 

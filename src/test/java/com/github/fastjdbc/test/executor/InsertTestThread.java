@@ -36,12 +36,12 @@ public class InsertTestThread extends BaseTestThread {
     }
 
     private void insertOne(ConnectionBean connection, TestService service) throws Exception {
-        Test test = initTest().setTestName("testInsertOne");
+        Test test = initTest().setTestName("insertOne testName");
         service.insertIntoTable(connection, test);
     }
 
     private void insertOneReturnId(ConnectionBean connection, TestService service) throws Exception {
-        Test test = initTest().setTestName("testReturnId");
+        Test test = initTest().setTestName("insertOneReturnId testName");
         Integer id = service.insertIntoTableReturnId(connection, test);
         System.out.println("=====Insert one table return id is " + id + "=====");
     }
@@ -50,7 +50,7 @@ public class InsertTestThread extends BaseTestThread {
         Test test = null;
         List<Test> list = new ArrayList<Test>(10);
         for (int i = 0; i < 10; i++) {
-            test = initTest().setTestName("test" + i).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
+            test = initTest().setTestName("batchInsertTable" + i).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
             list.add(test);
         }
         service.batchInsertIntoTable(connection, list);

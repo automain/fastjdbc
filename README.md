@@ -10,6 +10,9 @@ Overview
 
 version history
 ---
+### 2.1(2019-08-19):
+* add gid(global id for partition table) column support
+* adjust test method
 ### 2.0(2019-08-18):
 * disign upgrade for front and back end separation
 * remove __RequestUtil__ and __Servlet__ dependence
@@ -54,7 +57,7 @@ suggested.
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
     </dependency>
     ```
 license

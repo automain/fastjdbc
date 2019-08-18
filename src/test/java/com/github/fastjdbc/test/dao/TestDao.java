@@ -21,6 +21,7 @@ import com.github.fastjdbc.bean.PageBean;
 import com.github.fastjdbc.bean.PageParamBean;
 import com.github.fastjdbc.common.BaseDao;
 import com.github.fastjdbc.test.bean.Test;
+import com.github.fastjdbc.test.vo.TestVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,24 +29,24 @@ import java.util.List;
 public class TestDao extends BaseDao<Test> {
 
     @SuppressWarnings("unchecked")
-    public PageBean<Test> selectTableForCustomPage(ConnectionBean connection, Test bean, int page, int size) throws Exception {
-        List<Object> countParameterList = new ArrayList<Object>();
-        List<Object> parameterList = new ArrayList<Object>();
-        String countSql = setSearchCondition(bean, countParameterList, true);
-        String sql = setSearchCondition(bean, parameterList, false);
+    public PageBean<Test> selectTableForCustomPage(ConnectionBean connection, TestVO bean, int page, int size) throws Exception {
+        List<Object> countParamList = new ArrayList<Object>();
+        List<Object> paramList = new ArrayList<Object>();
+        String countSql = setSearchCondition(bean, countParamList, true);
+        String sql = setSearchCondition(bean, paramList, false);
         PageParamBean pageParamBean = new PageParamBean()
                 .setConnection(connection)
                 .setBean(bean)
                 .setCountSql(countSql)
-                .setCountParamList(countParameterList)
+                .setCountParamList(countParamList)
                 .setSql(sql)
-                .setParamList(parameterList)
+                .setParamList(paramList)
                 .setPage(page)
                 .setSize(size);
         return selectTableForPage(pageParamBean);
     }
 
-    private String setSearchCondition(Test bean, List<Object> parameterList, boolean isCountSql) {
+    private String setSearchCondition(TestVO bean, List<Object> paramList, boolean isCountSql) {
         StringBuilder sql = new StringBuilder("SELECT ");
         if (isCountSql) {
             sql.append("COUNT(1)");
@@ -55,16 +56,19 @@ public class TestDao extends BaseDao<Test> {
         sql.append(" FROM test WHERE is_valid = 1 ");
         if (bean.getGid() != null) {
             sql.append(" AND gid = ?");
-            parameterList.add(bean.getGid());
+            paramList.add(bean.getGid());
         }
-        if (bean.getCreateTime() != null && bean.getCreateTimeEnd() != null) {
-            sql.append(" AND create_time >= ? AND create_time <= ?");
-            parameterList.add(bean.getCreateTime());
-            parameterList.add(bean.getCreateTimeEnd());
+        if (bean.getCreateTime() != null) {
+            sql.append(" AND create_time >= ?");
+            paramList.add(bean.getCreateTime());
+        }
+        if (bean.getCreateTimeEnd() != null) {
+            sql.append(" AND create_time < ?");
+            paramList.add(bean.getCreateTimeEnd());
         }
         if (bean.getTestName() != null) {
             sql.append(" AND test_name LIKE ?");
-            parameterList.add(bean.getTestName() + "%");
+            paramList.add(bean.getTestName() + "%");
         }
         return sql.toString();
     }

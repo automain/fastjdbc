@@ -108,8 +108,7 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
     }
 
     /**
-     * Update the not null properties of bean by the primary key of bean, the primary key
-     * property should not null otherwise nothing will be updated.
+     * Update the properties of bean by the primary key of bean.
      *
      * @param connection ConnectionBean object
      * @param bean       bean to update
@@ -119,12 +118,27 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
-    public int updateTable(ConnectionBean connection, T bean, boolean all) throws SQLException {
-        return dao.updateTable(connection, bean, all);
+    public int updateTableById(ConnectionBean connection, T bean, boolean all) throws SQLException {
+        return dao.updateTableById(connection, bean, all);
     }
 
     /**
-     * Update the not null properties of bean by the given id list.
+     * Update the properties of bean by the gid column of bean.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to update
+     * @param all        true to update all column of bean, false to update not null column of bean
+     * @return count of updated rows
+     * @throws SQLException exception when update failed
+     * @see BaseBean#columnMap(boolean)
+     * @since 2.1
+     */
+    public int updateTableByGid(ConnectionBean connection, T bean, boolean all) throws SQLException {
+        return dao.updateTableByGid(connection, bean, all);
+    }
+
+    /**
+     * Update the properties of bean by the given id list.
      *
      * @param connection ConnectionBean object
      * @param bean       bean to update
@@ -140,7 +154,23 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
     }
 
     /**
-     * Update the not null properties of bean by the query result of param bean.
+     * Update the properties of bean by the given gid list.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to update
+     * @param gidList    a list gid of the beans which will be updated
+     * @param all        true to update all column of bean, false to update not null column of bean
+     * @return count of updated rows
+     * @throws SQLException exception when update failed
+     * @see BaseBean#columnMap(boolean)
+     * @since 2.1
+     */
+    public int updateTableByGidList(ConnectionBean connection, T bean, List<String> gidList, boolean all) throws SQLException {
+        return dao.updateTableByGidList(connection, bean, gidList, all);
+    }
+
+    /**
+     * Update the properties of bean by the query result of param bean.
      *
      * @param connection         ConnectionBean object
      * @param paramBean          param bean to query the rows to update
@@ -159,23 +189,39 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
 
     /**
      * Soft delete a bean by the given id.
-     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
+     * The column of delete mark should named {@code is_valid} with int type(tinyint in mysql) and
      * {@code 1} represent the row is deleted,
      * {@code 0} represent the row is effective.
      *
      * @param connection ConnectionBean object
-     * @param id         id of the bean
+     * @param bean       bean to soft delete, the primary key must not null
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public int softDeleteTableById(ConnectionBean connection, Integer id) throws SQLException {
-        return dao.softDeleteTableById(connection, bean, id);
+    public int softDeleteTableById(ConnectionBean connection, T bean) throws SQLException {
+        return dao.softDeleteTableById(connection, bean);
+    }
+
+    /**
+     * Soft delete a bean by the given gid.
+     * The column of delete mark should named {@code is_valid} with int type(tinyint in mysql) and
+     * {@code 1} represent the row is deleted,
+     * {@code 0} represent the row is effective.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to soft delete, the gid column must not null
+     * @return count of soft deleted rows
+     * @throws SQLException exception when soft delete
+     * @since 2.1
+     */
+    public int softDeleteTableByGid(ConnectionBean connection, T bean) throws SQLException {
+        return dao.softDeleteTableByGid(connection, bean);
     }
 
     /**
      * Soft delete a bean by the given id list.
-     * The column of delete mark should named {@code is_delete} with int type(tinyint in mysql) and
+     * The column of delete mark should named {@code is_valid} with int type(tinyint in mysql) and
      * {@code 1} represent the row is deleted,
      * {@code 0} represent the row is effective.
      *
@@ -190,16 +236,45 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
     }
 
     /**
+     * Soft delete a bean by the given gid list.
+     * The column of delete mark should named {@code is_valid} with int type(tinyint in mysql) and
+     * {@code 1} represent the row is deleted,
+     * {@code 0} represent the row is effective.
+     *
+     * @param connection ConnectionBean object
+     * @param gidList    a list gid of the beans which will be soft deleted
+     * @return count of soft deleted rows
+     * @throws SQLException exception when soft delete
+     * @since 2.1
+     */
+    public int softDeleteTableByGidList(ConnectionBean connection, List<String> gidList) throws SQLException {
+        return dao.softDeleteTableByGidList(connection, bean, gidList);
+    }
+
+    /**
      * Delete a bean by the given id.
      *
      * @param connection ConnectionBean object
-     * @param id         id of the bean
+     * @param bean       bean to delete, the primary key must not null
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public int deleteTableById(ConnectionBean connection, Integer id) throws SQLException {
-        return dao.deleteTableById(connection, bean, id);
+    public int deleteTableById(ConnectionBean connection, T bean) throws SQLException {
+        return dao.deleteTableById(connection, bean);
+    }
+
+    /**
+     * Delete a bean by the given gid.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       bean to delete, the gid column must not null
+     * @return count of deleted rows
+     * @throws SQLException exception when delete
+     * @since 2.1
+     */
+    public int deleteTableByGid(ConnectionBean connection, T bean) throws SQLException {
+        return dao.deleteTableByGid(connection, bean);
     }
 
     /**
@@ -213,6 +288,19 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
      */
     public int deleteTableByIdList(ConnectionBean connection, List<Integer> idList) throws SQLException {
         return dao.deleteTableByIdList(connection, bean, idList);
+    }
+
+    /**
+     * Delete a bean by the given gid list.
+     *
+     * @param connection ConnectionBean object
+     * @param gidList    a list gid of the beans which will be deleted
+     * @return count of deleted rows
+     * @throws SQLException exception when delete
+     * @since 2.1
+     */
+    public int deleteTableByGidList(ConnectionBean connection, List<String> gidList) throws SQLException {
+        return dao.deleteTableByGidList(connection, bean, gidList);
     }
 
     /**
@@ -230,13 +318,26 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
      * Query a bean by the given id.
      *
      * @param connection ConnectionBean object
-     * @param id         id of the bean
+     * @param bean       a bean with not null primary key
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public T selectTableById(ConnectionBean connection, Integer id) throws SQLException {
-        return dao.selectTableById(connection, bean, id);
+    public T selectTableById(ConnectionBean connection, T bean) throws SQLException {
+        return dao.selectTableById(connection, bean);
+    }
+
+    /**
+     * Query a bean by the given gid.
+     *
+     * @param connection ConnectionBean object
+     * @param bean       a bean with not null gid column
+     * @return the bean of query result
+     * @throws SQLException exception when query
+     * @since 2.1
+     */
+    public T selectTableByGid(ConnectionBean connection, T bean) throws SQLException {
+        return dao.selectTableByGid(connection, bean);
     }
 
     /**
@@ -250,6 +351,19 @@ public class BaseService<T extends BaseBean, D extends BaseDao<T>> {
      */
     public List<T> selectTableByIdList(ConnectionBean connection, List<Integer> idList) throws SQLException {
         return dao.selectTableByIdList(connection, bean, idList);
+    }
+
+    /**
+     * Query a bean by the given gid list.
+     *
+     * @param connection ConnectionBean object
+     * @param gidList    a list gid of the beans to query
+     * @return the bean list of query result
+     * @throws SQLException exception when query
+     * @since 2.1
+     */
+    public List<T> selectTableByGidList(ConnectionBean connection, List<String> gidList) throws SQLException {
+        return dao.selectTableByGidList(connection, bean, gidList);
     }
 
     /**

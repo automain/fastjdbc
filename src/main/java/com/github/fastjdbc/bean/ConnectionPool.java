@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -190,7 +189,7 @@ public class ConnectionPool {
 
     /**
      * <p>Close the {@link ResultSet} object.</p>
-     * <p>When {@link com.github.fastjdbc.common.BaseDao#executeSelectReturnResultSet(ConnectionBean, String, List)} called,
+     * <p>When {@code com.github.fastjdbc.common.BaseDao#executeSelectReturnResultSet(ConnectionBean, String, List)} called,
      * this method should be called to close {@link ResultSet} at last.</p>
      *
      * @param rs {@link ResultSet} object to close
