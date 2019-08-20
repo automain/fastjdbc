@@ -121,18 +121,11 @@ public class Test implements BaseBean<Test> {
     }
 
     @Override
-    public String primaryKey() {
-        return "id";
-    }
-
-    @Override
-    public Integer primaryValue() {
-        return this.getId();
-    }
-
-    @Override
     public Map<String, Object> columnMap(boolean all) {
-        Map<String, Object> map = new HashMap<String, Object>(7);
+        Map<String, Object> map = new HashMap<String, Object>(8);
+        if (all || this.getId() != null) {
+            map.put("id", this.getId());
+        }
         if (all || this.getGid() != null) {
             map.put("gid", this.getGid());
         }

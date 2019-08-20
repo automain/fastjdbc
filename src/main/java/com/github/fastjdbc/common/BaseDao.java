@@ -93,7 +93,8 @@ public class BaseDao<T extends BaseBean> {
 
     /**
      * Update the properties of bean by the primary key of bean, the primary key
-     * property should not null otherwise nothing will be updated.
+     * property should not null otherwise nothing will be updated, the primary column
+     * should be named by id and int type in mysql.
      *
      * @param connection ConnectionBean object
      * @param bean       bean to update
@@ -110,8 +111,8 @@ public class BaseDao<T extends BaseBean> {
         StringBuilder sqlBuilder = new StringBuilder("UPDATE ")
                 .append(bean.tableName()).append(" SET ")
                 .append(makeColumnParamSql(columnMap, paramList, ", "))
-                .append(" WHERE ").append(bean.primaryKey()).append(" = ?");
-        paramList.add(bean.primaryValue());
+                .append(" WHERE id = ?");
+        paramList.add(columnMap.get("id"));
         return executeUpdate(connection, sqlBuilder.toString(), paramList);
     }
 
@@ -140,7 +141,8 @@ public class BaseDao<T extends BaseBean> {
     }
 
     /**
-     * Update the properties of bean by the given id list.
+     * Update the properties of bean by the given id list, the primary column
+     * should be named by id and int type in mysql.
      *
      * @param connection ConnectionBean object
      * @param bean       bean to update
@@ -158,7 +160,7 @@ public class BaseDao<T extends BaseBean> {
         StringBuilder sqlBuilder = new StringBuilder("UPDATE ")
                 .append(bean.tableName()).append(" SET ")
                 .append(makeColumnParamSql(columnMap, paramList, ", "))
-                .append(" WHERE ").append(bean.primaryKey()).append(makeInStr(idList));
+                .append(" WHERE id").append(makeInStr(idList));
         paramList.addAll(idList);
         return executeUpdate(connection, sqlBuilder.toString(), paramList);
     }
@@ -247,7 +249,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     protected int softDeleteTableById(ConnectionBean connection, T bean) throws SQLException {
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE " + bean.primaryKey() + " = ?", List.of(bean.primaryValue()));
+        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id = ?", List.of(bean.columnMap(false).get("id")));
     }
 
     /**
@@ -280,7 +282,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     protected int softDeleteTableByIdList(ConnectionBean connection, T bean, List<Integer> idList) throws SQLException {
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE " + bean.primaryKey() + makeInStr(idList), idList);
+        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id" + makeInStr(idList), idList);
     }
 
     /**
@@ -310,7 +312,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.3
      */
     protected int deleteTableById(ConnectionBean connection, T bean) throws SQLException {
-        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", List.of(bean.primaryValue()));
+        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")));
     }
 
     /**
@@ -337,7 +339,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.3
      */
     protected int deleteTableByIdList(ConnectionBean connection, T bean, List<Integer> idList) throws SQLException {
-        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + makeInStr(idList), idList);
+        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList);
     }
 
     /**
@@ -391,7 +393,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     protected T selectTableById(ConnectionBean connection, T bean) throws SQLException {
-        return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + " = ?", List.of(bean.primaryValue()), bean);
+        return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")), bean);
     }
 
     /**
@@ -418,7 +420,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     protected List<T> selectTableByIdList(ConnectionBean connection, T bean, List<Integer> idList) throws SQLException {
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE " + bean.primaryKey() + makeInStr(idList), idList, bean);
+        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList, bean);
     }
 
     /**
@@ -426,7 +428,7 @@ public class BaseDao<T extends BaseBean> {
      *
      * @param connection ConnectionBean object
      * @param bean       bean object
-     * @param gidList     a list gid of the beans to query
+     * @param gidList    a list gid of the beans to query
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 2.1

@@ -3,15 +3,19 @@ Overview
 #### *fastjdbc* is a lightweight jdbc frame. It's designed around fast development, fast working and fast maintenance.
 #### **The following constraints must be accepted to use this frame:**
 * Java EE 12 or later is necessary.
-* The primary key in the database table should be the __int__ type in mysql (__java.lang.Integer__ type in java), or same level type in other database.
-* The primary key in the database table should be __auto increment__.
+* The primary key in the database table should be named by __id__ and __auto increment__ and __not null__ and __int__ type in mysql (__java.lang.Integer__ type in java), or same level type in other database.
 * Logical deletion(soft delete) are recommended and the valid flag column should be named by '__is_valid__' and __tinyint__ type in mysql(__java.lang.Integer__ type in java) or same level type in other database.
 '__0__' means the row is invalid and '__1__' means the row is valid.
+* column named by __gid__ and __char__ type in mysql (__java.lang.String__ type in java) should be used
+when the table is designed by partition or save secret message in business.
+* A part of demo is in the test directory.
 
 version history
 ---
-### 2.1(2019-08-19):
+### 2.1(2019-08-21):
 * add gid(global id for partition table) column support
+* change primary column to named __id__ and __int__ type in mysql (__java.lang.Integer__ type in java)
+* remove __primaryKey__ and __primaryValue__ function in __BaseBean__
 * adjust test method
 ### 2.0(2019-08-18):
 * disign upgrade for front and back end separation

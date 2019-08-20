@@ -37,35 +37,21 @@ public interface BaseBean<T extends BaseBean> {
     String tableName();
 
     /**
-     * Return the primary key column name of the child bean in the database.
-     *
-     * @return the primary key column name of the child bean in the database
-     * @since 1.0
-     */
-    String primaryKey();
-
-    /**
-     * Return the primary value of the child object.
-     *
-     * @return the primary value of the child object
-     * @since 1.0
-     */
-    Integer primaryValue();
-
-    /**
      * <p>The key of result map is column name in the database,
      * the value of map is this property value of the child bean.</p>
-     * eg: if there is a primary key column name {@code test_id}
+     * eg: if there is a primary key column name {@code id}
      * and an other column name {@code test_name}
      * the child method should like this:
      * <pre> {@code
-     * Map<String, Object> map = new HashMap<String, Object>();
+     * Map<String, Object> map = new HashMap<String, Object>(2);
+     * if (all || this.getId() != null) {
+     *      map.put("id", this.getId());
+     * }
      * if (all || this.getTestName() != null) {
      *      map.put("test_name", this.getTestName());
      * }
      * return map;
      * }</pre>
-     * <p>Note: the primary key value pair should not in this map!</p>
      *
      * @param all get all or not null column map
      * @return the all or not null column map of the child object
