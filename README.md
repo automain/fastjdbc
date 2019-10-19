@@ -2,7 +2,7 @@ Overview
 ---
 #### *fastjdbc* is a lightweight jdbc frame. It's designed around fast development, fast working and fast maintenance.
 #### **The following constraints must be accepted to use this frame:**
-* Java EE 12 or later is necessary.
+* Java EE 11 or later is necessary.
 * The primary key in the database table should be named by __id__ and __auto increment__ and __not null__ and __int__ type in mysql (__java.lang.Integer__ type in java), or same level type in other database.
 * Logical deletion(soft delete) are recommended and the valid flag column should be named by '__is_valid__' and __tinyint__ type in mysql(__java.lang.Integer__ type in java) or same level type in other database.
 '__0__' means the row is invalid and '__1__' means the row is valid.
@@ -12,6 +12,12 @@ when the table is designed by partition or save secret message in business.
 
 version history
 ---
+### 2.2(2019-10-19):
+* disign upgrade for connection
+* change JDK version to 11(LTS)
+* remove __ConectionBean__ and __java.util.logging.Logger__ dependence
+* add __slf4j__ as default log and output sql in debug level
+* Incompatible with older versions and version below 2.2 is deprecated
 ### 2.1(2019-08-21):
 * add gid(global id for partition table) column support
 * change primary column to named __id__ and __int__ type in mysql (__java.lang.Integer__ type in java)
@@ -61,7 +67,7 @@ suggested.
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>2.1</version>
+        <version>2.2</version>
     </dependency>
     ```
 license

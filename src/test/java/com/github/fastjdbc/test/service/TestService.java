@@ -16,12 +16,13 @@
 
 package com.github.fastjdbc.test.service;
 
-import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.PageBean;
 import com.github.fastjdbc.common.BaseService;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.dao.TestDao;
 import com.github.fastjdbc.test.vo.TestVO;
+
+import java.sql.Connection;
 
 public class TestService extends BaseService<Test, TestDao> {
 
@@ -29,7 +30,7 @@ public class TestService extends BaseService<Test, TestDao> {
         super(bean, dao);
     }
 
-    public PageBean<Test> selectTableForCustomPage(ConnectionBean connection, TestVO bean) throws Exception {
+    public PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean) throws Exception {
         return getDao().selectTableForCustomPage(connection, bean, bean.getPage(), bean.getSize());
     }
 

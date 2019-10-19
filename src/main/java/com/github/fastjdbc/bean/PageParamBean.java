@@ -18,6 +18,7 @@ package com.github.fastjdbc.bean;
 
 import com.github.fastjdbc.common.BaseBean;
 
+import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -29,11 +30,11 @@ import java.util.List;
 public class PageParamBean<T extends BaseBean> {
 
     /**
-     * {@link ConnectionBean} object.
+     * {@link Connection} object.
      *
      * @since 1.5
      */
-    private ConnectionBean connection;
+    private Connection connection;
 
     /**
      * Bean object witch type is same with the query result.
@@ -86,11 +87,11 @@ public class PageParamBean<T extends BaseBean> {
      */
     private int size;
 
-    public ConnectionBean getConnection() {
+    public Connection getConnection() {
         return connection;
     }
 
-    public PageParamBean<T> setConnection(ConnectionBean connection) {
+    public PageParamBean<T> setConnection(Connection connection) {
         this.connection = connection;
         return this;
     }

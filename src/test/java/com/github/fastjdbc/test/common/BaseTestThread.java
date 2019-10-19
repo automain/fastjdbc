@@ -16,7 +16,6 @@
 
 package com.github.fastjdbc.test.common;
 
-import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.ConnectionPool;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.dao.TestDao;
@@ -27,9 +26,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class BaseTestThread extends Thread {
 
@@ -41,28 +40,27 @@ public class BaseTestThread extends Thread {
             properties.load(is);
             HikariConfig config = new HikariConfig(properties);
             HikariDataSource masterPool = new HikariDataSource(config);
-            ConnectionPool.init(masterPool, null, Logger.getLogger("system"));
+            ConnectionPool.init(masterPool, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    protected void test(ConnectionBean connection, TestService service) throws Exception {
+    protected void test(Connection connection, TestService service) throws Exception {
     }
 
     @Override
     public void run() {
-        ConnectionBean connection = null;
+        Connection connection = null;
         try {
-            connection = ConnectionPool.getConnectionBean(null);
-            connection.setPrintSql(true);
+            connection = ConnectionPool.getConnection(null);
             TestService service = new TestService(new Test(), new TestDao());
             test(connection, service);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                ConnectionPool.closeConnectionBean(connection);
+                ConnectionPool.close(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

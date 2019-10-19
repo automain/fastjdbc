@@ -16,12 +16,12 @@
 
 package com.github.fastjdbc.test.executor;
 
-import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
 import com.github.fastjdbc.test.service.TestService;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +29,7 @@ import java.util.UUID;
 public class UpdateTestThread extends BaseTestThread {
 
     @Override
-    protected void test(ConnectionBean connection, TestService service) throws Exception {
+    protected void test(Connection connection, TestService service) throws Exception {
         updateByIdForNotNullColumn(connection, service);
         updateByGidForNotNullColumn(connection, service);
         updateByIdForAllColumn(connection, service);
@@ -41,16 +41,16 @@ public class UpdateTestThread extends BaseTestThread {
         updateByGidList(connection, service);
     }
 
-    private void updateByIdForNotNullColumn(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByIdForNotNullColumn(Connection connection, TestService service) throws Exception {
         service.updateTableById(connection, new Test().setId(1).setRemark("updateByIdForNotNullColumn remark"), false);
     }
 
-    private void updateByGidForNotNullColumn(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByGidForNotNullColumn(Connection connection, TestService service) throws Exception {
         Test test = service.selectTableById(connection, new Test().setId(2));
         service.updateTableByGid(connection, new Test().setGid(test.getGid()).setRemark("updateByGidForNotNullColumn remark"), false);
     }
 
-    private void updateByIdForAllColumn(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByIdForAllColumn(Connection connection, TestService service) throws Exception {
         Test bean = new Test()
                 .setId(3)
                 .setRemark("updateByIdForAllColumn remark")
@@ -59,11 +59,12 @@ public class UpdateTestThread extends BaseTestThread {
                 .setIsValid(1)
                 .setGid(UUID.randomUUID().toString())
                 .setUpdateTime((int) (System.currentTimeMillis() / 1000))
-                .setCreateTime((int) (System.currentTimeMillis() / 1000));
+                .setCreateTime((int) (System.currentTimeMillis() / 1000))
+                .setTestDictionary(1);
         service.updateTableById(connection, bean, true);
     }
 
-    private void updateByGidForAllColumn(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByGidForAllColumn(Connection connection, TestService service) throws Exception {
         Test test = service.selectTableById(connection, new Test().setId(4));
         Test bean = new Test()
                 .setId(4)
@@ -73,23 +74,24 @@ public class UpdateTestThread extends BaseTestThread {
                 .setIsValid(1)
                 .setGid(test.getGid())
                 .setUpdateTime((int) (System.currentTimeMillis() / 1000))
-                .setCreateTime((int) (System.currentTimeMillis() / 1000));
+                .setCreateTime((int) (System.currentTimeMillis() / 1000))
+                .setTestDictionary(1);
         service.updateTableByGid(connection, bean, true);
     }
 
-    private void updateByParamOne(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByParamOne(Connection connection, TestService service) throws Exception {
         Test param = new Test().setRemark("test remark");
         Test bean = new Test().setRemark("updateByParamOne remark");
         service.updateTable(connection, param, bean, false, false, false);
     }
 
-    private void updateByParamMulti(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByParamMulti(Connection connection, TestService service) throws Exception {
         Test param = new Test().setRemark("test remark");
         Test bean = new Test().setRemark("updateByParamMulti remark");
         service.updateTable(connection, param, bean, false, true, false);
     }
 
-    private void updateByParamInsertWhenNotExist(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByParamInsertWhenNotExist(Connection connection, TestService service) throws Exception {
         Test param = new Test().setRemark("updateByParamInsertWhenNotExist remark");
         Test bean = new Test()
                 .setRemark("updateByParamInsertWhenNotExist remark")
@@ -98,21 +100,22 @@ public class UpdateTestThread extends BaseTestThread {
                 .setIsValid(0)
                 .setGid(UUID.randomUUID().toString())
                 .setUpdateTime((int) (System.currentTimeMillis() / 1000))
-                .setCreateTime((int) (System.currentTimeMillis() / 1000));
+                .setCreateTime((int) (System.currentTimeMillis() / 1000))
+                .setTestDictionary(0);
         service.updateTable(connection, param, bean, true, false, false);
     }
 
-    private void updateByIdList(ConnectionBean connection, TestService service) throws Exception {
-        service.updateTableByIdList(connection, new Test().setRemark("updateByIdList remark"), List.of(5, 6, 7), false);
+    private void updateByIdList(Connection connection, TestService service) throws Exception {
+        service.updateTableByIdList(connection, new Test().setRemark("updateByIdList remark").setTestDictionary(0), List.of(5, 6, 7), false);
     }
 
-    private void updateByGidList(ConnectionBean connection, TestService service) throws Exception {
+    private void updateByGidList(Connection connection, TestService service) throws Exception {
         List<Test> tests = service.selectTableByIdList(connection, List.of(8, 9, 10));
         List<String> gidList = new ArrayList<String>(3);
         for (Test test : tests) {
             gidList.add(test.getGid());
         }
-        service.updateTableByGidList(connection, new Test().setRemark("updateByGidList remark"), gidList, false);
+        service.updateTableByGidList(connection, new Test().setRemark("updateByGidList remark").setTestDictionary(1), gidList, false);
     }
 
 }

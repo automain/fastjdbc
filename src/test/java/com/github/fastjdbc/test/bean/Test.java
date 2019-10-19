@@ -42,6 +42,8 @@ public class Test implements BaseBean<Test> {
     private String remark;
     // 测试名称
     private String testName;
+    // 测试字典(0:字典0,1:字典1,2:字典2)
+    private Integer testDictionary;
 
     public Integer getId() {
         return id;
@@ -115,6 +117,15 @@ public class Test implements BaseBean<Test> {
         return this;
     }
 
+    public Integer getTestDictionary() {
+        return testDictionary;
+    }
+
+    public Test setTestDictionary(Integer testDictionary) {
+        this.testDictionary = testDictionary;
+        return this;
+    }
+
     @Override
     public String tableName() {
         return "test";
@@ -122,7 +133,7 @@ public class Test implements BaseBean<Test> {
 
     @Override
     public Map<String, Object> columnMap(boolean all) {
-        Map<String, Object> map = new HashMap<String, Object>(8);
+        Map<String, Object> map = new HashMap<String, Object>(9);
         if (all || this.getId() != null) {
             map.put("id", this.getId());
         }
@@ -147,6 +158,9 @@ public class Test implements BaseBean<Test> {
         if (all || this.getTestName() != null) {
             map.put("test_name", this.getTestName());
         }
+        if (all || this.getTestDictionary() != null) {
+            map.put("test_dictionary", this.getTestDictionary());
+        }
         return map;
     }
 
@@ -160,7 +174,8 @@ public class Test implements BaseBean<Test> {
                 .setIsValid(rs.getInt("is_valid"))
                 .setMoney(rs.getBigDecimal("money"))
                 .setRemark(rs.getString("remark"))
-                .setTestName(rs.getString("test_name"));
+                .setTestName(rs.getString("test_name"))
+                .setTestDictionary(rs.getInt("test_dictionary"));
     }
 
     @Override
@@ -174,6 +189,7 @@ public class Test implements BaseBean<Test> {
                 ", money=" + money +
                 ", remark='" + remark + '\'' +
                 ", testName='" + testName + '\'' +
+                ", testDictionary=" + testDictionary +
                 '}';
     }
 }

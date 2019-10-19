@@ -16,17 +16,17 @@
 
 package com.github.fastjdbc.test.executor;
 
-import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
 import com.github.fastjdbc.test.service.TestService;
 
+import java.sql.Connection;
 import java.util.List;
 
 public class DeleteTestThread extends BaseTestThread {
 
     @Override
-    protected void test(ConnectionBean connection, TestService service) throws Exception {
+    protected void test(Connection connection, TestService service) throws Exception {
         service.softDeleteTableById(connection, new Test().setId(1));
         Test test2 = service.selectTableById(connection, new Test().setId(2));
         service.softDeleteTableByGid(connection, new Test().setGid(test2.getGid()));

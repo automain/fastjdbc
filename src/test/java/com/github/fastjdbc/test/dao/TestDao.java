@@ -16,20 +16,21 @@
 
 package com.github.fastjdbc.test.dao;
 
-import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.bean.PageBean;
 import com.github.fastjdbc.bean.PageParamBean;
 import com.github.fastjdbc.common.BaseDao;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.vo.TestVO;
+import org.apache.commons.collections4.CollectionUtils;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestDao extends BaseDao<Test> {
 
     @SuppressWarnings("unchecked")
-    public PageBean<Test> selectTableForCustomPage(ConnectionBean connection, TestVO bean, int page, int size) throws Exception {
+    public PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean, int page, int size) throws Exception {
         List<Object> countParamList = new ArrayList<Object>();
         List<Object> paramList = new ArrayList<Object>();
         String countSql = setSearchCondition(bean, countParamList, true);
@@ -48,12 +49,7 @@ public class TestDao extends BaseDao<Test> {
 
     private String setSearchCondition(TestVO bean, List<Object> paramList, boolean isCountSql) {
         StringBuilder sql = new StringBuilder("SELECT ");
-        if (isCountSql) {
-            sql.append("COUNT(1)");
-        } else {
-            sql.append("*");
-        }
-        sql.append(" FROM test WHERE is_valid = 1 ");
+        sql.append(isCountSql ? "COUNT(1)" : "*").append(" FROM test WHERE is_valid = 1");
         if (bean.getGid() != null) {
             sql.append(" AND gid = ?");
             paramList.add(bean.getGid());
@@ -69,6 +65,13 @@ public class TestDao extends BaseDao<Test> {
         if (bean.getTestName() != null) {
             sql.append(" AND test_name LIKE ?");
             paramList.add(bean.getTestName() + "%");
+        }
+        if (CollectionUtils.isNotEmpty(bean.getTestDictionaryList())) {
+            sql.append(" AND test_dictionary").append(makeInStr(bean.getTestDictionaryList()));
+            paramList.addAll(bean.getTestDictionaryList());
+        }
+        if (!isCountSql && bean.getSortLabel() != null && bean.getSortOrder() != null && bean.columnMap(true).containsKey(bean.getSortLabel())) {
+            sql.append(" ORDER BY ").append(bean.getSortLabel()).append("asc".equalsIgnoreCase(bean.getSortOrder()) ? " ASC" : " DESC");
         }
         return sql.toString();
     }

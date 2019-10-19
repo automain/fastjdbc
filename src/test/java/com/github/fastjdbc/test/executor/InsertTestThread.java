@@ -16,41 +16,45 @@
 
 package com.github.fastjdbc.test.executor;
 
-import com.github.fastjdbc.bean.ConnectionBean;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
 import com.github.fastjdbc.test.service.TestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class InsertTestThread extends BaseTestThread {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(InsertTestThread.class);
+
     @Override
-    protected void test(ConnectionBean connection, TestService service) throws Exception {
+    protected void test(Connection connection, TestService service) throws Exception {
         insertOne(connection, service);
         insertOneReturnId(connection, service);
         batchInsertTable(connection, service);
     }
 
-    private void insertOne(ConnectionBean connection, TestService service) throws Exception {
-        Test test = initTest().setTestName("insertOne testName");
+    private void insertOne(Connection connection, TestService service) throws Exception {
+        Test test = initTest().setTestName("insertOne testName").setTestDictionary(0);
         service.insertIntoTable(connection, test);
     }
 
-    private void insertOneReturnId(ConnectionBean connection, TestService service) throws Exception {
-        Test test = initTest().setTestName("insertOneReturnId testName");
+    private void insertOneReturnId(Connection connection, TestService service) throws Exception {
+        Test test = initTest().setTestName("insertOneReturnId testName").setTestDictionary(1);
         Integer id = service.insertIntoTableReturnId(connection, test);
-        System.out.println("=====Insert one table return id is " + id + "=====");
+        LOGGER.info("Insert one table return id = {}", id);
     }
 
-    private void batchInsertTable(ConnectionBean connection, TestService service) throws Exception {
+    private void batchInsertTable(Connection connection, TestService service) throws Exception {
         Test test = null;
         List<Test> list = new ArrayList<Test>(10);
         for (int i = 0; i < 10; i++) {
-            test = initTest().setTestName("batchInsertTable" + i).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
+            test = initTest().setTestName("batchInsertTable" + i).setTestDictionary(2).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
             list.add(test);
         }
         service.batchInsertIntoTable(connection, list);
