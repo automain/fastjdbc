@@ -16,10 +16,7 @@
 
 package com.github.fastjdbc.test.common;
 
-import com.github.fastjdbc.bean.ConnectionPool;
-import com.github.fastjdbc.test.bean.Test;
-import com.github.fastjdbc.test.dao.TestDao;
-import com.github.fastjdbc.test.service.TestService;
+import com.github.fastjdbc.ConnectionPool;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -30,7 +27,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class BaseTestThread extends Thread {
+public class BaseTestThread implements Runnable, ServiceDaoContainer {
 
     static {
         String path = BaseTestThread.class.getResource("/").getPath() + "db.properties";
@@ -46,7 +43,7 @@ public class BaseTestThread extends Thread {
         }
     }
 
-    protected void test(Connection connection, TestService service) throws Exception {
+    protected void test(Connection connection) throws Exception {
     }
 
     @Override
@@ -54,8 +51,7 @@ public class BaseTestThread extends Thread {
         Connection connection = null;
         try {
             connection = ConnectionPool.getConnection(null);
-            TestService service = new TestService(new Test(), new TestDao());
-            test(connection, service);
+            test(connection);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

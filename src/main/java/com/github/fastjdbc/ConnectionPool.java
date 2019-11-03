@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 fastjdbc
+ * Copyright 2019 fastjdbc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.fastjdbc.bean;
+package com.github.fastjdbc;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -151,7 +151,7 @@ public class ConnectionPool {
 
     /**
      * <p>Close the {@link ResultSet} object.</p>
-     * <p>When {@code com.github.fastjdbc.common.BaseDao#executeSelectReturnResultSet(Connection, String, List)} called,
+     * <p>When {@code com.github.fastjdbc.BaseDao#executeSelectReturnResultSet(Connection, String, List)} called,
      * this method should be called to close {@link ResultSet} at last.</p>
      *
      * @param rs {@link ResultSet} object to close

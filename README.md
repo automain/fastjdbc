@@ -12,6 +12,10 @@ when the table is designed by partition or save secret message in business.
 
 version history
 ---
+### 2.3(2019-11-03):
+* remove __BaseService__ class
+* move all classes to base dictionary
+* Incompatible with older versions and version below 2.3 is deprecated
 ### 2.2(2019-10-19):
 * disign upgrade for connection
 * change JDK version to 11(LTS)
@@ -67,7 +71,7 @@ suggested.
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
     </dependency>
     ```
 license

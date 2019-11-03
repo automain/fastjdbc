@@ -18,7 +18,6 @@ package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
-import com.github.fastjdbc.test.service.TestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,31 +32,31 @@ public class InsertTestThread extends BaseTestThread {
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertTestThread.class);
 
     @Override
-    protected void test(Connection connection, TestService service) throws Exception {
-        insertOne(connection, service);
-        insertOneReturnId(connection, service);
-        batchInsertTable(connection, service);
+    protected void test(Connection connection) throws Exception {
+        insertOne(connection);
+        insertOneReturnId(connection);
+        batchInsertTable(connection);
     }
 
-    private void insertOne(Connection connection, TestService service) throws Exception {
+    private void insertOne(Connection connection) throws Exception {
         Test test = initTest().setTestName("insertOne testName").setTestDictionary(0);
-        service.insertIntoTable(connection, test);
+        TEST_DAO.insertIntoTable(connection, test);
     }
 
-    private void insertOneReturnId(Connection connection, TestService service) throws Exception {
+    private void insertOneReturnId(Connection connection) throws Exception {
         Test test = initTest().setTestName("insertOneReturnId testName").setTestDictionary(1);
-        Integer id = service.insertIntoTableReturnId(connection, test);
+        Integer id = TEST_DAO.insertIntoTableReturnId(connection, test);
         LOGGER.info("Insert one table return id = {}", id);
     }
 
-    private void batchInsertTable(Connection connection, TestService service) throws Exception {
+    private void batchInsertTable(Connection connection) throws Exception {
         Test test = null;
         List<Test> list = new ArrayList<Test>(10);
         for (int i = 0; i < 10; i++) {
             test = initTest().setTestName("batchInsertTable" + i).setTestDictionary(2).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
             list.add(test);
         }
-        service.batchInsertIntoTable(connection, list);
+        TEST_DAO.batchInsertIntoTable(connection, list);
     }
 
     private Test initTest() {

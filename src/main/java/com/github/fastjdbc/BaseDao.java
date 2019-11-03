@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 fastjdbc
+ * Copyright 2019 fastjdbc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.github.fastjdbc.common;
+package com.github.fastjdbc;
 
-import com.github.fastjdbc.bean.ConnectionPool;
-import com.github.fastjdbc.bean.PageBean;
-import com.github.fastjdbc.bean.PageParamBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -730,7 +727,7 @@ public class BaseDao<T extends BaseBean> {
      * @param paramList  param list
      * @return success rows count
      * @throws SQLException exception when execute sql
-     * @see com.github.fastjdbc.common.BaseDao#insertIntoTableReturnId(Connection, BaseBean)
+     * @see BaseDao#insertIntoTableReturnId(Connection, BaseBean)
      * @since 1.0
      */
     protected static Integer executeUpdateReturnId(Connection connection, String sql, List<?> paramList) throws SQLException {

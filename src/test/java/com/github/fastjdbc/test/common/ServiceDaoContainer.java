@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 fastjdbc
+ * Copyright 2019 fastjdbc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.fastjdbc.test.service;
+package com.github.fastjdbc.test.common;
 
-import com.github.fastjdbc.PageBean;
-import com.github.fastjdbc.test.bean.Test;
-import com.github.fastjdbc.test.common.ServiceDaoContainer;
-import com.github.fastjdbc.test.vo.TestVO;
+import com.github.fastjdbc.test.dao.TestDao;
+import com.github.fastjdbc.test.service.TestService;
 
-import java.sql.Connection;
+public interface ServiceDaoContainer {
 
-public class TestService implements ServiceDaoContainer {
-
-    public PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean) throws Exception {
-        return TEST_DAO.selectTableForCustomPage(connection, bean, bean.getPage(), bean.getSize());
-    }
-
+    TestService TEST_SERVICE = new TestService();
+    TestDao TEST_DAO = new TestDao();
 }

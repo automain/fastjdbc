@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 fastjdbc
+ * Copyright 2019 fastjdbc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.fastjdbc.bean;
-
-import com.github.fastjdbc.common.BaseBean;
+package com.github.fastjdbc;
 
 import java.sql.Connection;
 import java.util.List;

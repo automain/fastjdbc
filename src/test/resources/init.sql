@@ -15,5 +15,6 @@ CREATE TABLE `test` (
   `test_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '测试名称',
   `test_dictionary` int(11) NOT NULL DEFAULT '0' COMMENT '测试字典(0:字典0,1:字典1,2:字典2)',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_gid` (`gid`)
+  UNIQUE KEY `uk_gid` (`gid`),
+  KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
