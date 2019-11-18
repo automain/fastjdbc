@@ -110,4 +110,18 @@ public class TestVO extends Test {
         this.testDictionaryList = testDictionaryList;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "TestVO{" +
+                "page=" + page +
+                ", size=" + size +
+                ", sortLabel='" + sortLabel + '\'' +
+                ", sortOrder='" + sortOrder + '\'' +
+                ", gidList=" + gidList +
+                ", createTimeEnd=" + createTimeEnd +
+                ", updateTimeEnd=" + updateTimeEnd +
+                ", testDictionaryList=" + testDictionaryList +
+                '}';
+    }
 }

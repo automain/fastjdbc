@@ -28,112 +28,40 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestDao extends BaseDao<Test> {
+public class TestDao extends BaseDao {
 
     private static final Test DEFAULT_BEAN = new Test();
 
-    public int insertIntoTable(Connection connection, Test bean) throws SQLException {
-        return super.insertIntoTable(connection, bean);
+    public static int softDeleteTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        return softDeleteTableByIdList(connection, DEFAULT_BEAN, idList);
     }
 
-    public Integer insertIntoTableReturnId(Connection connection, Test bean) throws SQLException {
-        return super.insertIntoTableReturnId(connection, bean);
+    public static int softDeleteTableByGidList(Connection connection, List<String> gidList) throws SQLException {
+        return softDeleteTableByGidList(connection, DEFAULT_BEAN, gidList);
     }
 
-    public int batchInsertIntoTable(Connection connection, List<Test> list) throws SQLException {
-        return super.batchInsertIntoTable(connection, list);
+    public static int deleteTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        return deleteTableByIdList(connection, DEFAULT_BEAN, idList);
     }
 
-    public int updateTableById(Connection connection, Test bean, boolean all) throws SQLException {
-        return super.updateTableById(connection, bean, all);
+    public static int deleteTableByGidList(Connection connection, List<String> gidList) throws SQLException {
+        return deleteTableByGidList(connection, DEFAULT_BEAN, gidList);
     }
 
-    public int updateTableByGid(Connection connection, Test bean, boolean all) throws SQLException {
-        return super.updateTableByGid(connection, bean, all);
+    public static List<Test> selectTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        return selectTableByIdList(connection, DEFAULT_BEAN, idList);
     }
 
-    public int updateTableByIdList(Connection connection, Test bean, List<Integer> idList, boolean all) throws SQLException {
-        return super.updateTableByIdList(connection, bean, idList, all);
+    public static List<Test> selectTableByGidList(Connection connection, List<String> gidList) throws SQLException {
+        return selectTableByGidList(connection, DEFAULT_BEAN, gidList);
     }
 
-    public int updateTableByGidList(Connection connection, Test bean, List<String> gidList, boolean all) throws SQLException {
-        return super.updateTableByGidList(connection, bean, gidList, all);
-    }
-
-    public int updateTable(Connection connection, Test paramBean, Test newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
-        return super.updateTable(connection, paramBean, newBean, insertWhenNotExist, updateMulti, all);
-    }
-
-    public int softDeleteTableById(Connection connection, Test bean) throws SQLException {
-        return super.softDeleteTableById(connection, bean);
-    }
-
-    public int softDeleteTableByGid(Connection connection, Test bean) throws SQLException {
-        return super.softDeleteTableByGid(connection, bean);
-    }
-
-    public int softDeleteTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
-        return super.softDeleteTableByIdList(connection, DEFAULT_BEAN, idList);
-    }
-
-    public int softDeleteTableByGidList(Connection connection, List<String> gidList) throws SQLException {
-        return super.softDeleteTableByGidList(connection, DEFAULT_BEAN, gidList);
-    }
-
-    public int deleteTableById(Connection connection, Test bean) throws SQLException {
-        return super.deleteTableById(connection, bean);
-    }
-
-    public int deleteTableByGid(Connection connection, Test bean) throws SQLException {
-        return super.deleteTableByGid(connection, bean);
-    }
-
-    public int deleteTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
-        return super.deleteTableByIdList(connection, DEFAULT_BEAN, idList);
-    }
-
-    public int deleteTableByGidList(Connection connection, List<String> gidList) throws SQLException {
-        return super.deleteTableByGidList(connection, DEFAULT_BEAN, gidList);
-    }
-
-    public int countTableByBean(Connection connection, Test bean) throws SQLException {
-        return super.countTableByBean(connection, bean);
-    }
-
-    public Test selectTableById(Connection connection, Test bean) throws SQLException {
-        return super.selectTableById(connection, bean);
-    }
-
-    public Test selectTableByGid(Connection connection, Test bean) throws SQLException {
-        return super.selectTableByGid(connection, bean);
-    }
-
-    public List<Test> selectTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
-        return super.selectTableByIdList(connection, DEFAULT_BEAN, idList);
-    }
-
-    public List<Test> selectTableByGidList(Connection connection, List<String> gidList) throws SQLException {
-        return super.selectTableByGidList(connection, DEFAULT_BEAN, gidList);
-    }
-
-    public Test selectOneTableByBean(Connection connection, Test bean) throws SQLException {
-        return super.selectOneTableByBean(connection, bean);
-    }
-
-    public List<Test> selectTableByBean(Connection connection, Test bean) throws SQLException {
-        return super.selectTableByBean(connection, bean);
-    }
-
-    public List<Test> selectAllTable(Connection connection) throws SQLException {
-        return super.selectAllTable(connection, DEFAULT_BEAN);
-    }
-
-    public PageBean<Test> selectTableForPage(Connection connection, Test bean, int page, int size) throws Exception {
-        return super.selectTableForPage(connection, bean, page, size);
+    public static List<Test> selectAllTable(Connection connection) throws SQLException {
+        return selectAllTable(connection, DEFAULT_BEAN);
     }
 
     @SuppressWarnings("unchecked")
-    public PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean, int page, int size) throws Exception {
+    public static PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean) throws Exception {
         List<Object> countParamList = new ArrayList<Object>();
         List<Object> paramList = new ArrayList<Object>();
         String countSql = setSearchCondition(bean, countParamList, true);
@@ -145,12 +73,12 @@ public class TestDao extends BaseDao<Test> {
                 .setCountParamList(countParamList)
                 .setSql(sql)
                 .setParamList(paramList)
-                .setPage(page)
-                .setSize(size);
+                .setPage(bean.getPage())
+                .setSize(bean.getSize());
         return selectTableForPage(pageParamBean);
     }
 
-    private String setSearchCondition(TestVO bean, List<Object> paramList, boolean isCountSql) {
+    private static String setSearchCondition(TestVO bean, List<Object> paramList, boolean isCountSql) {
         StringBuilder sql = new StringBuilder("SELECT ");
         sql.append(isCountSql ? "COUNT(1)" : "*").append(" FROM test WHERE is_valid = 1");
         if (bean.getGid() != null) {

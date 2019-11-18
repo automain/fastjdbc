@@ -16,17 +16,8 @@
 
 package com.github.fastjdbc.test.service;
 
-import com.github.fastjdbc.PageBean;
-import com.github.fastjdbc.test.bean.Test;
-import com.github.fastjdbc.test.common.ServiceDaoContainer;
-import com.github.fastjdbc.test.vo.TestVO;
+import com.github.fastjdbc.test.common.ServiceContainer;
 
-import java.sql.Connection;
-
-public class TestService implements ServiceDaoContainer {
-
-    public PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean) throws Exception {
-        return TEST_DAO.selectTableForCustomPage(connection, bean, bean.getPage(), bean.getSize());
-    }
+public class TestService implements ServiceContainer {
 
 }

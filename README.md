@@ -12,6 +12,9 @@ when the table is designed by partition or save secret message in business.
 
 version history
 ---
+### 2.4(2019-11-18):
+* change frequently used methods to static in __BaseDao__
+* adjust test classes to fix change
 ### 2.3(2019-11-03):
 * remove __BaseService__ class
 * move all classes to base dictionary
@@ -71,7 +74,7 @@ suggested.
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>2.3</version>
+        <version>2.4</version>
     </dependency>
     ```
 license

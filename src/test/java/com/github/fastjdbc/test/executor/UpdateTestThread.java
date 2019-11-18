@@ -18,6 +18,7 @@ package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
+import com.github.fastjdbc.test.dao.TestDao;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -41,12 +42,12 @@ public class UpdateTestThread extends BaseTestThread {
     }
 
     private void updateByIdForNotNullColumn(Connection connection) throws Exception {
-        TEST_DAO.updateTableById(connection, new Test().setId(1).setRemark("updateByIdForNotNullColumn remark"), false);
+        TestDao.updateTableById(connection, new Test().setId(1).setRemark("updateByIdForNotNullColumn remark"), false);
     }
 
     private void updateByGidForNotNullColumn(Connection connection) throws Exception {
-        Test test = TEST_DAO.selectTableById(connection, new Test().setId(2));
-        TEST_DAO.updateTableByGid(connection, new Test().setGid(test.getGid()).setRemark("updateByGidForNotNullColumn remark"), false);
+        Test test = TestDao.selectTableById(connection, new Test().setId(2));
+        TestDao.updateTableByGid(connection, new Test().setGid(test.getGid()).setRemark("updateByGidForNotNullColumn remark"), false);
     }
 
     private void updateByIdForAllColumn(Connection connection) throws Exception {
@@ -60,11 +61,11 @@ public class UpdateTestThread extends BaseTestThread {
                 .setUpdateTime((int) (System.currentTimeMillis() / 1000))
                 .setCreateTime((int) (System.currentTimeMillis() / 1000))
                 .setTestDictionary(1);
-        TEST_DAO.updateTableById(connection, bean, true);
+        TestDao.updateTableById(connection, bean, true);
     }
 
     private void updateByGidForAllColumn(Connection connection) throws Exception {
-        Test test = TEST_DAO.selectTableById(connection, new Test().setId(4));
+        Test test = TestDao.selectTableById(connection, new Test().setId(4));
         Test bean = new Test()
                 .setId(4)
                 .setRemark("updateByGidForAllColumn remark")
@@ -75,19 +76,19 @@ public class UpdateTestThread extends BaseTestThread {
                 .setUpdateTime((int) (System.currentTimeMillis() / 1000))
                 .setCreateTime((int) (System.currentTimeMillis() / 1000))
                 .setTestDictionary(1);
-        TEST_DAO.updateTableByGid(connection, bean, true);
+        TestDao.updateTableByGid(connection, bean, true);
     }
 
     private void updateByParamOne(Connection connection) throws Exception {
         Test param = new Test().setRemark("test remark");
         Test bean = new Test().setRemark("updateByParamOne remark");
-        TEST_DAO.updateTable(connection, param, bean, false, false, false);
+        TestDao.updateTable(connection, param, bean, false, false, false);
     }
 
     private void updateByParamMulti(Connection connection) throws Exception {
         Test param = new Test().setRemark("test remark");
         Test bean = new Test().setRemark("updateByParamMulti remark");
-        TEST_DAO.updateTable(connection, param, bean, false, true, false);
+        TestDao.updateTable(connection, param, bean, false, true, false);
     }
 
     private void updateByParamInsertWhenNotExist(Connection connection) throws Exception {
@@ -101,20 +102,20 @@ public class UpdateTestThread extends BaseTestThread {
                 .setUpdateTime((int) (System.currentTimeMillis() / 1000))
                 .setCreateTime((int) (System.currentTimeMillis() / 1000))
                 .setTestDictionary(0);
-        TEST_DAO.updateTable(connection, param, bean, true, false, false);
+        TestDao.updateTable(connection, param, bean, true, false, false);
     }
 
     private void updateByIdList(Connection connection) throws Exception {
-        TEST_DAO.updateTableByIdList(connection, new Test().setRemark("updateByIdList remark").setTestDictionary(0), List.of(5, 6, 7), false);
+        TestDao.updateTableByIdList(connection, new Test().setRemark("updateByIdList remark").setTestDictionary(0), List.of(5, 6, 7), false);
     }
 
     private void updateByGidList(Connection connection) throws Exception {
-        List<Test> tests = TEST_DAO.selectTableByIdList(connection, List.of(8, 9, 10));
+        List<Test> tests = TestDao.selectTableByIdList(connection, List.of(8, 9, 10));
         List<String> gidList = new ArrayList<String>(3);
         for (Test test : tests) {
             gidList.add(test.getGid());
         }
-        TEST_DAO.updateTableByGidList(connection, new Test().setRemark("updateByGidList remark").setTestDictionary(1), gidList, false);
+        TestDao.updateTableByGidList(connection, new Test().setRemark("updateByGidList remark").setTestDictionary(1), gidList, false);
     }
 
 }

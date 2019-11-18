@@ -18,6 +18,7 @@ package com.github.fastjdbc.test.executor;
 
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.common.BaseTestThread;
+import com.github.fastjdbc.test.dao.TestDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,12 +41,12 @@ public class InsertTestThread extends BaseTestThread {
 
     private void insertOne(Connection connection) throws Exception {
         Test test = initTest().setTestName("insertOne testName").setTestDictionary(0);
-        TEST_DAO.insertIntoTable(connection, test);
+        TestDao.insertIntoTable(connection, test);
     }
 
     private void insertOneReturnId(Connection connection) throws Exception {
         Test test = initTest().setTestName("insertOneReturnId testName").setTestDictionary(1);
-        Integer id = TEST_DAO.insertIntoTableReturnId(connection, test);
+        Integer id = TestDao.insertIntoTableReturnId(connection, test);
         LOGGER.info("Insert one table return id = {}", id);
     }
 
@@ -56,7 +57,7 @@ public class InsertTestThread extends BaseTestThread {
             test = initTest().setTestName("batchInsertTable" + i).setTestDictionary(2).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
             list.add(test);
         }
-        TEST_DAO.batchInsertIntoTable(connection, list);
+        TestDao.batchInsertIntoTable(connection, list);
     }
 
     private Test initTest() {

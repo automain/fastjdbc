@@ -27,7 +27,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class BaseTestThread implements Runnable, ServiceDaoContainer {
+public class BaseTestThread implements Runnable, ServiceContainer {
 
     static {
         String path = BaseTestThread.class.getResource("/").getPath() + "db.properties";

@@ -16,11 +16,9 @@
 
 package com.github.fastjdbc.test.common;
 
-import com.github.fastjdbc.test.dao.TestDao;
 import com.github.fastjdbc.test.service.TestService;
 
-public interface ServiceDaoContainer {
+public interface ServiceContainer {
 
     TestService TEST_SERVICE = new TestService();
-    TestDao TEST_DAO = new TestDao();
 }

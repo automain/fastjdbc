@@ -36,10 +36,9 @@ import java.util.Map;
  * <p>In business,we usually need to customize the query conditions and return the {@link PageBean} object,
  * a new method is needed to be added to the DAO class in this condition.</p>
  *
- * @param <T> an object which implement {@link BaseBean}
  * @since 1.0
  */
-public class BaseDao<T extends BaseBean> {
+public class BaseDao {
 
     /**
      * The logger facade.
@@ -58,7 +57,7 @@ public class BaseDao<T extends BaseBean> {
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    protected int insertIntoTable(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int insertIntoTable(Connection connection, T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
         return executeUpdate(connection, sql, paramList);
@@ -74,7 +73,7 @@ public class BaseDao<T extends BaseBean> {
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    protected Integer insertIntoTableReturnId(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> Integer insertIntoTableReturnId(Connection connection, T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
         return executeUpdateReturnId(connection, sql, paramList);
@@ -90,7 +89,7 @@ public class BaseDao<T extends BaseBean> {
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
-    protected int batchInsertIntoTable(Connection connection, List<T> list) throws SQLException {
+    public static <T extends BaseBean> int batchInsertIntoTable(Connection connection, List<T> list) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getBatchInsertSql(list, paramList);
         return executeUpdate(connection, sql, paramList);
@@ -110,7 +109,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    protected int updateTableById(Connection connection, T bean, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableById(Connection connection, T bean, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         Object id = columnMap.get("id");
         columnMap.remove("id");
@@ -133,7 +132,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 2.1
      */
     @SuppressWarnings("unchecked")
-    protected int updateTableByGid(Connection connection, T bean, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableByGid(Connection connection, T bean, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + 1);
@@ -156,7 +155,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    protected int updateTableByIdList(Connection connection, T bean, List<Integer> idList, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableByIdList(Connection connection, T bean, List<Integer> idList, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + idList.size());
@@ -178,7 +177,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 2.1
      */
     @SuppressWarnings("unchecked")
-    protected int updateTableByGidList(Connection connection, T bean, List<String> gidList, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableByGidList(Connection connection, T bean, List<String> gidList, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + gidList.size());
@@ -202,7 +201,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    protected int updateTable(Connection connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTable(Connection connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
         String tableName = paramBean.tableName();
         Map<String, Object> newColumnMap = newBean.columnMap(all);
         newColumnMap.remove("id");
@@ -247,7 +246,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    protected int softDeleteTableById(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int softDeleteTableById(Connection connection, T bean) throws SQLException {
         return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id = ?", List.of(bean.columnMap(false).get("id")));
     }
 
@@ -263,7 +262,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when soft delete
      * @since 2.1
      */
-    protected int softDeleteTableByGid(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int softDeleteTableByGid(Connection connection, T bean) throws SQLException {
         return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE gid = ?", List.of(bean.columnMap(false).get("gid")));
     }
 
@@ -280,7 +279,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    protected int softDeleteTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
+    public static <T extends BaseBean> int softDeleteTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
         return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id" + makeInStr(idList), idList);
     }
 
@@ -297,7 +296,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when soft delete
      * @since 2.1
      */
-    protected int softDeleteTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
+    public static <T extends BaseBean> int softDeleteTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
         return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE gid" + makeInStr(gidList), gidList);
     }
 
@@ -310,7 +309,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    protected int deleteTableById(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int deleteTableById(Connection connection, T bean) throws SQLException {
         return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")));
     }
 
@@ -323,7 +322,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when delete
      * @since 2.1
      */
-    protected int deleteTableByGid(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int deleteTableByGid(Connection connection, T bean) throws SQLException {
         return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE gid = ?", List.of(bean.columnMap(false).get("gid")));
     }
 
@@ -337,7 +336,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    protected int deleteTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
+    public static <T extends BaseBean> int deleteTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
         return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList);
     }
 
@@ -351,7 +350,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when delete
      * @since 2.1
      */
-    protected int deleteTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
+    public static <T extends BaseBean> int deleteTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
         return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE gid" + makeInStr(gidList), gidList);
     }
 
@@ -365,7 +364,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.7
      */
     @SuppressWarnings("unchecked")
-    protected int countTableByBean(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int countTableByBean(Connection connection, T bean) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(false);
         int size = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
@@ -391,7 +390,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    protected T selectTableById(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> T selectTableById(Connection connection, T bean) throws SQLException {
         return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")), bean);
     }
 
@@ -404,7 +403,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 2.1
      */
-    protected T selectTableByGid(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> T selectTableByGid(Connection connection, T bean) throws SQLException {
         return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE gid = ?", List.of(bean.columnMap(false).get("gid")), bean);
     }
 
@@ -418,7 +417,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    protected List<T> selectTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
+    public static <T extends BaseBean> List<T> selectTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
         return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList, bean);
     }
 
@@ -432,7 +431,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 2.1
      */
-    protected List<T> selectTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
+    public static <T extends BaseBean> List<T> selectTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
         return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE gid" + makeInStr(gidList), gidList, bean);
     }
 
@@ -447,7 +446,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    protected T selectOneTableByBean(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> T selectOneTableByBean(Connection connection, T bean) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(false);
         int size = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
@@ -465,7 +464,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    protected List<T> selectTableByBean(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> List<T> selectTableByBean(Connection connection, T bean) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(false);
         int size = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
@@ -482,7 +481,7 @@ public class BaseDao<T extends BaseBean> {
      * @throws SQLException exception when query
      * @since 1.0
      */
-    protected List<T> selectAllTable(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> List<T> selectAllTable(Connection connection, T bean) throws SQLException {
         return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName(), null, bean);
     }
 
@@ -499,7 +498,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    protected PageBean<T> selectTableForPage(Connection connection, T bean, int page, int size) throws Exception {
+    public static <T extends BaseBean> PageBean<T> selectTableForPage(Connection connection, T bean, int page, int size) throws Exception {
         Map<String, Object> columnMap = bean.columnMap(false);
         int columnSize = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(columnSize > 0 ? columnSize : 1);
@@ -526,7 +525,7 @@ public class BaseDao<T extends BaseBean> {
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    protected PageBean<T> selectTableForPage(PageParamBean<T> pageParamBean) throws Exception {
+    public static <T extends BaseBean> PageBean<T> selectTableForPage(PageParamBean<T> pageParamBean) throws Exception {
         PageBean pageBean = new PageBean().setTotal(0).setPage(1);
         T bean = pageParamBean.getBean();
         int size = Math.max(1, pageParamBean.getSize());
@@ -573,7 +572,7 @@ public class BaseDao<T extends BaseBean> {
      * @return string of sql placeholder
      * @since 1.0
      */
-    protected static String makeInStr(List<?> paramList) {
+    public static String makeInStr(List<?> paramList) {
         StringBuilder builder = new StringBuilder(" IN(");
         for (int i = paramList.size(); i > 0; i--) {
             builder.append("?");
