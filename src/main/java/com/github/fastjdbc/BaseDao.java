@@ -52,6 +52,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean to insert
+     * @param <T>        {@link BaseBean} type class
      * @return count of insert rows
      * @throws SQLException exception when insert failed
      * @see BaseBean#columnMap(boolean)
@@ -68,6 +69,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean to insert
+     * @param <T>        {@link BaseBean} type class
      * @return generated primary key
      * @throws SQLException exception when insert failed
      * @see BaseBean#columnMap(boolean)
@@ -84,6 +86,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param list       list of bean to insert
+     * @param <T>        {@link BaseBean} type class
      * @return count of insert rows
      * @throws SQLException exception when insert failed
      * @see BaseBean#columnMap(boolean)
@@ -103,6 +106,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean to update
      * @param all        true to update all column of bean, false to update not null column of bean
+     * @param <T>        {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
@@ -126,6 +130,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean to update
      * @param all        true to update all column of bean, false to update not null column of bean
+     * @param <T>        {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
@@ -149,6 +154,7 @@ public class BaseDao {
      * @param bean       bean to update
      * @param idList     a list id of the beans which will be updated
      * @param all        true to update all column of bean, false to update not null column of bean
+     * @param <T>        {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
@@ -171,6 +177,7 @@ public class BaseDao {
      * @param bean       bean to update
      * @param gidList    a list gid of the beans which will be updated
      * @param all        true to update all column of bean, false to update not null column of bean
+     * @param <T>        {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
@@ -195,6 +202,7 @@ public class BaseDao {
      * @param insertWhenNotExist whether or not to insert when the query returns nothing
      * @param updateMulti        whether or not to update multi result when the query returns more than one result
      * @param all                true to update all column of bean, false to update not null column of bean
+     * @param <T>                {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
@@ -242,6 +250,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
@@ -258,6 +267,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 2.1
@@ -275,6 +285,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean object
      * @param idList     a list id of the beans which will be soft deleted
+     * @param <T>        {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
@@ -292,6 +303,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean object
      * @param gidList    a list gid of the beans which will be soft deleted
+     * @param <T>        {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 2.1
@@ -305,6 +317,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 1.3
@@ -318,6 +331,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 2.1
@@ -332,6 +346,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean object
      * @param idList     a list id of the beans which will be deleted
+     * @param <T>        {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 1.3
@@ -346,6 +361,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean object
      * @param gidList    a list gid of the beans which will be deleted
+     * @param <T>        {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 2.1
@@ -359,6 +375,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       the param bean
+     * @param <T>        {@link BaseBean} type class
      * @return amount of rows which match the param bean
      * @throws SQLException exception when query
      * @since 1.7
@@ -386,6 +403,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 1.0
@@ -399,6 +417,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 2.1
@@ -413,6 +432,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean object
      * @param idList     a list id of the beans to query
+     * @param <T>        {@link BaseBean} type class
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 1.0
@@ -427,6 +447,7 @@ public class BaseDao {
      * @param connection {@link Connection} object
      * @param bean       bean object
      * @param gidList    a list gid of the beans to query
+     * @param <T>        {@link BaseBean} type class
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 2.1
@@ -441,6 +462,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       the param bean
+     * @param <T>        {@link BaseBean} type class
      * @return the first of query results
      * @throws SQLException exception when query
      * @since 1.0
@@ -459,6 +481,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       the param bean
+     * @param <T>        {@link BaseBean} type class
      * @return all query results
      * @throws SQLException exception when query
      * @since 1.0
@@ -477,6 +500,7 @@ public class BaseDao {
      *
      * @param connection {@link Connection} object
      * @param bean       bean object
+     * @param <T>        {@link BaseBean} type class
      * @return all rows
      * @throws SQLException exception when query
      * @since 1.0
@@ -492,6 +516,7 @@ public class BaseDao {
      * @param bean       the param bean
      * @param page       page number
      * @param size       the count of data displayed on each page
+     * @param <T>        {@link BaseBean} type class
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @see PageBean
@@ -520,6 +545,7 @@ public class BaseDao {
      * Query list of beans by the param bean for page by given sql and param list.
      *
      * @param pageParamBean {@link PageParamBean} object
+     * @param <T>           {@link BaseBean} type class
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @since 1.0
@@ -588,7 +614,7 @@ public class BaseDao {
      *
      * @param bean      bean object
      * @param paramList param list
-     * @param <T>       class which implement {@link BaseBean}
+     * @param <T>       {@link BaseBean} type class
      * @return sql string for insert into table
      * @since 1.0
      */
@@ -618,7 +644,7 @@ public class BaseDao {
      *
      * @param list      list of bean object
      * @param paramList param list
-     * @param <T>       class which implement {@link BaseBean}
+     * @param <T>       {@link BaseBean} type class
      * @return sql string for insert into table
      * @since 1.4
      */
@@ -753,7 +779,7 @@ public class BaseDao {
      * @param sql        sql to execute
      * @param paramList  param list
      * @param bean       bean object which type is same as the return one
-     * @param <T>        class which implement {@link BaseBean}
+     * @param <T>        {@link BaseBean} type class
      * @return child bean object of {@link BaseBean}
      * @throws SQLException exception when execute sql
      * @since 1.0
@@ -776,7 +802,7 @@ public class BaseDao {
      * @param sql        sql to execute
      * @param paramList  param list
      * @param bean       bean object which type is same as the return one
-     * @param <T>        class which implement {@link BaseBean}
+     * @param <T>        {@link BaseBean} type class
      * @return list of child bean object of {@link BaseBean}
      * @throws SQLException exception when execute sql
      * @since 1.0
