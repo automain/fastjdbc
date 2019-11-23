@@ -19,6 +19,7 @@ package com.github.fastjdbc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -796,6 +797,86 @@ public class BaseDao {
     }
 
     /**
+     * Execute a select sql and return a String type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return {@link String} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static String executeSelectReturnString(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            return rs.next() ? rs.getString(1) : null;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a Integer type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return {@link Integer} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static Integer executeSelectReturnInteger(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            return rs.next() ? rs.getInt(1) : null;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a Long type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return {@link Long} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static Long executeSelectReturnLong(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            return rs.next() ? rs.getLong(1) : null;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a BigDecimal type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return {@link BigDecimal} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static BigDecimal executeSelectReturnBigDecimal(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            return rs.next() ? rs.getBigDecimal(1) : null;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
      * Execute a select sql and return a child bean list of {@link BaseBean}.
      *
      * @param connection {@link Connection} object
@@ -817,6 +898,102 @@ public class BaseDao {
                 resultList.add((T) bean.beanFromResultSet(rs));
             }
             return resultList;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a list of String type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return a list of {@link String} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static List<String> executeSelectReturnStringList(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            List<String> result = new ArrayList<String>();
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            while (rs.next()) {
+                result.add(rs.getString(1));
+            }
+            return result;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a list of Integer type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return a list of {@link Integer} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static List<Integer> executeSelectReturnIntegerList(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            List<Integer> result = new ArrayList<Integer>();
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            while (rs.next()) {
+                result.add(rs.getInt(1));
+            }
+            return result;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a list of Long type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return a list of {@link Long} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static List<Long> executeSelectReturnLongList(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            List<Long> result = new ArrayList<Long>();
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            while (rs.next()) {
+                result.add(rs.getLong(1));
+            }
+            return result;
+        } finally {
+            ConnectionPool.close(rs);
+        }
+    }
+
+    /**
+     * Execute a select sql and return a list of BigDecimal type result
+     *
+     * @param connection {@link Connection} object
+     * @param sql        sql to execute
+     * @param paramList  param list
+     * @return a list of {@link BigDecimal} type result
+     * @throws SQLException exception when execute sql
+     * @since 2.5
+     */
+    protected static List<BigDecimal> executeSelectReturnBigDecimalList(Connection connection, String sql, List<?> paramList) throws SQLException {
+        ResultSet rs = null;
+        try {
+            List<BigDecimal> result = new ArrayList<BigDecimal>();
+            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            while (rs.next()) {
+                result.add(rs.getBigDecimal(1));
+            }
+            return result;
         } finally {
             ConnectionPool.close(rs);
         }

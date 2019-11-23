@@ -12,6 +12,8 @@ when the table is designed by partition or save secret message in business.
 
 version history
 ---
+### 2.5(2019-11-23):
+* add execute sql return single and list type result in __BaseDao__, String\Integer\Long\BigDecimal type support at now
 ### 2.4(2019-11-18):
 * change frequently used methods to static in __BaseDao__
 * adjust test classes to fix change
@@ -37,8 +39,7 @@ version history
 * Incompatible with older versions and version below 2.0 is deprecated
 ### 1.8(2018-12-08):
 * add __getIntValues__ function in __RequestUtil__
-* change __setTimeRange__ function in __BaseDao__, TimeStamp type property is deprecated and Integer type property with unix timestamp is 
-suggested.
+* change __setTimeRange__ function in __BaseDao__, TimeStamp type property is deprecated and Integer type property with unix timestamp is suggested.
 * remove __getTimestamp__ function in __RequestUtil__
 
 ### 1.7(2018-09-30):
@@ -74,7 +75,7 @@ suggested.
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>2.4</version>
+        <version>2.5</version>
     </dependency>
     ```
 license

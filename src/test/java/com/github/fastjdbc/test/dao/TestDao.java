@@ -23,6 +23,7 @@ import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.vo.TestVO;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -105,5 +106,45 @@ public class TestDao extends BaseDao {
             sql.append(" ORDER BY ").append(bean.getSortLabel()).append("asc".equalsIgnoreCase(bean.getSortOrder()) ? " ASC" : " DESC");
         }
         return sql.toString();
+    }
+
+    public static String selectTestNameById(Connection connection, Integer id) throws SQLException {
+        String sql = "SELECT test_name FROM test WHERE id = ?";
+        return executeSelectReturnString(connection, sql, List.of(id));
+    }
+
+    public static Integer selectCreateTimeById(Connection connection, Integer id) throws SQLException {
+        String sql = "SELECT create_time FROM test WHERE id = ?";
+        return executeSelectReturnInteger(connection, sql, List.of(id));
+    }
+
+    public static Long selectUpdateTimeById(Connection connection, Integer id) throws SQLException {
+        String sql = "SELECT update_time FROM test WHERE id = ?";
+        return executeSelectReturnLong(connection, sql, List.of(id));
+    }
+
+    public static BigDecimal selectMoneyById(Connection connection, Integer id) throws SQLException {
+        String sql = "SELECT money FROM test WHERE id = ?";
+        return executeSelectReturnBigDecimal(connection, sql, List.of(id));
+    }
+
+    public static List<String> selectTestNameByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        String sql = "SELECT test_name FROM test WHERE id" + makeInStr(idList);
+        return executeSelectReturnStringList(connection, sql, idList);
+    }
+
+    public static List<Integer> selectCreateTimeByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        String sql = "SELECT create_time FROM test WHERE id" + makeInStr(idList);
+        return executeSelectReturnIntegerList(connection, sql, idList);
+    }
+
+    public static List<Long> selectUpdateTimeByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        String sql = "SELECT update_time FROM test WHERE id" + makeInStr(idList);
+        return executeSelectReturnLongList(connection, sql, idList);
+    }
+
+    public static List<BigDecimal> selectMoneyByIdList(Connection connection, List<Integer> idList) throws SQLException {
+        String sql = "SELECT money FROM test WHERE id" + makeInStr(idList);
+        return executeSelectReturnBigDecimalList(connection, sql, idList);
     }
 }

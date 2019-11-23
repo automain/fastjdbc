@@ -24,6 +24,7 @@ import com.github.fastjdbc.test.vo.TestVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -46,6 +47,14 @@ public class SelectTestThread extends BaseTestThread {
         selectForPage(connection);
         selectForCustomerPage(connection);
         countByBean(connection);
+        executeSelectReturnString(connection);
+        executeSelectReturnInteger(connection);
+        executeSelectReturnLong(connection);
+        executeSelectReturnBigDecimal(connection);
+        executeSelectReturnStringList(connection);
+        executeSelectReturnIntegerList(connection);
+        executeSelectReturnLongList(connection);
+        executeSelectReturnBigDecimalList(connection);
     }
 
     private void selectById(Connection connection) throws Exception {
@@ -122,4 +131,43 @@ public class SelectTestThread extends BaseTestThread {
         LOGGER.info("Count by bean count = {}", count);
     }
 
+    private void executeSelectReturnString(Connection connection) throws Exception {
+        String testName = TestDao.selectTestNameById(connection, 1);
+        LOGGER.info("execute select return String = {}", testName);
+    }
+
+    private void executeSelectReturnInteger(Connection connection) throws Exception {
+        Integer createTime = TestDao.selectCreateTimeById(connection, 1);
+        LOGGER.info("execute select return Integer = {}", createTime);
+    }
+
+    private void executeSelectReturnLong(Connection connection) throws Exception {
+        Long updateTime = TestDao.selectUpdateTimeById(connection, 1);
+        LOGGER.info("execute select return Long = {}", updateTime);
+    }
+
+    private void executeSelectReturnBigDecimal(Connection connection) throws Exception {
+        BigDecimal money = TestDao.selectMoneyById(connection, 1);
+        LOGGER.info("execute select return BigDecimal = {}", money);
+    }
+
+    private void executeSelectReturnStringList(Connection connection) throws Exception {
+        List<String> testNameList = TestDao.selectTestNameByIdList(connection, List.of(1,2,3,4,5));
+        LOGGER.info("execute select return String list = {}", testNameList);
+    }
+
+    private void executeSelectReturnIntegerList(Connection connection) throws Exception {
+        List<Integer> createTimeList = TestDao.selectCreateTimeByIdList(connection, List.of(1,2,3,4,5));
+        LOGGER.info("execute select return Integer list = {}", createTimeList);
+    }
+
+    private void executeSelectReturnLongList(Connection connection) throws Exception {
+        List<Long> updateTimeList = TestDao.selectUpdateTimeByIdList(connection, List.of(1,2,3,4,5));
+        LOGGER.info("execute select return Long list = {}", updateTimeList);
+    }
+
+    private void executeSelectReturnBigDecimalList(Connection connection) throws Exception {
+        List<BigDecimal> moneyList = TestDao.selectMoneyByIdList(connection, List.of(1,2,3,4,5));
+        LOGGER.info("execute select return BigDecimal list = {}", moneyList);
+    }
 }
