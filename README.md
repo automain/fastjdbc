@@ -12,6 +12,9 @@ when the table is designed by partition or save secret message in business.
 
 version history
 ---
+### 2.6(2020-03-12):
+* move connection from all methods in __BaseDao__
+* add ThreadLocal property in __ConnectionPool__ to save connection object
 ### 2.5(2019-11-23):
 * add execute sql return single and list type result in __BaseDao__, String\Integer\Long\BigDecimal type support at now
 ### 2.4(2019-11-18):
@@ -75,7 +78,7 @@ version history
     <dependency>
         <groupId>com.github.automain</groupId>
         <artifactId>fastjdbc</artifactId>
-        <version>2.5</version>
+        <version>2.6</version>
     </dependency>
     ```
 license

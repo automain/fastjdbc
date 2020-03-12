@@ -16,15 +16,14 @@
 
 package com.github.fastjdbc.test.dao;
 
+import com.github.fastjdbc.BaseDao;
 import com.github.fastjdbc.PageBean;
 import com.github.fastjdbc.PageParamBean;
-import com.github.fastjdbc.BaseDao;
 import com.github.fastjdbc.test.bean.Test;
 import com.github.fastjdbc.test.vo.TestVO;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,42 +32,41 @@ public class TestDao extends BaseDao {
 
     private static final Test DEFAULT_BEAN = new Test();
 
-    public static int softDeleteTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
-        return softDeleteTableByIdList(connection, DEFAULT_BEAN, idList);
+    public static int softDeleteTableByIdList(List<Integer> idList) throws SQLException {
+        return softDeleteTableByIdList(DEFAULT_BEAN, idList);
     }
 
-    public static int softDeleteTableByGidList(Connection connection, List<String> gidList) throws SQLException {
-        return softDeleteTableByGidList(connection, DEFAULT_BEAN, gidList);
+    public static int softDeleteTableByGidList(List<String> gidList) throws SQLException {
+        return softDeleteTableByGidList(DEFAULT_BEAN, gidList);
     }
 
-    public static int deleteTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
-        return deleteTableByIdList(connection, DEFAULT_BEAN, idList);
+    public static int deleteTableByIdList(List<Integer> idList) throws SQLException {
+        return deleteTableByIdList(DEFAULT_BEAN, idList);
     }
 
-    public static int deleteTableByGidList(Connection connection, List<String> gidList) throws SQLException {
-        return deleteTableByGidList(connection, DEFAULT_BEAN, gidList);
+    public static int deleteTableByGidList(List<String> gidList) throws SQLException {
+        return deleteTableByGidList(DEFAULT_BEAN, gidList);
     }
 
-    public static List<Test> selectTableByIdList(Connection connection, List<Integer> idList) throws SQLException {
-        return selectTableByIdList(connection, DEFAULT_BEAN, idList);
+    public static List<Test> selectTableByIdList(List<Integer> idList) throws SQLException {
+        return selectTableByIdList(DEFAULT_BEAN, idList);
     }
 
-    public static List<Test> selectTableByGidList(Connection connection, List<String> gidList) throws SQLException {
-        return selectTableByGidList(connection, DEFAULT_BEAN, gidList);
+    public static List<Test> selectTableByGidList(List<String> gidList) throws SQLException {
+        return selectTableByGidList(DEFAULT_BEAN, gidList);
     }
 
-    public static List<Test> selectAllTable(Connection connection) throws SQLException {
-        return selectAllTable(connection, DEFAULT_BEAN);
+    public static List<Test> selectAllTable() throws SQLException {
+        return selectAllTable(DEFAULT_BEAN);
     }
 
     @SuppressWarnings("unchecked")
-    public static PageBean<Test> selectTableForCustomPage(Connection connection, TestVO bean) throws Exception {
+    public static PageBean<Test> selectTableForCustomPage(TestVO bean) throws Exception {
         List<Object> countParamList = new ArrayList<Object>();
         List<Object> paramList = new ArrayList<Object>();
         String countSql = setSearchCondition(bean, countParamList, true);
         String sql = setSearchCondition(bean, paramList, false);
         PageParamBean pageParamBean = new PageParamBean()
-                .setConnection(connection)
                 .setBean(bean)
                 .setCountSql(countSql)
                 .setCountParamList(countParamList)
@@ -108,43 +106,43 @@ public class TestDao extends BaseDao {
         return sql.toString();
     }
 
-    public static String selectTestNameById(Connection connection, Integer id) throws SQLException {
+    public static String selectTestNameById(Integer id) throws SQLException {
         String sql = "SELECT test_name FROM test WHERE id = ?";
-        return executeSelectReturnString(connection, sql, List.of(id));
+        return executeSelectReturnString(sql, List.of(id));
     }
 
-    public static Integer selectCreateTimeById(Connection connection, Integer id) throws SQLException {
+    public static Integer selectCreateTimeById(Integer id) throws SQLException {
         String sql = "SELECT create_time FROM test WHERE id = ?";
-        return executeSelectReturnInteger(connection, sql, List.of(id));
+        return executeSelectReturnInteger(sql, List.of(id));
     }
 
-    public static Long selectUpdateTimeById(Connection connection, Integer id) throws SQLException {
+    public static Long selectUpdateTimeById(Integer id) throws SQLException {
         String sql = "SELECT update_time FROM test WHERE id = ?";
-        return executeSelectReturnLong(connection, sql, List.of(id));
+        return executeSelectReturnLong(sql, List.of(id));
     }
 
-    public static BigDecimal selectMoneyById(Connection connection, Integer id) throws SQLException {
+    public static BigDecimal selectMoneyById(Integer id) throws SQLException {
         String sql = "SELECT money FROM test WHERE id = ?";
-        return executeSelectReturnBigDecimal(connection, sql, List.of(id));
+        return executeSelectReturnBigDecimal(sql, List.of(id));
     }
 
-    public static List<String> selectTestNameByIdList(Connection connection, List<Integer> idList) throws SQLException {
+    public static List<String> selectTestNameByIdList(List<Integer> idList) throws SQLException {
         String sql = "SELECT test_name FROM test WHERE id" + makeInStr(idList);
-        return executeSelectReturnStringList(connection, sql, idList);
+        return executeSelectReturnStringList(sql, idList);
     }
 
-    public static List<Integer> selectCreateTimeByIdList(Connection connection, List<Integer> idList) throws SQLException {
+    public static List<Integer> selectCreateTimeByIdList(List<Integer> idList) throws SQLException {
         String sql = "SELECT create_time FROM test WHERE id" + makeInStr(idList);
-        return executeSelectReturnIntegerList(connection, sql, idList);
+        return executeSelectReturnIntegerList(sql, idList);
     }
 
-    public static List<Long> selectUpdateTimeByIdList(Connection connection, List<Integer> idList) throws SQLException {
+    public static List<Long> selectUpdateTimeByIdList(List<Integer> idList) throws SQLException {
         String sql = "SELECT update_time FROM test WHERE id" + makeInStr(idList);
-        return executeSelectReturnLongList(connection, sql, idList);
+        return executeSelectReturnLongList(sql, idList);
     }
 
-    public static List<BigDecimal> selectMoneyByIdList(Connection connection, List<Integer> idList) throws SQLException {
+    public static List<BigDecimal> selectMoneyByIdList(List<Integer> idList) throws SQLException {
         String sql = "SELECT money FROM test WHERE id" + makeInStr(idList);
-        return executeSelectReturnBigDecimalList(connection, sql, idList);
+        return executeSelectReturnBigDecimalList(sql, idList);
     }
 }

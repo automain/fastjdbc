@@ -23,7 +23,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -43,20 +42,19 @@ public class BaseTestThread implements Runnable, ServiceContainer {
         }
     }
 
-    protected void test(Connection connection) throws Exception {
+    protected void test() throws Exception {
     }
 
     @Override
     public void run() {
-        Connection connection = null;
         try {
-            connection = ConnectionPool.getConnection(null);
-            test(connection);
+            ConnectionPool.getConnection(null);
+            test();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                ConnectionPool.close(connection);
+                ConnectionPool.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

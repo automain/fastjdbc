@@ -51,52 +51,49 @@ public class BaseDao {
     /**
      * Insert the not null properties of bean.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean to insert
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean to insert
+     * @param <T>  {@link BaseBean} type class
      * @return count of insert rows
      * @throws SQLException exception when insert failed
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public static <T extends BaseBean> int insertIntoTable(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int insertIntoTable(T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
-        return executeUpdate(connection, sql, paramList);
+        return executeUpdate(sql, paramList);
     }
 
     /**
      * Insert the not null properties of bean and return the generated primary key.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean to insert
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean to insert
+     * @param <T>  {@link BaseBean} type class
      * @return generated primary key
      * @throws SQLException exception when insert failed
      * @see BaseBean#columnMap(boolean)
      * @since 1.0
      */
-    public static <T extends BaseBean> Integer insertIntoTableReturnId(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> Integer insertIntoTableReturnId(T bean) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getInsertSql(bean, paramList);
-        return executeUpdateReturnId(connection, sql, paramList);
+        return executeUpdateReturnId(sql, paramList);
     }
 
     /**
      * Batch insert the properties of bean list.
      *
-     * @param connection {@link Connection} object
-     * @param list       list of bean to insert
-     * @param <T>        {@link BaseBean} type class
+     * @param list list of bean to insert
+     * @param <T>  {@link BaseBean} type class
      * @return count of insert rows
      * @throws SQLException exception when insert failed
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
-    public static <T extends BaseBean> int batchInsertIntoTable(Connection connection, List<T> list) throws SQLException {
+    public static <T extends BaseBean> int batchInsertIntoTable(List<T> list) throws SQLException {
         List<Object> paramList = new ArrayList<Object>();
         String sql = getBatchInsertSql(list, paramList);
-        return executeUpdate(connection, sql, paramList);
+        return executeUpdate(sql, paramList);
     }
 
     /**
@@ -104,100 +101,95 @@ public class BaseDao {
      * property should not null otherwise nothing will be updated, the primary column
      * should be named by id and int type in mysql.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean to update
-     * @param all        true to update all column of bean, false to update not null column of bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean to update
+     * @param all  true to update all column of bean, false to update not null column of bean
+     * @param <T>  {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTableById(Connection connection, T bean, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableById(T bean, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         Object id = columnMap.get("id");
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + 1);
         String columnParamSql = makeColumnParamSql(columnMap, paramList, ", ");
         paramList.add(id);
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE id = ?", paramList);
+        return executeUpdate("UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE id = ?", paramList);
     }
 
     /**
      * Update the properties of bean by the gid of bean, the column named gid
      * should be exists and should not null otherwise nothing will be updated.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean to update
-     * @param all        true to update all column of bean, false to update not null column of bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean to update
+     * @param all  true to update all column of bean, false to update not null column of bean
+     * @param <T>  {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
      * @since 2.1
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTableByGid(Connection connection, T bean, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableByGid(T bean, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + 1);
         String columnParamSql = makeColumnParamSql(columnMap, paramList, ", ");
         paramList.add(columnMap.get("gid"));
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE gid = ?", paramList);
+        return executeUpdate("UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE gid = ?", paramList);
     }
 
     /**
      * Update the properties of bean by the given id list, the primary column
      * should be named by id and int type in mysql.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean to update
-     * @param idList     a list id of the beans which will be updated
-     * @param all        true to update all column of bean, false to update not null column of bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean   bean to update
+     * @param idList a list id of the beans which will be updated
+     * @param all    true to update all column of bean, false to update not null column of bean
+     * @param <T>    {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTableByIdList(Connection connection, T bean, List<Integer> idList, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableByIdList(T bean, List<Integer> idList, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + idList.size());
         String columnParamSql = makeColumnParamSql(columnMap, paramList, ", ");
         paramList.addAll(idList);
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE id" + makeInStr(idList), paramList);
+        return executeUpdate("UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE id" + makeInStr(idList), paramList);
     }
 
     /**
      * Update the properties of bean by the given gid list.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean to update
-     * @param gidList    a list gid of the beans which will be updated
-     * @param all        true to update all column of bean, false to update not null column of bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean    bean to update
+     * @param gidList a list gid of the beans which will be updated
+     * @param all     true to update all column of bean, false to update not null column of bean
+     * @param <T>     {@link BaseBean} type class
      * @return count of updated rows
      * @throws SQLException exception when update failed
      * @see BaseBean#columnMap(boolean)
      * @since 2.1
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTableByGidList(Connection connection, T bean, List<String> gidList, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTableByGidList(T bean, List<String> gidList, boolean all) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(all);
         columnMap.remove("id");
         List<Object> paramList = new ArrayList<Object>(columnMap.size() + gidList.size());
         String columnParamSql = makeColumnParamSql(columnMap, paramList, ", ");
         paramList.addAll(gidList);
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE gid" + makeInStr(gidList), paramList);
+        return executeUpdate("UPDATE " + bean.tableName() + " SET " + columnParamSql + " WHERE gid" + makeInStr(gidList), paramList);
     }
 
     /**
      * Update the properties of bean by the query result of param bean.
      *
-     * @param connection         {@link Connection} object
      * @param paramBean          param bean to query the rows to update by the not null columns
      * @param newBean            bean to update
      * @param insertWhenNotExist whether or not to insert when the query returns nothing
@@ -210,7 +202,7 @@ public class BaseDao {
      * @since 1.4
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int updateTable(Connection connection, T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
+    public static <T extends BaseBean> int updateTable(T paramBean, T newBean, boolean insertWhenNotExist, boolean updateMulti, boolean all) throws SQLException {
         String tableName = paramBean.tableName();
         Map<String, Object> newColumnMap = newBean.columnMap(all);
         newColumnMap.remove("id");
@@ -225,9 +217,9 @@ public class BaseDao {
         if (insertWhenNotExist) {
             ResultSet rs = null;
             try {
-                rs = executeSelectReturnResultSet(connection, "SELECT 1 FROM " + tableName + paramBuilder.toString() + " LIMIT 1", paramList);
+                rs = executeSelectReturnResultSet("SELECT 1 FROM " + tableName + paramBuilder.toString() + " LIMIT 1", paramList);
                 if (!rs.next()) {
-                    return insertIntoTable(connection, newBean);
+                    return insertIntoTable(newBean);
                 }
             } finally {
                 ConnectionPool.close(rs);
@@ -240,7 +232,7 @@ public class BaseDao {
         if (paramList != null) {
             newList.addAll(paramList);
         }
-        return executeUpdate(connection, updateBuilder.toString(), newList);
+        return executeUpdate(updateBuilder.toString(), newList);
     }
 
     /**
@@ -249,15 +241,14 @@ public class BaseDao {
      * {@code 1} represent the row is valid,
      * {@code 0} represent the row is invalid.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public static <T extends BaseBean> int softDeleteTableById(Connection connection, T bean) throws SQLException {
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id = ?", List.of(bean.columnMap(false).get("id")));
+    public static <T extends BaseBean> int softDeleteTableById(T bean) throws SQLException {
+        return executeUpdate("UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id = ?", List.of(bean.columnMap(false).get("id")));
     }
 
     /**
@@ -266,15 +257,14 @@ public class BaseDao {
      * {@code 1} represent the row is valid,
      * {@code 0} represent the row is invalid.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 2.1
      */
-    public static <T extends BaseBean> int softDeleteTableByGid(Connection connection, T bean) throws SQLException {
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE gid = ?", List.of(bean.columnMap(false).get("gid")));
+    public static <T extends BaseBean> int softDeleteTableByGid(T bean) throws SQLException {
+        return executeUpdate("UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE gid = ?", List.of(bean.columnMap(false).get("gid")));
     }
 
     /**
@@ -283,16 +273,15 @@ public class BaseDao {
      * {@code 1} represent the row is valid,
      * {@code 0} represent the row is invalid.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param idList     a list id of the beans which will be soft deleted
-     * @param <T>        {@link BaseBean} type class
+     * @param bean   bean object
+     * @param idList a list id of the beans which will be soft deleted
+     * @param <T>    {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 1.0
      */
-    public static <T extends BaseBean> int softDeleteTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id" + makeInStr(idList), idList);
+    public static <T extends BaseBean> int softDeleteTableByIdList(T bean, List<Integer> idList) throws SQLException {
+        return executeUpdate("UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE id" + makeInStr(idList), idList);
     }
 
     /**
@@ -301,95 +290,89 @@ public class BaseDao {
      * {@code 1} represent the row is valid,
      * {@code 0} represent the row is invalid.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param gidList    a list gid of the beans which will be soft deleted
-     * @param <T>        {@link BaseBean} type class
+     * @param bean    bean object
+     * @param gidList a list gid of the beans which will be soft deleted
+     * @param <T>     {@link BaseBean} type class
      * @return count of soft deleted rows
      * @throws SQLException exception when soft delete
      * @since 2.1
      */
-    public static <T extends BaseBean> int softDeleteTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
-        return executeUpdate(connection, "UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE gid" + makeInStr(gidList), gidList);
+    public static <T extends BaseBean> int softDeleteTableByGidList(T bean, List<String> gidList) throws SQLException {
+        return executeUpdate("UPDATE " + bean.tableName() + " SET is_valid = 0 WHERE gid" + makeInStr(gidList), gidList);
     }
 
     /**
      * Delete a bean by the given id.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public static <T extends BaseBean> int deleteTableById(Connection connection, T bean) throws SQLException {
-        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")));
+    public static <T extends BaseBean> int deleteTableById(T bean) throws SQLException {
+        return executeUpdate("DELETE FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")));
     }
 
     /**
      * Delete a bean by the given gid.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 2.1
      */
-    public static <T extends BaseBean> int deleteTableByGid(Connection connection, T bean) throws SQLException {
-        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE gid = ?", List.of(bean.columnMap(false).get("gid")));
+    public static <T extends BaseBean> int deleteTableByGid(T bean) throws SQLException {
+        return executeUpdate("DELETE FROM " + bean.tableName() + " WHERE gid = ?", List.of(bean.columnMap(false).get("gid")));
     }
 
     /**
      * Delete a bean by the given id list.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param idList     a list id of the beans which will be deleted
-     * @param <T>        {@link BaseBean} type class
+     * @param bean   bean object
+     * @param idList a list id of the beans which will be deleted
+     * @param <T>    {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 1.3
      */
-    public static <T extends BaseBean> int deleteTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
-        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList);
+    public static <T extends BaseBean> int deleteTableByIdList(T bean, List<Integer> idList) throws SQLException {
+        return executeUpdate("DELETE FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList);
     }
 
     /**
      * Delete a bean by the given gid list.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param gidList    a list gid of the beans which will be deleted
-     * @param <T>        {@link BaseBean} type class
+     * @param bean    bean object
+     * @param gidList a list gid of the beans which will be deleted
+     * @param <T>     {@link BaseBean} type class
      * @return count of deleted rows
      * @throws SQLException exception when delete
      * @since 2.1
      */
-    public static <T extends BaseBean> int deleteTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
-        return executeUpdate(connection, "DELETE FROM " + bean.tableName() + " WHERE gid" + makeInStr(gidList), gidList);
+    public static <T extends BaseBean> int deleteTableByGidList(T bean, List<String> gidList) throws SQLException {
+        return executeUpdate("DELETE FROM " + bean.tableName() + " WHERE gid" + makeInStr(gidList), gidList);
     }
 
     /**
      * Count the columns by the param bean.
      *
-     * @param connection {@link Connection} object
-     * @param bean       the param bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean the param bean
+     * @param <T>  {@link BaseBean} type class
      * @return amount of rows which match the param bean
      * @throws SQLException exception when query
      * @since 1.7
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> int countTableByBean(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> int countTableByBean(T bean) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(false);
         int size = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
         String sql = makeSelectTableSql(bean, columnMap, paramList, true);
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -402,136 +385,127 @@ public class BaseDao {
     /**
      * Query a bean by the given id.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public static <T extends BaseBean> T selectTableById(Connection connection, T bean) throws SQLException {
-        return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")), bean);
+    public static <T extends BaseBean> T selectTableById(T bean) throws SQLException {
+        return executeSelectReturnBean("SELECT * FROM " + bean.tableName() + " WHERE id = ?", List.of(bean.columnMap(false).get("id")), bean);
     }
 
     /**
      * Query a bean by the given gid.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return the bean of query result
      * @throws SQLException exception when query
      * @since 2.1
      */
-    public static <T extends BaseBean> T selectTableByGid(Connection connection, T bean) throws SQLException {
-        return executeSelectReturnBean(connection, "SELECT * FROM " + bean.tableName() + " WHERE gid = ?", List.of(bean.columnMap(false).get("gid")), bean);
+    public static <T extends BaseBean> T selectTableByGid(T bean) throws SQLException {
+        return executeSelectReturnBean("SELECT * FROM " + bean.tableName() + " WHERE gid = ?", List.of(bean.columnMap(false).get("gid")), bean);
     }
 
     /**
      * Query a bean by the given id list.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param idList     a list id of the beans to query
-     * @param <T>        {@link BaseBean} type class
+     * @param bean   bean object
+     * @param idList a list id of the beans to query
+     * @param <T>    {@link BaseBean} type class
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public static <T extends BaseBean> List<T> selectTableByIdList(Connection connection, T bean, List<Integer> idList) throws SQLException {
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList, bean);
+    public static <T extends BaseBean> List<T> selectTableByIdList(T bean, List<Integer> idList) throws SQLException {
+        return executeSelectReturnList("SELECT * FROM " + bean.tableName() + " WHERE id" + makeInStr(idList), idList, bean);
     }
 
     /**
      * Query a bean by the given gid list.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param gidList    a list gid of the beans to query
-     * @param <T>        {@link BaseBean} type class
+     * @param bean    bean object
+     * @param gidList a list gid of the beans to query
+     * @param <T>     {@link BaseBean} type class
      * @return the bean list of query result
      * @throws SQLException exception when query
      * @since 2.1
      */
-    public static <T extends BaseBean> List<T> selectTableByGidList(Connection connection, T bean, List<String> gidList) throws SQLException {
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName() + " WHERE gid" + makeInStr(gidList), gidList, bean);
+    public static <T extends BaseBean> List<T> selectTableByGidList(T bean, List<String> gidList) throws SQLException {
+        return executeSelectReturnList("SELECT * FROM " + bean.tableName() + " WHERE gid" + makeInStr(gidList), gidList, bean);
     }
 
     /**
      * Query a bean by the param bean, match all the not null properties equals.
      * When multi rows match the condition, return the first one.
      *
-     * @param connection {@link Connection} object
-     * @param bean       the param bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean the param bean
+     * @param <T>  {@link BaseBean} type class
      * @return the first of query results
      * @throws SQLException exception when query
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> T selectOneTableByBean(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> T selectOneTableByBean(T bean) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(false);
         int size = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
         String sql = makeSelectTableSql(bean, columnMap, paramList, false) + " LIMIT 1";
-        return executeSelectReturnBean(connection, sql, paramList, bean);
+        return executeSelectReturnBean(sql, paramList, bean);
     }
 
     /**
      * Query list of beans by the param bean, match all the not null properties equals.
      *
-     * @param connection {@link Connection} object
-     * @param bean       the param bean
-     * @param <T>        {@link BaseBean} type class
+     * @param bean the param bean
+     * @param <T>  {@link BaseBean} type class
      * @return all query results
      * @throws SQLException exception when query
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> List<T> selectTableByBean(Connection connection, T bean) throws SQLException {
+    public static <T extends BaseBean> List<T> selectTableByBean(T bean) throws SQLException {
         Map<String, Object> columnMap = bean.columnMap(false);
         int size = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(size > 0 ? size : 1);
         String sql = makeSelectTableSql(bean, columnMap, paramList, false);
-        return executeSelectReturnList(connection, sql, paramList, bean);
+        return executeSelectReturnList(sql, paramList, bean);
     }
 
     /**
      * Query all rows.
      *
-     * @param connection {@link Connection} object
-     * @param bean       bean object
-     * @param <T>        {@link BaseBean} type class
+     * @param bean bean object
+     * @param <T>  {@link BaseBean} type class
      * @return all rows
      * @throws SQLException exception when query
      * @since 1.0
      */
-    public static <T extends BaseBean> List<T> selectAllTable(Connection connection, T bean) throws SQLException {
-        return executeSelectReturnList(connection, "SELECT * FROM " + bean.tableName(), null, bean);
+    public static <T extends BaseBean> List<T> selectAllTable(T bean) throws SQLException {
+        return executeSelectReturnList("SELECT * FROM " + bean.tableName(), null, bean);
     }
 
     /**
      * Query list of beans by the param bean for page, match all the not null properties equals.
      *
-     * @param connection {@link Connection} object
-     * @param bean       the param bean
-     * @param page       page number
-     * @param size       the count of data displayed on each page
-     * @param <T>        {@link BaseBean} type class
+     * @param bean the param bean
+     * @param page page number
+     * @param size the count of data displayed on each page
+     * @param <T>  {@link BaseBean} type class
      * @return {@link PageBean} object
      * @throws Exception exception when query
      * @see PageBean
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseBean> PageBean<T> selectTableForPage(Connection connection, T bean, int page, int size) throws Exception {
+    public static <T extends BaseBean> PageBean<T> selectTableForPage(T bean, int page, int size) throws Exception {
         Map<String, Object> columnMap = bean.columnMap(false);
         int columnSize = columnMap.size();
         List<Object> paramList = new ArrayList<Object>(columnSize > 0 ? columnSize : 1);
         String sql = makeSelectTableSql(bean, columnMap, paramList, false);
         String countSql = "SELECT COUNT(1)" + sql.substring(8);
         PageParamBean pageParamBean = new PageParamBean()
-                .setConnection(connection)
                 .setBean(bean)
                 .setCountSql(countSql)
                 .setCountParamList(paramList)
@@ -557,14 +531,13 @@ public class BaseDao {
         T bean = pageParamBean.getBean();
         int size = Math.max(1, pageParamBean.getSize());
         int page = Math.max(1, pageParamBean.getPage());
-        Connection connection = pageParamBean.getConnection();
         List<Object> paramList = pageParamBean.getParamList();
         ResultSet countResult = null;
         ResultSet pageResult = null;
         List<T> data = new ArrayList<T>();
         try {
             int total = 0;
-            countResult = executeSelectReturnResultSet(connection, pageParamBean.getCountSql(), pageParamBean.getCountParamList());
+            countResult = executeSelectReturnResultSet(pageParamBean.getCountSql(), pageParamBean.getCountParamList());
             if (countResult.next()) {
                 total = countResult.getInt(1);
             }
@@ -579,7 +552,7 @@ public class BaseDao {
                 }
                 paramList.add((page - 1) * size);
                 paramList.add(size);
-                pageResult = executeSelectReturnResultSet(connection, pageParamBean.getSql() + " LIMIT ?, ?", paramList);
+                pageResult = executeSelectReturnResultSet(pageParamBean.getSql() + " LIMIT ?, ?", paramList);
                 while (pageResult.next()) {
                     data.add((T) bean.beanFromResultSet(pageResult));
                 }
@@ -724,14 +697,14 @@ public class BaseDao {
     /**
      * Execute update type sql.
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return success rows count
      * @throws SQLException exception when execute sql
      * @since 1.0
      */
-    protected static int executeUpdate(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static int executeUpdate(String sql, List<?> paramList) throws SQLException {
+        Connection connection = ConnectionPool.CONNECTION_POOL.get();
         if (connection == null || connection.isClosed() || connection.isReadOnly()) {
             throw new RuntimeException("connection object must not null and not closed and not read only");
         }
@@ -748,15 +721,15 @@ public class BaseDao {
     /**
      * Execute update type sql, only for insert sql and return id.
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return success rows count
      * @throws SQLException exception when execute sql
-     * @see BaseDao#insertIntoTableReturnId(Connection, BaseBean)
+     * @see BaseDao#insertIntoTableReturnId(BaseBean)
      * @since 1.0
      */
-    protected static Integer executeUpdateReturnId(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static Integer executeUpdateReturnId(String sql, List<?> paramList) throws SQLException {
+        Connection connection = ConnectionPool.CONNECTION_POOL.get();
         if (connection == null || connection.isClosed() || connection.isReadOnly()) {
             throw new RuntimeException("connection object must not null and not closed and not read only");
         }
@@ -776,20 +749,19 @@ public class BaseDao {
     /**
      * Execute a select sql and return a child bean of {@link BaseBean}.
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
-     * @param bean       bean object which type is same as the return one
-     * @param <T>        {@link BaseBean} type class
+     * @param sql       sql to execute
+     * @param paramList param list
+     * @param bean      bean object which type is same as the return one
+     * @param <T>       {@link BaseBean} type class
      * @return child bean object of {@link BaseBean}
      * @throws SQLException exception when execute sql
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseBean> T executeSelectReturnBean(Connection connection, String sql, List<?> paramList, T bean) throws SQLException {
+    protected static <T extends BaseBean> T executeSelectReturnBean(String sql, List<?> paramList, T bean) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             return rs.next() ? (T) bean.beanFromResultSet(rs) : null;
         } finally {
             ConnectionPool.close(rs);
@@ -799,17 +771,16 @@ public class BaseDao {
     /**
      * Execute a select sql and return a String type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return {@link String} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static String executeSelectReturnString(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static String executeSelectReturnString(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             return rs.next() ? rs.getString(1) : null;
         } finally {
             ConnectionPool.close(rs);
@@ -819,17 +790,16 @@ public class BaseDao {
     /**
      * Execute a select sql and return a Integer type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return {@link Integer} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static Integer executeSelectReturnInteger(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static Integer executeSelectReturnInteger(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             return rs.next() ? rs.getInt(1) : null;
         } finally {
             ConnectionPool.close(rs);
@@ -839,17 +809,16 @@ public class BaseDao {
     /**
      * Execute a select sql and return a Long type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return {@link Long} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static Long executeSelectReturnLong(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static Long executeSelectReturnLong(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             return rs.next() ? rs.getLong(1) : null;
         } finally {
             ConnectionPool.close(rs);
@@ -859,17 +828,16 @@ public class BaseDao {
     /**
      * Execute a select sql and return a BigDecimal type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return {@link BigDecimal} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static BigDecimal executeSelectReturnBigDecimal(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static BigDecimal executeSelectReturnBigDecimal(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             return rs.next() ? rs.getBigDecimal(1) : null;
         } finally {
             ConnectionPool.close(rs);
@@ -879,20 +847,19 @@ public class BaseDao {
     /**
      * Execute a select sql and return a child bean list of {@link BaseBean}.
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
-     * @param bean       bean object which type is same as the return one
-     * @param <T>        {@link BaseBean} type class
+     * @param sql       sql to execute
+     * @param paramList param list
+     * @param bean      bean object which type is same as the return one
+     * @param <T>       {@link BaseBean} type class
      * @return list of child bean object of {@link BaseBean}
      * @throws SQLException exception when execute sql
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseBean> List<T> executeSelectReturnList(Connection connection, String sql, List<?> paramList, T bean) throws SQLException {
+    protected static <T extends BaseBean> List<T> executeSelectReturnList(String sql, List<?> paramList, T bean) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             List<T> resultList = new ArrayList<T>();
             while (rs.next()) {
                 resultList.add((T) bean.beanFromResultSet(rs));
@@ -906,18 +873,17 @@ public class BaseDao {
     /**
      * Execute a select sql and return a list of String type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return a list of {@link String} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static List<String> executeSelectReturnStringList(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static List<String> executeSelectReturnStringList(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
             List<String> result = new ArrayList<String>();
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             while (rs.next()) {
                 result.add(rs.getString(1));
             }
@@ -930,18 +896,17 @@ public class BaseDao {
     /**
      * Execute a select sql and return a list of Integer type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return a list of {@link Integer} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static List<Integer> executeSelectReturnIntegerList(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static List<Integer> executeSelectReturnIntegerList(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
             List<Integer> result = new ArrayList<Integer>();
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             while (rs.next()) {
                 result.add(rs.getInt(1));
             }
@@ -954,18 +919,17 @@ public class BaseDao {
     /**
      * Execute a select sql and return a list of Long type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return a list of {@link Long} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static List<Long> executeSelectReturnLongList(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static List<Long> executeSelectReturnLongList(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
             List<Long> result = new ArrayList<Long>();
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             while (rs.next()) {
                 result.add(rs.getLong(1));
             }
@@ -978,18 +942,17 @@ public class BaseDao {
     /**
      * Execute a select sql and return a list of BigDecimal type result
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return a list of {@link BigDecimal} type result
      * @throws SQLException exception when execute sql
      * @since 2.5
      */
-    protected static List<BigDecimal> executeSelectReturnBigDecimalList(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static List<BigDecimal> executeSelectReturnBigDecimalList(String sql, List<?> paramList) throws SQLException {
         ResultSet rs = null;
         try {
             List<BigDecimal> result = new ArrayList<BigDecimal>();
-            rs = executeSelectReturnResultSet(connection, sql, paramList);
+            rs = executeSelectReturnResultSet(sql, paramList);
             while (rs.next()) {
                 result.add(rs.getBigDecimal(1));
             }
@@ -1004,14 +967,14 @@ public class BaseDao {
      * <p>Note: When the existing methods do not meet the requirements, you can call this for customer select sql,
      * just as important, you must call {@link ConnectionPool#close(ResultSet)} to close the {@link ResultSet} object at last.</p>
      *
-     * @param connection {@link Connection} object
-     * @param sql        sql to execute
-     * @param paramList  param list
+     * @param sql       sql to execute
+     * @param paramList param list
      * @return {@link ResultSet} object
      * @throws SQLException exception when execute sql
      * @since 1.0
      */
-    protected static ResultSet executeSelectReturnResultSet(Connection connection, String sql, List<?> paramList) throws SQLException {
+    protected static ResultSet executeSelectReturnResultSet(String sql, List<?> paramList) throws SQLException {
+        Connection connection = ConnectionPool.CONNECTION_POOL.get();
         if (connection == null || connection.isClosed()) {
             throw new RuntimeException("connection object must not null and not closed");
         }

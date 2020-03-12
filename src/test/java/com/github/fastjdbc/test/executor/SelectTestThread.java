@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -36,80 +35,80 @@ public class SelectTestThread extends BaseTestThread {
     private static final Logger LOGGER = LoggerFactory.getLogger(SelectTestThread.class);
 
     @Override
-    protected void test(Connection connection) throws Exception {
-        selectById(connection);
-        selectByGid(connection);
-        selectByIdList(connection);
-        selectByGidList(connection);
-        selectOneByBean(connection);
-        selectByBean(connection);
-        selectAll(connection);
-        selectForPage(connection);
-        selectForCustomerPage(connection);
-        countByBean(connection);
-        executeSelectReturnString(connection);
-        executeSelectReturnInteger(connection);
-        executeSelectReturnLong(connection);
-        executeSelectReturnBigDecimal(connection);
-        executeSelectReturnStringList(connection);
-        executeSelectReturnIntegerList(connection);
-        executeSelectReturnLongList(connection);
-        executeSelectReturnBigDecimalList(connection);
+    protected void test() throws Exception {
+        selectById();
+        selectByGid();
+        selectByIdList();
+        selectByGidList();
+        selectOneByBean();
+        selectByBean();
+        selectAll();
+        selectForPage();
+        selectForCustomerPage();
+        countByBean();
+        executeSelectReturnString();
+        executeSelectReturnInteger();
+        executeSelectReturnLong();
+        executeSelectReturnBigDecimal();
+        executeSelectReturnStringList();
+        executeSelectReturnIntegerList();
+        executeSelectReturnLongList();
+        executeSelectReturnBigDecimalList();
     }
 
-    private void selectById(Connection connection) throws Exception {
-        Test test = TestDao.selectTableById(connection, new Test().setId(1));
+    private void selectById() throws Exception {
+        Test test = TestDao.selectTableById(new Test().setId(1));
         LOGGER.info("Select by id test = {}", test);
     }
 
-    private void selectByGid(Connection connection) throws Exception {
-        Test test = TestDao.selectTableById(connection, new Test().setId(2));
-        Test testByGid = TestDao.selectTableByGid(connection, new Test().setGid(test.getGid()));
+    private void selectByGid() throws Exception {
+        Test test = TestDao.selectTableById(new Test().setId(2));
+        Test testByGid = TestDao.selectTableByGid(new Test().setGid(test.getGid()));
         LOGGER.info("Select by gid test = {}", testByGid);
     }
 
-    private void selectByIdList(Connection connection) throws Exception {
-        List<Test> testList = TestDao.selectTableByIdList(connection, List.of(3, 4));
+    private void selectByIdList() throws Exception {
+        List<Test> testList = TestDao.selectTableByIdList(List.of(3, 4));
         LOGGER.info("Select by id List test list = {}", testList);
     }
 
-    private void selectByGidList(Connection connection) throws Exception {
-        List<Test> testList = TestDao.selectTableByIdList(connection, List.of(5, 6));
+    private void selectByGidList() throws Exception {
+        List<Test> testList = TestDao.selectTableByIdList(List.of(5, 6));
         List<String> gidList = new ArrayList<String>(2);
         for (Test test : testList) {
             gidList.add(test.getGid());
         }
-        List<Test> testByGidList = TestDao.selectTableByGidList(connection, gidList);
+        List<Test> testByGidList = TestDao.selectTableByGidList(gidList);
         LOGGER.info("Select by gid List test list = {}", testByGidList);
     }
 
-    private void selectOneByBean(Connection connection) throws Exception {
+    private void selectOneByBean() throws Exception {
         Test bean = new Test();
         bean.setIsValid(1);
-        Test test = TestDao.selectOneTableByBean(connection, bean);
+        Test test = TestDao.selectOneTableByBean(bean);
         LOGGER.info("Select one by bean test = {}", test);
     }
 
-    private void selectByBean(Connection connection) throws Exception {
+    private void selectByBean() throws Exception {
         Test bean = new Test();
         bean.setIsValid(1);
-        List<Test> testList = TestDao.selectTableByBean(connection, bean);
+        List<Test> testList = TestDao.selectTableByBean(bean);
         LOGGER.info("Select by bean test list = {}", testList);
     }
 
-    private void selectAll(Connection connection) throws Exception {
-        List<Test> testList = TestDao.selectAllTable(connection);
+    private void selectAll() throws Exception {
+        List<Test> testList = TestDao.selectAllTable();
         LOGGER.info("Select all test list = {}", testList);
     }
 
-    private void selectForPage(Connection connection) throws Exception {
+    private void selectForPage() throws Exception {
         Test bean = new Test();
         bean.setIsValid(1);
-        PageBean<Test> pageBean = TestDao.selectTableForPage(connection, bean, 1, 10);
+        PageBean<Test> pageBean = TestDao.selectTableForPage(bean, 1, 10);
         LOGGER.info("Select for page pageBean = {}", pageBean);
     }
 
-    private void selectForCustomerPage(Connection connection) throws Exception {
+    private void selectForCustomerPage() throws Exception {
         int dayStart = (int) LocalDate.now().atStartOfDay().atZone(ZoneOffset.systemDefault()).toInstant().getEpochSecond();
         int dayEnd = dayStart + 86400;
         TestVO bean = new TestVO();
@@ -120,54 +119,54 @@ public class SelectTestThread extends BaseTestThread {
         bean.setTestDictionaryList(List.of(0, 1));
         bean.setSortLabel("create_time");
         bean.setSortOrder("asc");
-        PageBean<Test> pageBean = TestDao.selectTableForCustomPage(connection, bean);
+        PageBean<Test> pageBean = TestDao.selectTableForCustomPage(bean);
         LOGGER.info("Select for customer page pageBean = {}", pageBean);
     }
 
-    private void countByBean(Connection connection) throws Exception {
+    private void countByBean() throws Exception {
         Test bean = new Test();
         bean.setIsValid(1);
-        int count = TestDao.countTableByBean(connection, bean);
+        int count = TestDao.countTableByBean(bean);
         LOGGER.info("Count by bean count = {}", count);
     }
 
-    private void executeSelectReturnString(Connection connection) throws Exception {
-        String testName = TestDao.selectTestNameById(connection, 1);
+    private void executeSelectReturnString() throws Exception {
+        String testName = TestDao.selectTestNameById(1);
         LOGGER.info("execute select return String = {}", testName);
     }
 
-    private void executeSelectReturnInteger(Connection connection) throws Exception {
-        Integer createTime = TestDao.selectCreateTimeById(connection, 1);
+    private void executeSelectReturnInteger() throws Exception {
+        Integer createTime = TestDao.selectCreateTimeById(1);
         LOGGER.info("execute select return Integer = {}", createTime);
     }
 
-    private void executeSelectReturnLong(Connection connection) throws Exception {
-        Long updateTime = TestDao.selectUpdateTimeById(connection, 1);
+    private void executeSelectReturnLong() throws Exception {
+        Long updateTime = TestDao.selectUpdateTimeById(1);
         LOGGER.info("execute select return Long = {}", updateTime);
     }
 
-    private void executeSelectReturnBigDecimal(Connection connection) throws Exception {
-        BigDecimal money = TestDao.selectMoneyById(connection, 1);
+    private void executeSelectReturnBigDecimal() throws Exception {
+        BigDecimal money = TestDao.selectMoneyById(1);
         LOGGER.info("execute select return BigDecimal = {}", money);
     }
 
-    private void executeSelectReturnStringList(Connection connection) throws Exception {
-        List<String> testNameList = TestDao.selectTestNameByIdList(connection, List.of(1,2,3,4,5));
+    private void executeSelectReturnStringList() throws Exception {
+        List<String> testNameList = TestDao.selectTestNameByIdList(List.of(1, 2, 3, 4, 5));
         LOGGER.info("execute select return String list = {}", testNameList);
     }
 
-    private void executeSelectReturnIntegerList(Connection connection) throws Exception {
-        List<Integer> createTimeList = TestDao.selectCreateTimeByIdList(connection, List.of(1,2,3,4,5));
+    private void executeSelectReturnIntegerList() throws Exception {
+        List<Integer> createTimeList = TestDao.selectCreateTimeByIdList(List.of(1, 2, 3, 4, 5));
         LOGGER.info("execute select return Integer list = {}", createTimeList);
     }
 
-    private void executeSelectReturnLongList(Connection connection) throws Exception {
-        List<Long> updateTimeList = TestDao.selectUpdateTimeByIdList(connection, List.of(1,2,3,4,5));
+    private void executeSelectReturnLongList() throws Exception {
+        List<Long> updateTimeList = TestDao.selectUpdateTimeByIdList(List.of(1, 2, 3, 4, 5));
         LOGGER.info("execute select return Long list = {}", updateTimeList);
     }
 
-    private void executeSelectReturnBigDecimalList(Connection connection) throws Exception {
-        List<BigDecimal> moneyList = TestDao.selectMoneyByIdList(connection, List.of(1,2,3,4,5));
+    private void executeSelectReturnBigDecimalList() throws Exception {
+        List<BigDecimal> moneyList = TestDao.selectMoneyByIdList(List.of(1, 2, 3, 4, 5));
         LOGGER.info("execute select return BigDecimal list = {}", moneyList);
     }
 }

@@ -52,7 +52,14 @@ public class ConnectionPool {
      *
      * @since 1.0
      */
-    private static Map<String, DataSource> POOL_MAP = new HashMap<>();
+    private static Map<String, DataSource> POOL_MAP = new HashMap<String, DataSource>();
+
+    /**
+     * A connection pool for save connection in each threads
+     *
+     * @since 2.6
+     */
+    static final ThreadLocal<Connection> CONNECTION_POOL = new ThreadLocal<Connection>();
 
     /**
      * <p>Initialization method for init global connection pool.</p>
@@ -94,37 +101,39 @@ public class ConnectionPool {
      * <p>When the slave pool name is not null, but not found in {@link #POOL_MAP}, the {@link #DEFAULT_SLAVE_POOL} will be used.</p>
      *
      * @param slavePoolName slave pool name
-     * @return an object of {@link Connection}
      * @throws SQLException exception when get connection failed
      * @since 1.0
      */
-    public static Connection getConnection(String slavePoolName) throws SQLException {
-        Connection connection = null;
-        if (slavePoolName == null) {
-            connection = MASTER_POOL.getConnection();
-            connection.setAutoCommit(false);
-            connection.setReadOnly(false);
-        } else {
-            connection = getSlaveDataSource(slavePoolName).getConnection();
-            connection.setReadOnly(true);
+    public static void getConnection(String slavePoolName) throws SQLException {
+        Connection connection = CONNECTION_POOL.get();
+        if (connection == null) {
+            if (slavePoolName == null) {
+                connection = MASTER_POOL.getConnection();
+                connection.setAutoCommit(false);
+                connection.setReadOnly(false);
+            } else {
+                connection = getSlaveDataSource(slavePoolName).getConnection();
+                connection.setReadOnly(true);
+            }
+            CONNECTION_POOL.set(connection);
         }
-        return connection;
     }
 
     /**
      * Roll back the write connection when exception occurred and close both connection without commit.
      *
-     * @param connection the connection to roll back
      * @throws SQLException exception when roll back failed
      * @since 1.0
      */
-    public static void rollback(Connection connection) throws SQLException {
+    public static void rollback() throws SQLException {
+        Connection connection = CONNECTION_POOL.get();
         if (connection != null && !connection.isReadOnly()) {
             try {
                 connection.rollback();
             } finally {
                 connection.close();
                 connection = null;
+                CONNECTION_POOL.remove();
             }
         }
     }
@@ -132,11 +141,11 @@ public class ConnectionPool {
     /**
      * Close the write connection with commit and close the read connection without commit.
      *
-     * @param connection the {@link Connection} object to close
      * @throws SQLException exception when close failed
      * @since 2.2
      */
-    public static void close(Connection connection) throws SQLException {
+    public static void close() throws SQLException {
+        Connection connection = CONNECTION_POOL.get();
         if (connection != null) {
             try {
                 if (!connection.isReadOnly()) {
@@ -145,6 +154,7 @@ public class ConnectionPool {
             } finally {
                 connection.close();
                 connection = null;
+                CONNECTION_POOL.remove();
             }
         }
     }

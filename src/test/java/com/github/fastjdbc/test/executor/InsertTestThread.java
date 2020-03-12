@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,31 +32,31 @@ public class InsertTestThread extends BaseTestThread {
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertTestThread.class);
 
     @Override
-    protected void test(Connection connection) throws Exception {
-        insertOne(connection);
-        insertOneReturnId(connection);
-        batchInsertTable(connection);
+    protected void test() throws Exception {
+        insertOne();
+        insertOneReturnId();
+        batchInsertTable();
     }
 
-    private void insertOne(Connection connection) throws Exception {
+    private void insertOne() throws Exception {
         Test test = initTest().setTestName("insertOne testName").setTestDictionary(0);
-        TestDao.insertIntoTable(connection, test);
+        TestDao.insertIntoTable(test);
     }
 
-    private void insertOneReturnId(Connection connection) throws Exception {
+    private void insertOneReturnId() throws Exception {
         Test test = initTest().setTestName("insertOneReturnId testName").setTestDictionary(1);
-        Integer id = TestDao.insertIntoTableReturnId(connection, test);
+        Integer id = TestDao.insertIntoTableReturnId(test);
         LOGGER.info("Insert one table return id = {}", id);
     }
 
-    private void batchInsertTable(Connection connection) throws Exception {
+    private void batchInsertTable() throws Exception {
         Test test = null;
         List<Test> list = new ArrayList<Test>(10);
         for (int i = 0; i < 10; i++) {
             test = initTest().setTestName("batchInsertTable" + i).setTestDictionary(2).setCreateTime((int) (System.currentTimeMillis() / 1000) + (i * 2000));
             list.add(test);
         }
-        TestDao.batchInsertIntoTable(connection, list);
+        TestDao.batchInsertIntoTable(list);
     }
 
     private Test initTest() {

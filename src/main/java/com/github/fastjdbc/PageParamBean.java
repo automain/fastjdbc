@@ -16,7 +16,6 @@
 
 package com.github.fastjdbc;
 
-import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -26,13 +25,6 @@ import java.util.List;
  * @since 1.5
  */
 public class PageParamBean<T extends BaseBean> {
-
-    /**
-     * {@link Connection} object.
-     *
-     * @since 1.5
-     */
-    private Connection connection;
 
     /**
      * Bean object witch type is same with the query result.
@@ -84,15 +76,6 @@ public class PageParamBean<T extends BaseBean> {
      * @since 1.5
      */
     private int size;
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public PageParamBean<T> setConnection(Connection connection) {
-        this.connection = connection;
-        return this;
-    }
 
     public T getBean() {
         return bean;
@@ -160,8 +143,7 @@ public class PageParamBean<T extends BaseBean> {
     @Override
     public String toString() {
         return "PageParamBean{" +
-                "connection=" + connection +
-                ", bean=" + bean +
+                "bean=" + bean +
                 ", countSql='" + countSql + '\'' +
                 ", countParamList=" + countParamList +
                 ", sql='" + sql + '\'' +
